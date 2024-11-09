@@ -55,15 +55,9 @@ public class  Book extends AbstractEntity {
 
 
     @Override
-    public void initFilterMap() {
+    public void initFilterableMap() {
         this.filterMap = new EntityFilterMap();
-        filterMap.addFilter("title", null);
-        filterMap.addFilter("author", null);
-        filterMap.addFilter("description", null);
-        filterMap.addFilter("isbn", null);
-        filterMap.addFilter("price", null);
-        filterMap.addFilter("quantity", null);
-        filterMap.addFilter("isAvailable", null);
+        this.filterMap.setFilterableKeys(List.of("title", "author", "isbn", "price", "is_available"));
 
     }
 

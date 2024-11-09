@@ -1,10 +1,8 @@
 package com.ecommerce.book_store.persistent.entity;
 
 import com.ecommerce.book_store.persistent.EntityFilterMap;
-import jakarta.annotation.PreDestroy;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -38,12 +36,7 @@ public abstract class AbstractEntity {
         this.updatedAt = LocalDateTime.now();
     }
 
-    @PreDestroy
-    public void preDestroy() {
-        this.deletedAt = LocalDateTime.now();
-    }
-
-    public abstract void initFilterMap();
+    public abstract void initFilterableMap();
     public abstract void addFilter(String key, Object value);
 
 }
