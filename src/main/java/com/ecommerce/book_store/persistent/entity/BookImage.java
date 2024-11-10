@@ -4,11 +4,11 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.awt.print.Book;
 
 @Getter
 @Setter
 @Table(name="book_images")
+@Entity
 public class BookImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -20,6 +20,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name="books")
+@Entity
 public class  Book extends AbstractEntity {
     @Column(name="title")
     private String title;
