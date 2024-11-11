@@ -6,14 +6,10 @@ import lombok.Setter;
 
 
 @Getter
-@Setter
 @Table(name="book_images")
 @Entity
-public class BookImage {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id", insertable = false, updatable = false)
-    private Long id;
+@Setter
+public class BookImage extends AbstractEntity {
     @Column(name="url")
     private String url;
     @ManyToOne
@@ -26,5 +22,10 @@ public class BookImage {
     public BookImage(String url, Book book) {
         this.url = url;
         this.book = book;
+    }
+
+    @Override
+    public void initFilterableMap() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

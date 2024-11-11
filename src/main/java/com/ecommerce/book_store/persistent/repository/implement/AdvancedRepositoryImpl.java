@@ -2,7 +2,7 @@ package com.ecommerce.book_store.persistent.repository.implement;
 
 import com.ecommerce.book_store.core.exception.RepositoryException;
 import com.ecommerce.book_store.persistent.entity.AbstractEntity;
-import com.ecommerce.book_store.persistent.repository.abstraction.IAdvancedRepository;
+import com.ecommerce.book_store.persistent.repository.abstraction.AdvancedRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -14,17 +14,24 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Map;
 
-public abstract class IAdvancedRepositoryImpl<E extends AbstractEntity> implements IAdvancedRepository<E> {
+public abstract class AdvancedRepositoryImpl<E extends AbstractEntity> implements AdvancedRepository<E> {
     private final Class<E> entityClass;
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    public IAdvancedRepositoryImpl(Class<E> entityClass) {
+    public AdvancedRepositoryImpl(Class<E> entityClass) {
         this.entityClass = entityClass;
     }
 
 
+    /**
+     * Find all entities by criteria. (Advanced search)
+     *
+     * @param criteria Map of criteria
+     * @param pageable Pageable object
+     * @return List of entities that match the criteria
+     */
     @Override
     public List<E> findAllByCriteria(Map<String, Object> criteria, Pageable pageable) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
@@ -54,6 +61,12 @@ public abstract class IAdvancedRepositoryImpl<E extends AbstractEntity> implemen
     }
 
 
+    /**
+     * Find all deleted entities. (Soft deleted entities)
+     *
+     * @param pageable Pageable object
+     * @return List of deleted entities
+     */
     @Override
     public List<E> findAllDeleted(Pageable pageable) {
         TypedQuery<E> query = entityManager.createQuery("SELECT e FROM " + entityClass.getName() + " e WHERE e.deletedAt IS NOT NULL", entityClass);
@@ -65,6 +78,13 @@ public abstract class IAdvancedRepositoryImpl<E extends AbstractEntity> implemen
         return query.setFirstResult((int) pageable.getOffset()).setMaxResults(pageable.getPageSize()).getResultList();
     }
 
+    /**
+     * Find all deleted entities by criteria. (Advanced search)
+     *
+     * @param criteria Map of criteria
+     * @param pageable Pageable object
+     * @return List of deleted entities that match the criteria
+     */
     @Override
     public List<E> findAllDeletedByCriteria(Map<String, Object> criteria, Pageable pageable) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
@@ -79,6 +99,12 @@ public abstract class IAdvancedRepositoryImpl<E extends AbstractEntity> implemen
         return entityManager.createQuery(criteriaQuery).getResultList();
     }
 
+    /**
+     * Delete entities by ids.
+     *
+     * @param ids List of ids
+     * @return Number of deleted entities
+     */
 
     @Override
     public int deleteByIds(List<Long> ids) {
@@ -91,6 +117,12 @@ public abstract class IAdvancedRepositoryImpl<E extends AbstractEntity> implemen
         }
     }
 
+    /**
+     * Soft delete entities by ids.
+     *
+     * @param ids List of ids
+     * @return Number of soft deleted entities
+     */
     @Override
     public int softDeleteByIds(List<Long> ids) {
         TypedQuery<E> query = entityManager.createQuery("UPDATE " + entityClass.getName() + " e SET e.deletedAt = CURRENT_TIMESTAMP WHERE e.id IN :ids", entityClass);
@@ -98,6 +130,13 @@ public abstract class IAdvancedRepositoryImpl<E extends AbstractEntity> implemen
         return query.executeUpdate();
     }
 
+
+    /**
+     * Restore entities by ids.
+     *
+     * @param ids List of ids
+     * @return Number of restored entities
+     */
     @Override
     public int restoreByIds(List<Long> ids) {
         TypedQuery<E> query = entityManager.createQuery("UPDATE " + entityClass.getName() + " e SET e.deletedAt = NULL WHERE e.id IN :ids", entityClass);
@@ -105,6 +144,12 @@ public abstract class IAdvancedRepositoryImpl<E extends AbstractEntity> implemen
         return query.executeUpdate();
     }
 
+    /**
+     * Soft delete entity by id.
+     *
+     * @param id Id of the entity
+     * @return True if the entity is soft deleted, otherwise false
+     */
     @Override
     public boolean softDeleteById(Long id) {
         try {

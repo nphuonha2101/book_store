@@ -4,16 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.ecommerce.book_store.persistent.EntityFilterMap;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,8 +15,8 @@ import lombok.Setter;
 public class  Book extends AbstractEntity {
     @Column(name="title")
     private String title;
-    @Column(name="author")
-    private String author;
+    @Column(name="author_name")
+    private String authorName;
     @Column(name="description")
     private String description;
     @Column(name="isbn")
@@ -38,32 +29,34 @@ public class  Book extends AbstractEntity {
     private int  quantity;
     @Column(name="is_available")
     private boolean isAvailable;
+    @Column(name = "published_at")
+    private LocalDateTime publishedAt;
+    @ManyToOne
+    @JoinColumn(name="category_id")
+    private Category category;
   
     public Book() {
     }
 
-    public Book(String title, String author, String description, String isbn, List<BookImage> images, double price, int quantity, boolean isAvailable) {
+    public Book(String title, String authorName, String description, String isbn, List<BookImage> images, double price, int quantity, boolean isAvailable, LocalDateTime publishedAt, Category category) {
         this.title = title;
-        this.author = author;
-            
+        this.authorName = authorName;
         this.description = description;
         this.isbn = isbn;
         this.images = images;
         this.price = price;
         this.quantity = quantity;
         this.isAvailable = isAvailable;
+        this.publishedAt = publishedAt;
+        this.category = category;
     }
 
 
     @Override
     public void initFilterableMap() {
         this.filterMap = new EntityFilterMap();
-        this.filterMap.setFilterableKeys(List.of("title", "author", "isbn", "price", "is_available"));
+        this.filterMap.setFilterableKeys(List.of("title", "authorName", "price", "isAvailable", "publishedAt", "category"));
 
     }
 
-    @Override
-    public void addFilter(String key, Object value) {
-        this.filterMap.addFilter(key, value);
-    }
 }

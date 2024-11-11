@@ -1,96 +1,118 @@
 package com.ecommerce.book_store.service.implement;
 
+import com.ecommerce.book_store.http.dto.request.implement.BookRequestDto;
+import com.ecommerce.book_store.http.dto.response.implement.BookResponseDto;
+import com.ecommerce.book_store.http.dto.response.implement.CategoryResponseDto;
+import com.ecommerce.book_store.persistent.entity.AbstractEntity;
 import com.ecommerce.book_store.persistent.entity.Book;
+import com.ecommerce.book_store.persistent.entity.BookImage;
+import com.ecommerce.book_store.persistent.entity.Category;
 import com.ecommerce.book_store.persistent.repository.abstraction.BookRepository;
 import com.ecommerce.book_store.persistent.repository.implement.BookAdvancedRepositoryImpl;
 import com.ecommerce.book_store.service.abstraction.BookService;
+import com.ecommerce.book_store.service.abstraction.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
 
 @Service
-public class BookServiceImpl implements BookService {
-    private final BookAdvancedRepositoryImpl bookAdvancedRepository;
-    private final BookRepository bookRepository;
+public class BookServiceImpl extends IAdvancedServiceImpl<BookRequestDto, BookResponseDto, Book> implements BookService {
+
+    private final CategoryService categoryService;
 
     @Autowired
-    public BookServiceImpl(BookAdvancedRepositoryImpl bookAdvancedRepository, BookRepository bookRepository) {
-        this.bookAdvancedRepository = bookAdvancedRepository;
-        this.bookRepository = bookRepository;
+    public BookServiceImpl(BookAdvancedRepositoryImpl bookAdvancedRepository, BookRepository bookRepository, CategoryService categoryService) {
+        super(bookRepository, bookAdvancedRepository);
+        this.categoryService = categoryService;
     }
 
     @Override
-    public Book findById(Long id) {
-        return bookRepository.findById(id).orElse(null);
+    public Book toEntity(BookRequestDto requestDto) {
+        Book result = new Book(
+                requestDto.getTitle(),
+                requestDto.getAuthorName(),
+                requestDto.getDescription(),
+                requestDto.getIsbn(),
+                null,
+                requestDto.getPrice(),
+                requestDto.getQuantity(),
+                requestDto.isAvailable(),
+                requestDto.getPublishedAt(),
+                null
+        );
+
+        Category category = categoryService.findById(requestDto.getCategoryId());
+
+        List<BookImage> bookImages = new ArrayList<>();
+        for (String imageUrl : requestDto.getImageUrls()) {
+            BookImage bookImage = new BookImage(imageUrl, result);
+            bookImages.add(bookImage);
+        }
+
+        result.setCategory(category);
+        result.setImages(bookImages);
+
+
+
+        return result;
     }
 
     @Override
-    public List<Book> findAll() {
-        return bookRepository.findAll();
+    public BookResponseDto toResponseDto(AbstractEntity entity) {
+        Book book = (Book) entity;
+
+        CategoryResponseDto categoryResponseDto = new CategoryResponseDto(
+                book.getCategory().getId(),
+                book.getCategory().getName(),
+                book.getCategory().getDescription()
+        );
+
+        return new BookResponseDto(
+                book.getId(),
+                book.getTitle(),
+                book.getAuthorName(),
+                book.getDescription(),
+                book.getIsbn(),
+                book.getImages(),
+                book.getPrice(),
+                book.getQuantity(),
+                book.isAvailable(),
+                categoryResponseDto,
+                book.getPublishedAt()
+        );
     }
 
     @Override
-    public List<Book> findAll(Sort sort) {
-        return bookRepository.findAll(sort);
+    public List<BookResponseDto> toResponseDto(List<AbstractEntity> entities) {
+        List<BookResponseDto> result = new ArrayList<>();
+        for (AbstractEntity entity : entities) {
+            result.add(toResponseDto(entity));
+        }
+        return result;
     }
 
     @Override
-    public List<Book> findAll(Pageable pageable) {
-        return bookRepository.findAll(pageable).getContent();
-    }
+    public void copyProperties(BookRequestDto requestDto, Book entity) {
+        Category category = categoryService.findById(requestDto.getCategoryId());
+        List<BookImage> bookImages = new ArrayList<>();
+        for (String imageUrl : requestDto.getImageUrls()) {
+            BookImage bookImage = new BookImage(imageUrl, entity);
+            bookImages.add(bookImage);
+        }
 
-    @Override
-    public List<Book> findAllByCriteria(Map<String, Object> criteria, Pageable pageable) {
-        return bookAdvancedRepository.findAllByCriteria(criteria, pageable);
-    }
-
-    @Override
-    public List<Book> findAllDeleted(Pageable pageable) {
-        return bookAdvancedRepository.findAllDeleted(pageable);
-    }
-
-    @Override
-    public List<Book> findAllDeletedByCriteria(Map<String, Object> criteria, Pageable pageable) {
-        return bookAdvancedRepository.findAllDeletedByCriteria(criteria, pageable);
-    }
-
-    @Override
-    public Book save(Book T) {
-        return bookRepository.save(T);
-    }
-
-    @Override
-    public Book update(Book T) {
-        return bookRepository.save(T);
-    }
-
-    @Override
-    public boolean deleteById(Long id) {
-        bookRepository.deleteById(id);
-        return true;
-    }
-
-    @Override
-    public int deleteByIds(List<Long> ids) {
-        return bookAdvancedRepository.deleteByIds(ids);
-    }
-
-    @Override
-    public boolean softDeleteById(Long id) {
-        return bookAdvancedRepository.softDeleteById(id);
-    }
-
-    @Override
-    public int softDeleteByIds(List<Long> ids) {
-        return bookAdvancedRepository.softDeleteByIds(ids);
-    }
-
-    @Override
-    public int restoreByIds(List<Long> ids) {
-        return bookAdvancedRepository.restoreByIds(ids);
+        entity.setTitle(requestDto.getTitle());
+        entity.setAuthorName(requestDto.getAuthorName());
+        entity.setDescription(requestDto.getDescription());
+        entity.setIsbn(requestDto.getIsbn());
+        entity.setPrice(requestDto.getPrice());
+        entity.setQuantity(requestDto.getQuantity());
+        entity.setAvailable(requestDto.isAvailable());
+        entity.setPublishedAt(requestDto.getPublishedAt());
+        entity.setCategory(category);
+        entity.setImages(bookImages);
     }
 }

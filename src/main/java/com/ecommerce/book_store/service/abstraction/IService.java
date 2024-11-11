@@ -1,5 +1,7 @@
 package com.ecommerce.book_store.service.abstraction;
 
+import com.ecommerce.book_store.http.dto.request.AbstractRequestDto;
+import com.ecommerce.book_store.http.dto.response.AbstractResponseDto;
 import com.ecommerce.book_store.persistent.entity.AbstractEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -8,34 +10,68 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 
-public interface IService<T extends AbstractEntity> {
+public interface IService<RQ extends AbstractRequestDto, RS extends AbstractResponseDto, E extends AbstractEntity> {
+    /**
+     * Find entity by id
+     * @param id Id of the entity
+     * @return Entity that has the id
+     */
     @Transactional(readOnly = true)
-    T findById(Long id);
+    E findById(Long id);
+
+    /**
+     * Find all entities
+     * @return List of all entities
+     */
     @Transactional(readOnly = true)
-    List<T> findAll();
+    List<E> findAll();
+
+    /**
+     * Find all entities and sort them. How to use: new Sort(Sort.Direction.ASC, "field1", "field2", ...)
+     * @param sort Sort object
+     * @return List of all entities that are sorted
+     */
     @Transactional(readOnly = true)
-    List<T> findAll(Sort sort);
+    List<E> findAll(Sort sort);
+
+    /**
+     * Find all entities and paginate them. How to use: PageRequest.of(page, size, sort)
+     * @param pageable Pageable object
+     * @return List of entities that are paginated
+     */
     @Transactional(readOnly = true)
-    List<T> findAll(Pageable pageable);
-    @Transactional(readOnly = true)
-    List<T> findAllByCriteria(Map<String, Object> criteria, Pageable pageable);
-    @Transactional(readOnly = true)
-    List<T> findAllDeleted(Pageable pageable);
-    @Transactional(readOnly = true)
-    List<T> findAllDeletedByCriteria(Map<String, Object> criteria, Pageable pageable);
+    List<E> findAll(Pageable pageable);
+
+    /**
+     * Save requestDto to database
+     * @param requestDto RequestDto object get from client
+     * @return ResponseDto object that is saved to database
+     */
     @Transactional
-    T save(T T);
+    E save(RQ requestDto);
+
+    /**
+     * Update requestDto to database
+     * @param requestDto RequestDto object get from client
+     * @param id Id of the entity to update
+     * @return ResponseDto object that is updated to database
+     */
     @Transactional
-    T update(T T);
+    E update(RQ requestDto, Long id);
+
+    /**
+     * Delete entity by id
+     * @param id Id of the entity to delete
+     * @return True if the entity is deleted, false otherwise
+     */
     @Transactional
     boolean deleteById(Long id);
-    @Transactional
-    int deleteByIds(List<Long> ids);
-    @Transactional
-    boolean softDeleteById(Long id);
-    @Transactional
-    int softDeleteByIds(List<Long> ids);
-    @Transactional
-    int restoreByIds(List<Long> ids);
+
+
+    E toEntity(RQ requestDto);
+
+    RS toResponseDto(AbstractEntity entity);
+    List<RS> toResponseDto(List<AbstractEntity> entities);
+    void copyProperties(RQ requestDto, E entity);
 
 }

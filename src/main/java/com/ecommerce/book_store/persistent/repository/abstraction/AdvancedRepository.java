@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Map;
 
-public interface IAdvancedRepository<E extends AbstractEntity>
+public interface AdvancedRepository<E extends AbstractEntity>
 {
     List<E> findAllByCriteria(Map<String, Object> criteria, Pageable pageable);
     List<E> findAllDeleted(Pageable pageable);

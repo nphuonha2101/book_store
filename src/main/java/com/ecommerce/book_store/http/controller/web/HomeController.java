@@ -1,6 +1,6 @@
 package com.ecommerce.book_store.http.controller.web;
 
-import com.ecommerce.book_store.http.dto.response.BookResponseDto;
+import com.ecommerce.book_store.http.dto.response.implement.BookResponseDto;
 import com.ecommerce.book_store.persistent.entity.Book;
 import com.ecommerce.book_store.service.abstraction.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +22,9 @@ public class HomeController {
 
     @GetMapping(path = {"/", "/home"})
     public String index(Model model) {
-        List<Book> books = bookService.findAll();
-        List<BookResponseDto> response = BookResponseDto.toResponseDto(books);
 
         model.addAttribute("greet", "Greetings from Spring Boot! Made with love by Book Store Team");
-        model.addAttribute("books", response);
+//        model.addAttribute("books", response);
         return "home/index";
     }
 }

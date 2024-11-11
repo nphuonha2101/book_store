@@ -37,6 +37,9 @@ public abstract class AbstractEntity {
     }
 
     public abstract void initFilterableMap();
-    public abstract void addFilter(String key, Object value);
+    public void addFilter(String key, Object value) {
+        initFilterableMap();
+        this.filterMap.addFilter(key, value);
+    }
 
 }
