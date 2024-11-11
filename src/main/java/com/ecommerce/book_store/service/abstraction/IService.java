@@ -68,10 +68,32 @@ public interface IService<RQ extends AbstractRequestDto, RS extends AbstractResp
     boolean deleteById(Long id);
 
 
+    /**
+     * Convert requestDto to entity
+     * @param requestDto is a information from client and will be converted to entity to save to database
+     * @return Entity object
+     */
     E toEntity(RQ requestDto);
 
+    /**
+     * Convert entity to responseDto. The responseDto will be sent to client so we must convert entity to responseDto to hide sensitive information
+     * @param entity is a object get from database
+     * @return ResponseDto object
+     */
     RS toResponseDto(AbstractEntity entity);
+
+    /**
+     * Convert list of entities to list of responseDtos
+     * @param entities is a list of objects get from database
+     * @return List of responseDtos
+     */
     List<RS> toResponseDto(List<AbstractEntity> entities);
+
+    /**
+     * Copy properties from requestDto to entity. It is used in update method
+     * @param requestDto is a information from client
+     * @param entity is a object get from database
+     */
     void copyProperties(RQ requestDto, E entity);
 
 }

@@ -31,11 +31,6 @@ public class CategoryServiceImpl extends IServiceImpl<CategoryRequestDto, Catego
     }
 
     @Override
-    public List<CategoryResponseDto> toResponseDto(List<AbstractEntity> entities) {
-        return entities.stream().map(this::toResponseDto).toList();
-    }
-
-    @Override
     public void copyProperties(CategoryRequestDto requestDto, Category entity) {
         entity.setName(requestDto.getName());
         entity.setDescription(requestDto.getDescription());

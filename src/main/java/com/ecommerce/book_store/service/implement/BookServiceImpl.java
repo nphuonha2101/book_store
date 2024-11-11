@@ -86,14 +86,6 @@ public class BookServiceImpl extends IAdvancedServiceImpl<BookRequestDto, BookRe
         );
     }
 
-    @Override
-    public List<BookResponseDto> toResponseDto(List<AbstractEntity> entities) {
-        List<BookResponseDto> result = new ArrayList<>();
-        for (AbstractEntity entity : entities) {
-            result.add(toResponseDto(entity));
-        }
-        return result;
-    }
 
     @Override
     public void copyProperties(BookRequestDto requestDto, Book entity) {

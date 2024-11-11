@@ -9,8 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 
-public interface IAdvancedService<RQ extends AbstractRequestDto, RS extends AbstractResponseDto, E extends AbstractEntity> extends
-        IService<RQ, RS, E> {
+public interface IAdvancedService<RQ extends AbstractRequestDto, RS extends AbstractResponseDto, E extends AbstractEntity>
+        extends IService<RQ, RS, E> {
     /**
      * Find all entities by criteria. The criteria is a map of key-value pairs.
      * The key is the field name of the entity and the value is the value of the field.
@@ -78,11 +78,4 @@ public interface IAdvancedService<RQ extends AbstractRequestDto, RS extends Abst
     @Transactional
     int restoreByIds(List<Long> ids);
 
-    E toEntity(RQ requestDto);
-
-    RS toResponseDto(AbstractEntity entity);
-
-    List<RS> toResponseDto(List<AbstractEntity> entities);
-
-    void copyProperties(RQ requestDto, E entity);
 }

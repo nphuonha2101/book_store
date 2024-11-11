@@ -64,4 +64,9 @@ public abstract class IServiceImpl<RQ extends AbstractRequestDto, RS extends Abs
         repository.deleteById(id);
         return true;
     }
+
+    @Override
+    public List<RS> toResponseDto(List<AbstractEntity> entities) {
+        return entities.stream().map(this::toResponseDto).collect(Collectors.toList());
+    }
 }

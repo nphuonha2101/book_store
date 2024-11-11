@@ -57,15 +57,4 @@ public abstract class IAdvancedServiceImpl<RS extends AbstractRequestDto, RQ ext
         return advancedRepository.restoreByIds(ids);
     }
 
-    @Override
-    public abstract E toEntity(RS requestDto);
-
-    @Override
-    public abstract RQ toResponseDto(AbstractEntity entity);
-
-    @Override
-    public abstract List<RQ> toResponseDto(List<AbstractEntity> entities);
-
-    @Override
-    public abstract void copyProperties(RS requestDto, E entity);
 }
