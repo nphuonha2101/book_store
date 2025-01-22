@@ -11,7 +11,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class CategoryServiceImpl extends IServiceImpl<CategoryRequestDto, CategoryResponseDto, Category> implements CategoryService {
+public class CategoryServiceImpl extends IServiceImpl<CategoryRequestDto, CategoryResponseDto, Category>
+        implements CategoryService {
     public CategoryServiceImpl(CategoryRepository repository) {
         super(repository);
     }

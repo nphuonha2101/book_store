@@ -23,7 +23,7 @@ public class HomeController {
     @GetMapping(path = {"/", "/home"})
     public String index(Model model) {
 
-        model.addAttribute("greet", "Greetings from Spring Boot! Made with love by Book Store Team");
+        model.addAttribute("greet", "Phuong Cute dep gai kkk");
 //        model.addAttribute("books", response);
         return "home/index";
     }

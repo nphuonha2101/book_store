@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @Table(name="books")
 @Entity
-public class  Book extends AbstractEntity {
+public class Book extends AbstractEntity {
     @Column(name="title")
     private String title;
     @Column(name="author_name")

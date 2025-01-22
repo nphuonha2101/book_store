@@ -20,7 +20,9 @@ import java.util.List;
 
 
 @Service
-public class BookServiceImpl extends IAdvancedServiceImpl<BookRequestDto, BookResponseDto, Book> implements BookService {
+public class BookServiceImpl
+        extends IAdvancedServiceImpl<BookRequestDto, BookResponseDto, Book>
+        implements BookService {
 
     private final CategoryService categoryService;
 
@@ -55,8 +57,6 @@ public class BookServiceImpl extends IAdvancedServiceImpl<BookRequestDto, BookRe
 
         result.setCategory(category);
         result.setImages(bookImages);
-
-
 
         return result;
     }
