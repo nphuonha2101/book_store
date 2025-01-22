@@ -33,14 +33,14 @@ public class Order extends AbstractEntity {
     public Order() {
     }
 
-    public Order(User user, Voucher voucher, String address, String phone, String note, OrderStatus status, double totalAmount) {
+    public Order(User user, Voucher voucher, String address, String phone, String note, OrderStatus status) {
         this.user = user;
         this.voucher = voucher;
         this.address = address;
         this.phone = phone;
         this.note = note;
         this.status = status;
-        this.totalAmount = totalAmount;
+
     }
 
     @Override
