@@ -1,10 +1,7 @@
 package com.ecommerce.book_store.persistent.entity;
 
-import com.ecommerce.book_store.persistent.EntityFilterMap;
 import jakarta.persistence.*;
 import lombok.Getter;
-
-import java.util.List;
 
 @Entity
 @Table(name = "admins")
@@ -30,9 +27,4 @@ public class Admin extends AbstractEntity{
         this.role = role;
     }
 
-    @Override
-    public void initFilterableMap() {
-       this.filterMap = new EntityFilterMap();
-       this.filterMap.setFilterableKeys(List.of("name"));
-    }
 }

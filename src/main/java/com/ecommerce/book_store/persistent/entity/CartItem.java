@@ -1,11 +1,8 @@
 package com.ecommerce.book_store.persistent.entity;
 
-import com.ecommerce.book_store.persistent.EntityFilterMap;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -33,9 +30,4 @@ public class CartItem extends AbstractEntity {
         this.price = price;
     }
 
-    @Override
-    public void initFilterableMap() {
-        this.filterMap = new EntityFilterMap();
-        this.filterMap.setFilterableKeys(List.of("cart", "book", "quantity", "price"));
-    }
 }

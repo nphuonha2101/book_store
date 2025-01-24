@@ -24,9 +24,4 @@ public class BookImage extends AbstractEntity {
         this.book = book;
     }
 
-    @Override
-    public void initFilterableMap() {
-
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 }

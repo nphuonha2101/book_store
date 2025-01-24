@@ -1,6 +1,5 @@
 package com.ecommerce.book_store.persistent.entity;
 
-import com.ecommerce.book_store.persistent.EntityFilterMap;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
@@ -30,10 +29,4 @@ public class Category extends AbstractEntity{
         this.name = name;
         this.description = description;
     }
-
-    @Override
-    public void initFilterableMap() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
 }

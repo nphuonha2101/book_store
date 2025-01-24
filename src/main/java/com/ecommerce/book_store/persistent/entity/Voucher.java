@@ -38,9 +38,4 @@ public class Voucher extends AbstractEntity {
         this.expired_date = expired_date;
     }
 
-
-    @Override
-    public void initFilterableMap() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 }

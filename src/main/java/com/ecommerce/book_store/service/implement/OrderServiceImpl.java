@@ -3,7 +3,6 @@ package com.ecommerce.book_store.service.implement;
 import com.ecommerce.book_store.core.constant.OrderStatus;
 import com.ecommerce.book_store.http.dto.request.implement.OrderRequestDto;
 import com.ecommerce.book_store.http.dto.response.implement.OrderResponseDto;
-import com.ecommerce.book_store.http.dto.response.implement.RoleResponseDto;
 import com.ecommerce.book_store.http.dto.response.implement.UserResponseDto;
 import com.ecommerce.book_store.http.dto.response.implement.VoucherResponseDto;
 import com.ecommerce.book_store.persistent.entity.AbstractEntity;
@@ -11,7 +10,6 @@ import com.ecommerce.book_store.persistent.entity.Order;
 import com.ecommerce.book_store.persistent.entity.User;
 import com.ecommerce.book_store.persistent.entity.Voucher;
 import com.ecommerce.book_store.persistent.repository.abstraction.OrderRepository;
-import com.ecommerce.book_store.persistent.repository.implement.OrderAdvancedRepositoryImpl;
 import com.ecommerce.book_store.service.abstraction.OrderService;
 import com.ecommerce.book_store.service.abstraction.RoleService;
 import com.ecommerce.book_store.service.abstraction.UserService;
@@ -20,24 +18,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class OrderServiceImpl extends IAdvancedServiceImpl<OrderRequestDto, OrderResponseDto, Order>
+public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderResponseDto, Order>
         implements OrderService {
     private final VoucherService voucherService;
     private final UserService userService;
-    private final RoleService roleService;
 
     @Autowired
-    public OrderServiceImpl(
-            OrderAdvancedRepositoryImpl orderAdvancedRepository,
-                            OrderRepository orderRepository,
-            VoucherService voucherService,
-            UserService userService,
-            RoleService roleService
-            ) {
-        super(orderRepository, orderAdvancedRepository);
+    public OrderServiceImpl(OrderRepository repository, VoucherService voucherService, UserService userService) {
+        super(repository);
         this.voucherService = voucherService;
         this.userService = userService;
-        this.roleService = roleService;
     }
 
     @Override
@@ -87,7 +77,5 @@ public class OrderServiceImpl extends IAdvancedServiceImpl<OrderRequestDto, Orde
         entity.setPhone(requestDto.getPhone());
         entity.setNote(requestDto.getNote());
         entity.setStatus(OrderStatus.valueOf(requestDto.getStatus()));
-
-
     }
 }

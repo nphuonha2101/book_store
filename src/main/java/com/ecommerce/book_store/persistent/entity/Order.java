@@ -1,7 +1,6 @@
 package com.ecommerce.book_store.persistent.entity;
 
 import com.ecommerce.book_store.core.constant.OrderStatus;
-import com.ecommerce.book_store.persistent.EntityFilterMap;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,9 +42,4 @@ public class Order extends AbstractEntity {
 
     }
 
-    @Override
-    public void initFilterableMap() {
-        this.filterMap = new EntityFilterMap();
-        this.filterMap.addFilter("user", "status");
-    }
 }

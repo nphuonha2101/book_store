@@ -24,8 +24,4 @@ public class Role extends AbstractEntity{
         this.description = description;
     }
 
-    @Override
-    public void initFilterableMap() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 }

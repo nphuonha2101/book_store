@@ -38,8 +38,4 @@ public class User extends AbstractEntity{
         this.address = address;
     }
 
-    @Override
-    public void initFilterableMap() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 }

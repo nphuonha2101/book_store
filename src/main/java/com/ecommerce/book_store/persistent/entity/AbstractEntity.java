@@ -1,17 +1,19 @@
 package com.ecommerce.book_store.persistent.entity;
 
-import com.ecommerce.book_store.persistent.EntityFilterMap;
 import jakarta.persistence.*;
 import lombok.Getter;
+import org.hibernate.annotations.*;
 
 import java.time.LocalDateTime;
 
 @MappedSuperclass
 @Getter
+@SoftDelete
+@SQLDelete(sql = "UPDATE #{entityName} SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@FilterDef(name = "deletedFilter", parameters = @ParamDef(name = "isDeleted", type = Boolean.class))
+@Filter(name = "deletedFilter", condition = "deleted_at IS NULL")
 public abstract class AbstractEntity {
 
-    @Transient
-    protected EntityFilterMap filterMap;
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -35,11 +37,4 @@ public abstract class AbstractEntity {
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
-
-    public abstract void initFilterableMap();
-    public void addFilter(String key, Object value) {
-        initFilterableMap();
-        this.filterMap.addFilter(key, value);
-    }
-
 }

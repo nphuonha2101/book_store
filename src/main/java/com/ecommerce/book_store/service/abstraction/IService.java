@@ -13,6 +13,7 @@ import java.util.Map;
 public interface IService<RQ extends AbstractRequestDto, RS extends AbstractResponseDto, E extends AbstractEntity> {
     /**
      * Find entity by id
+     *
      * @param id Id of the entity
      * @return Entity that has the id
      */
@@ -21,6 +22,7 @@ public interface IService<RQ extends AbstractRequestDto, RS extends AbstractResp
 
     /**
      * Find all entities
+     *
      * @return List of all entities
      */
     @Transactional(readOnly = true)
@@ -28,6 +30,7 @@ public interface IService<RQ extends AbstractRequestDto, RS extends AbstractResp
 
     /**
      * Find all entities and sort them. How to use: new Sort(Sort.Direction.ASC, "field1", "field2", ...)
+     *
      * @param sort Sort object
      * @return List of all entities that are sorted
      */
@@ -36,6 +39,7 @@ public interface IService<RQ extends AbstractRequestDto, RS extends AbstractResp
 
     /**
      * Find all entities and paginate them. How to use: PageRequest.of(page, size, sort)
+     *
      * @param pageable Pageable object
      * @return List of entities that are paginated
      */
@@ -44,6 +48,7 @@ public interface IService<RQ extends AbstractRequestDto, RS extends AbstractResp
 
     /**
      * Save requestDto to database
+     *
      * @param requestDto RequestDto object get from client
      * @return ResponseDto object that is saved to database
      */
@@ -52,8 +57,9 @@ public interface IService<RQ extends AbstractRequestDto, RS extends AbstractResp
 
     /**
      * Update requestDto to database
+     *
      * @param requestDto RequestDto object get from client
-     * @param id Id of the entity to update
+     * @param id         Id of the entity to update
      * @return ResponseDto object that is updated to database
      */
     @Transactional
@@ -61,6 +67,7 @@ public interface IService<RQ extends AbstractRequestDto, RS extends AbstractResp
 
     /**
      * Delete entity by id
+     *
      * @param id Id of the entity to delete
      * @return True if the entity is deleted, false otherwise
      */
@@ -70,6 +77,7 @@ public interface IService<RQ extends AbstractRequestDto, RS extends AbstractResp
 
     /**
      * Convert requestDto to entity
+     *
      * @param requestDto is a information from client and will be converted to entity to save to database
      * @return Entity object
      */
@@ -77,6 +85,7 @@ public interface IService<RQ extends AbstractRequestDto, RS extends AbstractResp
 
     /**
      * Convert entity to responseDto. The responseDto will be sent to client so we must convert entity to responseDto to hide sensitive information
+     *
      * @param entity is a object get from database
      * @return ResponseDto object
      */
@@ -84,6 +93,7 @@ public interface IService<RQ extends AbstractRequestDto, RS extends AbstractResp
 
     /**
      * Convert list of entities to list of responseDtos
+     *
      * @param entities is a list of objects get from database
      * @return List of responseDtos
      */
@@ -91,8 +101,9 @@ public interface IService<RQ extends AbstractRequestDto, RS extends AbstractResp
 
     /**
      * Copy properties from requestDto to entity. It is used in update method
-     * @param requestDto is a information from client
-     * @param entity is a object get from database
+     *
+     * @param requestDto is an information from client
+     * @param entity     is an object get from database
      */
     void copyProperties(RQ requestDto, E entity);
 

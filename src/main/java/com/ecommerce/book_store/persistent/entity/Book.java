@@ -3,7 +3,6 @@ package com.ecommerce.book_store.persistent.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.ecommerce.book_store.persistent.EntityFilterMap;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -50,13 +49,4 @@ public class Book extends AbstractEntity {
         this.publishedAt = publishedAt;
         this.category = category;
     }
-
-
-    @Override
-    public void initFilterableMap() {
-        this.filterMap = new EntityFilterMap();
-        this.filterMap.setFilterableKeys(List.of("title", "authorName", "price", "isAvailable", "publishedAt", "category"));
-
-    }
-
 }

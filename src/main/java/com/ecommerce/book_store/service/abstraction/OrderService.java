@@ -4,5 +4,5 @@ import com.ecommerce.book_store.http.dto.request.implement.OrderRequestDto;
 import com.ecommerce.book_store.http.dto.response.implement.OrderResponseDto;
 import com.ecommerce.book_store.persistent.entity.Order;
 
-public interface OrderService extends IAdvancedService<OrderRequestDto, OrderResponseDto, Order> {
+public interface OrderService extends IService<OrderRequestDto, OrderResponseDto, Order> {
 }

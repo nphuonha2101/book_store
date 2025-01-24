@@ -8,7 +8,6 @@ import com.ecommerce.book_store.persistent.entity.Book;
 import com.ecommerce.book_store.persistent.entity.BookImage;
 import com.ecommerce.book_store.persistent.entity.Category;
 import com.ecommerce.book_store.persistent.repository.abstraction.BookRepository;
-import com.ecommerce.book_store.persistent.repository.implement.BookAdvancedRepositoryImpl;
 import com.ecommerce.book_store.service.abstraction.BookService;
 import com.ecommerce.book_store.service.abstraction.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,14 +20,14 @@ import java.util.List;
 
 @Service
 public class BookServiceImpl
-        extends IAdvancedServiceImpl<BookRequestDto, BookResponseDto, Book>
+        extends IServiceImpl<BookRequestDto, BookResponseDto, Book>
         implements BookService {
 
     private final CategoryService categoryService;
 
     @Autowired
-    public BookServiceImpl(BookAdvancedRepositoryImpl bookAdvancedRepository, BookRepository bookRepository, CategoryService categoryService) {
-        super(bookRepository, bookAdvancedRepository);
+    public BookServiceImpl(BookRepository repository, CategoryService categoryService) {
+        super(repository);
         this.categoryService = categoryService;
     }
 

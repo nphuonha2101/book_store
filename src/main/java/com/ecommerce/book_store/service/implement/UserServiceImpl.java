@@ -12,11 +12,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserServiceImpl extends IServiceImpl<UserRequestDto, UserResponseDto, User>
             implements UserService {
-    private final RoleServiceImpl roleService;
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, RoleServiceImpl roleService) {
+    public UserServiceImpl(UserRepository userRepository) {
         super(userRepository);
-        this.roleService = roleService;
     }
 
     @Override
