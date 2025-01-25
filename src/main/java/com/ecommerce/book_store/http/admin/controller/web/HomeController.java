@@ -1,4 +1,4 @@
-package com.ecommerce.book_store.http.admin.controller;
+package com.ecommerce.book_store.http.admin.controller.web;
 
 import com.ecommerce.book_store.service.abstraction.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +19,10 @@ public class HomeController {
     @GetMapping(path = {"/", "/home"})
     public String index(Model model) {
 
-        model.addAttribute("greet", "Phuong Cute dep gai kkk");
+//        model.addAttribute("greet", "Phuong Cute dep gai kkk");
 //        model.addAttribute("books", response);
+        model.addAttribute("CONTENT_TITLE", "Trang chủ");
+        model.addAttribute("LAYOUT_TITLE", "BookStore");
         return "pages/home/index";
     }
 }
