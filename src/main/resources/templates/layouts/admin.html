@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="head" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" >
+<head th:replace="~{fragments/admin/head :: head}">
+</head>
+<body>
+
+<div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+     data-sidebar-position="fixed" data-header-position="fixed">
+    <aside th:replace="~{fragments/admin/sidebar :: side-bar}"></aside>
+
+    <div class="body-wrapper">
+        <header th:replace="~{fragments/admin/header :: header}"></header>
+
+        <div class="page-content">
+            <div class="container-fluid">
+                <div layout:fragment="content"></div>
+            </div>
+        </div>
+
+        <footer th:replace="~{fragments/admin/footer :: footer}"></footer>
+    </div>
+</div>
+
+</body>
+</html>
