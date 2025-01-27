@@ -2,14 +2,16 @@ package com.ecommerce.book_store.persistent.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "admins")
 @Getter
+@Setter
 public class Admin extends AbstractEntity{
     @Column(name = "name")
     private String name;
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
     @Column(name = "password")
     private String password;

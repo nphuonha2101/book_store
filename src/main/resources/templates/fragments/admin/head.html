@@ -1,0 +1,7 @@
+<head xmlns:th="http://www.thymeleaf.org" th:fragment="head" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" >
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${CONTENT_TITLE} + ' - ' + ${LAYOUT_TITLE}">Default Title</title>
+    <link rel="shortcut icon" type="image/png" th:href="@{/admin/images/logos/favicon.png}" />
+    <link rel="stylesheet" th:href="@{/admin/css/styles.min.css}" />
+</head>
