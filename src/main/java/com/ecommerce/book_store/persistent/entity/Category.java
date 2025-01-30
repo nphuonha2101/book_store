@@ -7,13 +7,14 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
 @Table(name = "categories")
 @Getter
 @Setter
-public class Category extends AbstractEntity{
+public class Category extends AbstractEntity implements Serializable {
     @Column(name = "name")
     private String name;
     @Column(name = "description")

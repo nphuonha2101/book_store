@@ -4,12 +4,14 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 
 @Getter
 @Table(name="book_images")
 @Entity
 @Setter
-public class BookImage extends AbstractEntity {
+public class BookImage extends AbstractEntity implements Serializable {
     @Column(name="url")
     private String url;
     @ManyToOne

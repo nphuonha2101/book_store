@@ -6,11 +6,13 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Entity
 @Table(name = "roles")
 @Getter
 @Setter
-public class Role extends AbstractEntity{
+public class Role extends AbstractEntity implements Serializable {
     @Column(name = "name")
     private String name;
     @Column(name = "description")

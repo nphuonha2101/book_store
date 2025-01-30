@@ -4,11 +4,13 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @Table(name = "reviews")
 @Entity
-public class Review extends AbstractEntity {
+public class Review extends AbstractEntity implements Serializable {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

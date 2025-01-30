@@ -12,6 +12,9 @@ import com.ecommerce.book_store.service.abstraction.BookService;
 import com.ecommerce.book_store.service.abstraction.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -49,9 +52,11 @@ public class BookServiceImpl
         Category category = categoryService.findById(requestDto.getCategoryId());
 
         List<BookImage> bookImages = new ArrayList<>();
-        for (String imageUrl : requestDto.getImageUrls()) {
-            BookImage bookImage = new BookImage(imageUrl, result);
-            bookImages.add(bookImage);
+        if (requestDto.getImageUrls() != null) {
+            for (String imageUrl : requestDto.getImageUrls()) {
+                BookImage bookImage = new BookImage(imageUrl, result);
+                bookImages.add(bookImage);
+            }
         }
 
         result.setCategory(category);
@@ -106,4 +111,35 @@ public class BookServiceImpl
         entity.setCategory(category);
         entity.setImages(bookImages);
     }
+
+    @Cacheable(value = "books", key = "#id")
+    @Override
+    public Book findById(Long id) {
+        return super.findById(id);
+    }
+
+    @Cacheable(value = "books")
+    @Override
+    public List<Book> findAll() {
+        return super.findAll();
+    }
+
+    @CachePut(value = "books", key = "#result.id")
+    @Override
+    public Book save(BookRequestDto requestDto) {
+        return super.save(requestDto);
+    }
+
+    @CachePut(value = "books", key = "#id")
+    @Override
+    public Book update(BookRequestDto requestDto, Long id) {
+        return super.update(requestDto, id);
+    }
+
+    @CacheEvict(value = "books", key = "#id")
+    @Override
+    public boolean deleteById(Long id) {
+        return super.deleteById(id);
+    }
+
 }
