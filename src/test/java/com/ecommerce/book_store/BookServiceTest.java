@@ -3,6 +3,8 @@ package com.ecommerce.book_store;
 import com.ecommerce.book_store.http.dto.request.implement.BookRequestDto;
 import com.ecommerce.book_store.persistent.entity.Book;
 import com.ecommerce.book_store.service.abstraction.BookService;
+import com.ecommerce.book_store.service.implement.BookServiceImpl;
+import com.nimbusds.jose.shaded.gson.Gson;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,7 +15,7 @@ import java.time.LocalDateTime;
 public class BookServiceTest {
 
     @Autowired
-    private BookService bookService;
+    private BookServiceImpl bookService;
 
     @Test
     public void saveBookTest() {

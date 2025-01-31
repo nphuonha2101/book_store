@@ -3,6 +3,7 @@ package com.ecommerce.book_store.service.abstraction;
 import com.ecommerce.book_store.http.dto.request.AbstractRequestDto;
 import com.ecommerce.book_store.http.dto.response.AbstractResponseDto;
 import com.ecommerce.book_store.persistent.entity.AbstractEntity;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,7 +45,7 @@ public interface IService<RQ extends AbstractRequestDto, RS extends AbstractResp
      * @return List of entities that are paginated
      */
     @Transactional(readOnly = true)
-    List<E> findAll(Pageable pageable);
+    Page<E> findAll(Pageable pageable);
 
     /**
      * Save requestDto to database
