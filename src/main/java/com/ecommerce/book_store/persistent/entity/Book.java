@@ -31,7 +31,7 @@ public class Book extends AbstractEntity implements Serializable {
     private boolean isAvailable;
     @Column(name = "published_at")
     private LocalDateTime publishedAt;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name="category_id")
     private Category category;
   
