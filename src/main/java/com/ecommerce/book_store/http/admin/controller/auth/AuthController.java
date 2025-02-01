@@ -9,7 +9,8 @@ public class AuthController {
     public String login() {
         return "pages/auth/login";
     }
-
-    // register
-    // logout
+    @GetMapping("/register")
+    public String register() {
+        return "pages/auth/register";
+    }
 }

@@ -38,4 +38,11 @@ public class User extends AbstractEntity{
         this.address = address;
     }
 
+    public User(String name, String email, String password, String phone, String address) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.phone = phone;
+        this.address = address;
+    }
 }
