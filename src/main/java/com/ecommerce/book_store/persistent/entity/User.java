@@ -4,11 +4,13 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Entity
 @Getter
 @Setter
 @Table(name = "users")
-public class User extends AbstractEntity{
+public class User extends AbstractEntity implements Serializable {
     @Column(name = "name")
     private String name;
     @Column(name = "email", unique = true)

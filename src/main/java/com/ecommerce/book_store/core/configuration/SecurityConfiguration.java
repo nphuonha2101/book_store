@@ -1,12 +1,11 @@
 package com.ecommerce.book_store.core.configuration;
 
+import com.ecommerce.book_store.service.implement.AdminDetailsService;
 import com.ecommerce.book_store.service.implement.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,18 +17,19 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 public class SecurityConfiguration {
 
     private final CustomUserDetailsService userDetailsService;
+    private final AdminDetailsService adminDetailsService;
 
-    public SecurityConfiguration(CustomUserDetailsService userDetailsService) {
+    public SecurityConfiguration(CustomUserDetailsService userDetailsService, AdminDetailsService adminDetailsService) {
         this.userDetailsService = userDetailsService;
+        this.adminDetailsService = adminDetailsService;
     }
 
     @Bean
-    @Primary
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/login", "/register", "/logout")
+                .authenticationProvider(userAuthenticationProvider())
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
+                .authorizeHttpRequests(authRequests -> authRequests
                         .requestMatchers("/login", "/register").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -50,16 +50,17 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChainAdmin(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/admin/**")
+                .authenticationProvider(adminAuthenticationProvider())
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
+                .authorizeHttpRequests(authRequests -> authRequests
                         .requestMatchers("/admin/login", "/admin/register").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/admin/login")
+                        .loginProcessingUrl("/admin/login")
                         .permitAll()
-                        .defaultSuccessUrl("/admin/home", true)
+                        .defaultSuccessUrl("/admin/dashboard", true)
                         .failureUrl("/admin/login?error=true")
                 )
                 .logout(logout -> logout
@@ -70,21 +71,25 @@ public class SecurityConfiguration {
         return http.build();
     }
 
-    /**
-     * Encoding Algorithm for password
-     * @return PasswordEncoder object
-     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
+    public DaoAuthenticationProvider userAuthenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
+        authProvider.setHideUserNotFoundExceptions(false);
+        return authProvider;
+    }
 
+    @Bean
+    public DaoAuthenticationProvider adminAuthenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(adminDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
         authProvider.setHideUserNotFoundExceptions(false);
         return authProvider;
     }
@@ -93,5 +98,4 @@ public class SecurityConfiguration {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
-
 }

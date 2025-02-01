@@ -4,6 +4,7 @@ import com.ecommerce.book_store.http.dto.request.AbstractRequestDto;
 import com.ecommerce.book_store.http.dto.response.AbstractResponseDto;
 import com.ecommerce.book_store.persistent.entity.AbstractEntity;
 import com.ecommerce.book_store.service.abstraction.IService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -35,8 +36,8 @@ public abstract class IServiceImpl<RQ extends AbstractRequestDto, RS extends Abs
     }
 
     @Override
-    public List<E> findAll(Pageable pageable) {
-        return repository.findAll(pageable).stream().collect(Collectors.toList());
+    public Page<E> findAll(Pageable pageable) {
+        return repository.findAll(pageable);
     }
 
     @Override

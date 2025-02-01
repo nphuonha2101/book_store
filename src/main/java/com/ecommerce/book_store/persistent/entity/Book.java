@@ -1,5 +1,6 @@
 package com.ecommerce.book_store.persistent.entity;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -11,7 +12,7 @@ import lombok.Setter;
 @Setter
 @Table(name="books")
 @Entity
-public class Book extends AbstractEntity {
+public class Book extends AbstractEntity implements Serializable {
     @Column(name="title")
     private String title;
     @Column(name="author_name")
@@ -30,7 +31,7 @@ public class Book extends AbstractEntity {
     private boolean isAvailable;
     @Column(name = "published_at")
     private LocalDateTime publishedAt;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name="category_id")
     private Category category;
   

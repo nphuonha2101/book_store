@@ -15,7 +15,12 @@ import com.ecommerce.book_store.service.abstraction.RoleService;
 import com.ecommerce.book_store.service.abstraction.UserService;
 import com.ecommerce.book_store.service.abstraction.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderResponseDto, Order>
@@ -77,5 +82,35 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
         entity.setPhone(requestDto.getPhone());
         entity.setNote(requestDto.getNote());
         entity.setStatus(OrderStatus.valueOf(requestDto.getStatus()));
+    }
+
+    @Cacheable(value = "orders")
+    @Override
+    public List<Order> findAll() {
+        return super.findAll();
+    }
+
+    @Cacheable(value = "orders", key = "#id")
+    @Override
+    public Order findById(Long id) {
+        return super.findById(id);
+    }
+
+    @CachePut(value = "orders", key = "#result.id")
+    @Override
+    public Order save(OrderRequestDto requestDto) {
+        return super.save(requestDto);
+    }
+
+    @CachePut(value = "orders", key = "#id")
+    @Override
+    public Order update(OrderRequestDto requestDto, Long id) {
+        return super.update(requestDto, id);
+    }
+
+    @CacheEvict(value = "orders", key = "#id")
+    @Override
+    public boolean deleteById(Long id) {
+        return super.deleteById(id);
     }
 }

@@ -2,14 +2,18 @@ package com.ecommerce.book_store.persistent.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
+
+import java.io.Serializable;
 
 @Entity
 @Table(name = "admins")
 @Getter
-public class Admin extends AbstractEntity{
+@Setter
+public class Admin extends AbstractEntity implements Serializable {
     @Column(name = "name")
     private String name;
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
     @Column(name = "password")
     private String password;
