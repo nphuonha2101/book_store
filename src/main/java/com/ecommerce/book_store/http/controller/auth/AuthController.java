@@ -1,4 +1,4 @@
-package com.ecommerce.book_store.http.admin.controller.auth;
+package com.ecommerce.book_store.http.controller.auth;
 
 import com.ecommerce.book_store.service.abstraction.UserService;
 import org.springframework.stereotype.Controller;

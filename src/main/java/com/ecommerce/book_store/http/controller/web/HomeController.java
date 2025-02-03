@@ -1,4 +1,4 @@
-package com.ecommerce.book_store.http.admin.controller.web;
+package com.ecommerce.book_store.http.controller.web;
 
 import com.ecommerce.book_store.persistent.entity.Book;
 import com.ecommerce.book_store.service.abstraction.BookService;
