@@ -33,6 +33,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/login", "/register").permitAll()
                         .anyRequest().authenticated()
                 )
+
                 .formLogin(form -> form
                         .loginPage("/login")
                         .permitAll()
@@ -84,8 +85,8 @@ public class SecurityConfiguration {
         authProvider.setHideUserNotFoundExceptions(false);
         return authProvider;
     }
-
     @Bean
+
     public DaoAuthenticationProvider adminAuthenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(adminDetailsService);

@@ -13,19 +13,26 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserServiceImpl extends IServiceImpl<UserRequestDto, UserResponseDto, User>
             implements UserService {
-    private final UserRepository userRepository;
+
     private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, UserRepository userRepository1, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         super(userRepository);
-        this.userRepository = userRepository1;
+        this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public User toEntity(UserRequestDto requestDto) {
-        return null;
+        return new User(
+                requestDto.getUsername(),
+                requestDto.getEmail(),
+                requestDto.getPassword(),
+                requestDto.getPhone(),
+                requestDto.getAddress()
+        );
     }
 
     @Override
@@ -47,7 +54,7 @@ public class UserServiceImpl extends IServiceImpl<UserRequestDto, UserResponseDt
 
         // Create new user
         User user = new User();
-        user.setName(userDto.getUsername());
+//        user.setName(userDto.getUsername());
         user.setEmail(userDto.getEmail());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setPhone(userDto.getPhone());
