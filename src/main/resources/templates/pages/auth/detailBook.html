@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/layouts/master.html}">
+<head>
+    <title>Chi tiết sản phẩm</title>
+</head>
+<body>
+<th:block layout:fragment="content">
+    <section class="item-details section">
+        <div class="container">
+            <div class="top-area">
+                <div class="row align-items-center">
+                    <div class="col-lg-6 col-md-12 col-12">
+                        <div class="product-images">
+                            <main id="gallery">
+                                <div class="main-img" th:if="${book != null && !#lists.isEmpty(book.images)}">
+                                    <img th:src="${book.images[0].url}" id="current" alt="Product Image">
+                                </div>
+                                <div class="images" th:if="${book != null && !#lists.isEmpty(book.images)}">
+                                    <th:block th:each="image : ${book.images}">
+                                        <img th:src="${image.url}" class="img" alt="Product Image">
+                                    </th:block>
+                                </div>
+                            </main>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-12 col-12">
+                        <div class="product-info">
+                            <h2 class="title" th:text="${book != null ? book.title : ''}">Product Title</h2>
+                            <h3 class="discount-price" th:if="${book != null}">
+                                <span th:text="${#numbers.formatDecimal(book.price, 1, 'COMMA', 2, 'POINT')} + ' VND'">Price</span>
+                            </h3>
+                            <p class="info-text" th:text="${book != null ? book.description : ''}">Product Description</p>
+
+                            <!-- Add to Cart Form -->
+                            <form th:action="@{/cart/add}" method="post" th:if="${book != null}">
+                                <input type="hidden" th:value="${book.id}" name="productId">
+                                <div class="row">
+                                    <div class="col-lg-4 col-md-4 col-12">
+                                        <div class="form-group quantity">
+                                            <label for="quantity">Số lượng</label>
+                                            <input type="number" id="quantity" name="quantity"
+                                                   class="form-control" value="1" min="1"
+                                                   th:max="${book.quantity}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bottom-content">
+                                    <div class="row align-items-end">
+                                        <div class="col-lg-4 col-md-4 col-12">
+                                            <div class="button cart-button">
+                                                <button class="btn" style="width: 100%;"
+                                                        th:disabled="${book.quantity == 0}">
+                                                    Thêm vào giỏ hàng
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-12">
+                                            <div class="wish-button">
+                                                <button class="btn"><i class="lni lni-heart"></i> Yêu thích</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-details-info">
+                <div class="single-block">
+                    <div class="row">
+                        <div class="col-lg-12 col-12">
+                            <div class="info-body custom-responsive-margin">
+                                <h4>Mô tả</h4>
+                                <p th:text="${book != null ? book.description : ''}">Product Details</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</th:block>
+</body>
+</html>
