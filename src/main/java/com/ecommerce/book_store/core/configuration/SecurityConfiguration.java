@@ -8,12 +8,15 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfiguration {
 
     private final CustomUserDetailsService userDetailsService;
@@ -44,6 +47,14 @@ public class SecurityConfiguration {
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout=true")
                         .permitAll()
+                )
+                .sessionManagement(session -> session
+                        .invalidSessionUrl("/login")
+                        .sessionFixation(SessionManagementConfigurer.SessionFixationConfigurer::migrateSession
+                        )
+                        .maximumSessions(1)
+                        .maxSessionsPreventsLogin(true)
+                        .expiredUrl("/login?expired=true")
                 );
         return http.build();
     }
@@ -68,6 +79,14 @@ public class SecurityConfiguration {
                         .logoutUrl("/admin/logout")
                         .logoutSuccessUrl("/admin/login?logout=true")
                         .permitAll()
+                )
+                .sessionManagement(session -> session
+                        .invalidSessionUrl("/admin/login")
+                        .sessionFixation(SessionManagementConfigurer.SessionFixationConfigurer::migrateSession
+                        )
+                        .maximumSessions(1)
+                        .maxSessionsPreventsLogin(true)
+                        .expiredUrl("/admin/login?expired=true")
                 );
         return http.build();
     }

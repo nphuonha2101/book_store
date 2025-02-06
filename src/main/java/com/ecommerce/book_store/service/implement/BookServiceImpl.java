@@ -15,7 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,39 +30,62 @@ public class BookServiceImpl
         implements BookService {
 
     private final CategoryService categoryService;
+    private final FirebaseStorageService firebaseStorageService;
 
     @Autowired
-    public BookServiceImpl(BookRepository repository, CategoryService categoryService) {
+    public BookServiceImpl(BookRepository repository, CategoryService categoryService, FirebaseStorageService firebaseStorageService) {
         super(repository);
         this.categoryService = categoryService;
+        this.firebaseStorageService = firebaseStorageService;
     }
 
     @Override
     public Book toEntity(BookRequestDto requestDto) {
+        // Upload cover image if exists
+        String coverImageUrl = null;
+        if (requestDto.getCoverImage() != null && !requestDto.getCoverImage().isEmpty()) {
+            coverImageUrl = firebaseStorageService.uploadFile(
+                    requestDto.getCoverImage(),
+                    "books/covers"
+            );
+        }
+
+        // Upload multiple book images if exists
+        List<String> imageUrls = new ArrayList<>();
+        if (requestDto.getBookImages() != null && !requestDto.getBookImages().isEmpty()) {
+            for (MultipartFile image : requestDto.getBookImages()) {
+                String imageUrl = firebaseStorageService.uploadFile(
+                        image,
+                        "books/images"
+                );
+                imageUrls.add(imageUrl);
+            }
+        }
+
+        // Create book entity
         Book result = new Book(
                 requestDto.getTitle(),
                 requestDto.getAuthorName(),
                 requestDto.getDescription(),
                 requestDto.getIsbn(),
-                null,
-                requestDto.getPrice(),
+                coverImageUrl,
+                requestDto.getPrice().doubleValue(),
                 requestDto.getQuantity(),
                 requestDto.isAvailable(),
                 requestDto.getPublishedAt(),
                 null
         );
 
+        // Set category
         Category category = categoryService.findById(requestDto.getCategoryId());
-
-        List<BookImage> bookImages = new ArrayList<>();
-        if (requestDto.getImageUrls() != null) {
-            for (String imageUrl : requestDto.getImageUrls()) {
-                BookImage bookImage = new BookImage(imageUrl, result);
-                bookImages.add(bookImage);
-            }
-        }
-
         result.setCategory(category);
+
+        // Create BookImage entities from uploaded URLs
+        List<BookImage> bookImages = new ArrayList<>();
+        for (String imageUrl : imageUrls) {
+            BookImage bookImage = new BookImage(imageUrl, result);
+            bookImages.add(bookImage);
+        }
         result.setImages(bookImages);
 
         return result;
@@ -94,8 +120,29 @@ public class BookServiceImpl
     @Override
     public void copyProperties(BookRequestDto requestDto, Book entity) {
         Category category = categoryService.findById(requestDto.getCategoryId());
+
+        String coverImageUrl = null;
+        if (requestDto.getCoverImage() != null && !requestDto.getCoverImage().isEmpty()) {
+            coverImageUrl = firebaseStorageService.uploadFile(
+                    requestDto.getCoverImage(),
+                    "books/covers"
+            );
+        }
+
+        // Upload multiple book images if exists
+        List<String> imageUrls = new ArrayList<>();
+        if (requestDto.getBookImages() != null && !requestDto.getBookImages().isEmpty()) {
+            for (MultipartFile image : requestDto.getBookImages()) {
+                String imageUrl = firebaseStorageService.uploadFile(
+                        image,
+                        "books/images"
+                );
+                imageUrls.add(imageUrl);
+            }
+        }
+
         List<BookImage> bookImages = new ArrayList<>();
-        for (String imageUrl : requestDto.getImageUrls()) {
+        for (String imageUrl : imageUrls) {
             BookImage bookImage = new BookImage(imageUrl, entity);
             bookImages.add(bookImage);
         }
@@ -104,10 +151,11 @@ public class BookServiceImpl
         entity.setAuthorName(requestDto.getAuthorName());
         entity.setDescription(requestDto.getDescription());
         entity.setIsbn(requestDto.getIsbn());
-        entity.setPrice(requestDto.getPrice());
+        entity.setPrice(requestDto.getPrice().doubleValue());
         entity.setQuantity(requestDto.getQuantity());
         entity.setAvailable(requestDto.isAvailable());
         entity.setPublishedAt(requestDto.getPublishedAt());
+        entity.setCoverImage(coverImageUrl);
         entity.setCategory(category);
         entity.setImages(bookImages);
     }

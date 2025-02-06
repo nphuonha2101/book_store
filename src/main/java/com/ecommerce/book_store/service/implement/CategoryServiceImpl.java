@@ -39,34 +39,4 @@ public class CategoryServiceImpl extends IServiceImpl<CategoryRequestDto, Catego
         entity.setName(requestDto.getName());
         entity.setDescription(requestDto.getDescription());
     }
-
-    @Cacheable(value = "categories")
-    @Override
-    public List<Category> findAll() {
-        return super.findAll();
-    }
-
-    @Cacheable(value = "categories", key = "#id")
-    @Override
-    public Category findById(Long id) {
-        return super.findById(id);
-    }
-
-    @CachePut(value = "categories", key = "#result.id")
-    @Override
-    public Category save(CategoryRequestDto requestDto) {
-        return super.save(requestDto);
-    }
-
-    @CachePut(value = "categories", key = "#id")
-    @Override
-    public Category update(CategoryRequestDto requestDto, Long id) {
-        return super.update(requestDto, id);
-    }
-
-    @CacheEvict(value = "categories", key = "#id")
-    @Override
-    public boolean deleteById(Long id) {
-        return super.deleteById(id);
-    }
 }
