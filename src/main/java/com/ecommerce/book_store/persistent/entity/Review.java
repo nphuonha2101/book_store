@@ -1,6 +1,8 @@
 package com.ecommerce.book_store.persistent.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,16 +22,15 @@ public class Review extends AbstractEntity implements Serializable {
     @Column(name = "rating")
     private int rating;
     @Column(name = "comment")
-    private String coomment;
+    private String comment;
 
     public Review() {
     }
 
-    public Review(User user, Book book, int rating, String coomment) {
+    public Review(User user, Book book, int rating, String comment) {
         this.user = user;
         this.book = book;
         this.rating = rating;
-        this.coomment = coomment;
+        this.comment = comment;
     }
-
 }
