@@ -30,7 +30,8 @@
                             <h3 class="discount-price" th:if="${book != null}">
                                 <span th:text="${#numbers.formatDecimal(book.price, 1, 'COMMA', 2, 'POINT')} + ' VND'">Price</span>
                             </h3>
-                            <p class="info-text" th:text="${book != null ? book.description : ''}">Product Description</p>
+                            <p class="info-text" th:text="${book != null ? book.description : ''}">Product
+                                Description</p>
 
                             <!-- Add to Cart Form -->
                             <form th:action="@{/cart/add}" method="post" th:if="${book != null}">
@@ -80,23 +81,119 @@
                     </div>
                 </div>
             </div>
+            <!-- Modal Đánh Giá Sản Phẩm -->
+            <div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="reviewModalLabel">Đánh giá sản phẩm</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="reviewForm">
+                                <input type="hidden" id="bookId" th:value="${book.id}">
+                                <input type="hidden" id="userId" th:value="${1}">
+                                <div class="mb-3">
+                                    <label for="rating" class="form-label">Chọn số sao:</label>
+                                    <select id="rating" class="form-control">
+                                        <option value="1">⭐</option>
+                                        <option value="2">⭐⭐</option>
+                                        <option value="3">⭐⭐⭐</option>
+                                        <option value="4">⭐⭐⭐⭐</option>
+                                        <option value="5">⭐⭐⭐⭐⭐</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="comment" class="form-label">Bình luận:</label>
+                                    <textarea id="comment" class="form-control" rows="3"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary" onclick="submitReview(event)">Gửi đánh
+                                    giá
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Button mở modal -->
+            <div class="review-button mt-3">
+                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#reviewModal">Đánh giá sản phẩm
+                </button>
+            </div>
+
+            <div class="reviews mt-4">
+                <h4>Đánh giá từ người dùng</h4>
+                <div id="reviewList">
+                    <th:block th:each="review : ${reviews}">
+                        <div class="review card mt-2 rounded-5 rounded p-2">
+                            <div class="card-title p-2">
+                                <h5 th:text="${review.user.name}"></h5>
+                            </div>
+                            <div class="card-subtitle ps-2">
+                                <p th:text="${review.createdAt}"></p>
+                            </div>
+                            <div class="card-body">
+                                <div class="rating">
+                                    <span th:each="i : ${#numbers.sequence(1, review.rating)}">⭐</span>
+                                </div>
+                                <p th:text="${review.comment}"></p>
+                            </div>
+                        </div>
+                    </th:block>
+                </div>
+            </div>
+
         </div>
     </section>
 
-<script type="text/javascript">
-    const current = document.getElementById("current");
-    const opacity = 0.6;
-    const imgs = document.querySelectorAll(".img");
-    imgs.forEach(img => {
-        img.addEventListener("click", (e) => {
-            imgs.forEach(img => {
-                img.style.opacity = 1;
+    <script type="text/javascript">
+        const current = document.getElementById("current");
+        const opacity = 0.6;
+        const imgs = document.querySelectorAll(".img");
+        imgs.forEach(img => {
+            img.addEventListener("click", (e) => {
+                imgs.forEach(img => {
+                    img.style.opacity = 1;
+                });
+                current.src = e.target.src;
+                e.target.style.opacity = opacity;
             });
-            current.src = e.target.src;
-            e.target.style.opacity = opacity;
         });
-    });
-</script>
+
+        function submitReview(event) {
+            event.preventDefault();
+            const bookId = document.getElementById("bookId").value;
+            const userId = document.getElementById("userId").value;
+            const rating = document.getElementById("rating").value;
+            const comment = document.getElementById("comment").value;
+
+            fetch('/reviews/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    bookId: bookId,
+                    userId: userId,
+                    rating: rating,
+                    comment: comment
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Đánh giá của bạn đã được gửi!");
+                        location.reload();
+                    } else {
+                        alert("Có lỗi xảy ra, vui lòng thử lại!");
+                    }
+                })
+                .catch(error => console.error("Lỗi:", error));
+        }
+
+    </script>
 </th:block>
 </body>
 </html>
