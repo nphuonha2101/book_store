@@ -109,4 +109,13 @@ public class ReviewServiceImpl extends IServiceImpl<ReviewRequestDto, ReviewResp
         }
         return null;
     }
+
+    @Override
+    public double getAverageRatingByBookId(Long bookId) {
+        List<Review> reviews = reviewRepository.findByBookId(bookId);
+        return reviews.stream()
+                .mapToInt(Review::getRating)
+                .average()
+                .orElse(0.0);
+    }
 }

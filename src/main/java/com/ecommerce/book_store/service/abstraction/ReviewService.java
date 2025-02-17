@@ -8,5 +8,6 @@ import java.util.List;
 public interface ReviewService {
     List<Review> getReviewsByBookId(Long bookId);
     Review addReview(Long bookId, Long userId, int rating, String comment);
+    double getAverageRatingByBookId(Long bookId);
 }
 

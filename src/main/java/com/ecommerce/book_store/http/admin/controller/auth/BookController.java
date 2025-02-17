@@ -3,7 +3,6 @@ package com.ecommerce.book_store.http.admin.controller.auth;
 import com.ecommerce.book_store.persistent.entity.Review;
 import com.ecommerce.book_store.service.abstraction.BookService;
 import com.ecommerce.book_store.service.abstraction.ReviewService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +29,8 @@ public class BookController {
                     model.addAttribute("book", book);
                     List<Review> reviews = reviewService.getReviewsByBookId(id);
                     model.addAttribute("reviews", reviews);
+                    double avgRating = reviewService.getAverageRatingByBookId(id);
+                    model.addAttribute("avgRating", avgRating);
                     return "pages/auth/detailBook";
                 })
                 .orElse("error/404");
