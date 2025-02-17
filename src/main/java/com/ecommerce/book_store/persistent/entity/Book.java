@@ -50,4 +50,6 @@ public class Book extends AbstractEntity implements Serializable {
         this.publishedAt = publishedAt;
         this.category = category;
     }
+
+
 }
