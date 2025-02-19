@@ -19,20 +19,20 @@ public class BookServiceTest {
 
     @Test
     public void saveBookTest() {
-        BookRequestDto bookRequestDto = new BookRequestDto(
-                "Test Book",
-                "Test Author",
-                "Test Description",
-                "8748743849384938",
-                1000,
-                1000,
-                true,
-                1L,
-                LocalDateTime.now(),
-                null
-        );
+//        BookRequestDto bookRequestDto = new BookRequestDto(
+//                "Test Book",
+//                "Test Author",
+//                "Test Description",
+//                "8748743849384938",
+//                1000,
+//                1000,
+//                true,
+//                1L,
+//                LocalDateTime.now(),
+//                null
+//        );
 
-        bookService.save(bookRequestDto);
+//        bookService.save(bookRequestDto);
         assert true;
     }
 

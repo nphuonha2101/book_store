@@ -15,8 +15,10 @@ public class BookImage extends AbstractEntity implements Serializable {
     @Column(name="url")
     private String url;
     @ManyToOne
-    @JoinColumn(name="book_id")
+    @JoinColumn(name="book_id", insertable = false, updatable = false)
     protected Book book;
+    @Column(name="book_id")
+    private Long bookId;
 
     public BookImage() {
     }

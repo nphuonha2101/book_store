@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin.html}">
+
+<div layout:fragment="content" class="pb-100">
+    <div class="breadcrumb-area">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/admin/dashboard}">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/admin/books}">Quản lý sách</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Tạo sách mới</li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="container">
+        <h2 class="mb-4">Tạo sách mới</h2>
+        <form id="bookForm" th:action="@{/admin/books/store}" method="post" enctype="multipart/form-data">
+            <div class="row g-4">
+                <!-- Card thông tin cơ bản -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Thông tin cơ bản</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3 form-group">
+                                <label for="title" class="form-label">Tiêu đề <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="title" name="title" required>
+                            </div>
+                            <div class="mb-3 form-group">
+                                <label for="authorName" class="form-label">Tên tác giả <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="authorName" name="authorName" required>
+                            </div>
+                            <div class="mb-3 form-group">
+                                <label for="description" class="form-label">Mô tả <span class="text-danger">*</span></label>
+                                <textarea class="form-control validate" id="description" name="description" rows="3"></textarea>
+                            </div>
+                            <div class="mb-3 form-group">
+                                <label for="isbn" class="form-label">ISBN <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="isbn" name="isbn" required>
+                            </div>
+                            <div class="mb-3 form-group">
+                                <label for="category" class="form-label">Thể loại <span class="text-danger">*</span></label>
+                                <select class="form-select" id="category" name="categoryId" required>
+                                    <option th:each="category : ${categories}"
+                                            th:value="${category.id}"
+                                            th:text="${category.name}"></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card chi tiết bổ sung -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Chi tiết bổ sung</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4 form-group">
+                                <label for="coverImage" class="form-label">Ảnh bìa <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" id="coverImage" name="coverImage" accept="image/*">
+                                <div id="coverImagePreview" class="preview-container mt-2"></div>
+                            </div>
+                            <div class="mb-3 form-group">
+                                <label for="price" class="form-label">Giá <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">₫</span>
+                                    <input type="number" class="form-control" id="price" name="price" step="1000" required>
+                                </div>
+                            </div>
+                            <div class="mb-3 form-group">
+                                <label for="quantity" class="form-label">Số lượng <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="quantity" name="quantity" required>
+                            </div>
+                            <div class="mb-3 form-group">
+                                <label for="publishedAt" class="form-label">Ngày xuất bản <span class="text-danger">*</span></label>
+                                <input type="datetime-local" class="form-control" id="publishedAt" name="publishedAt">
+                            </div>
+                            <div class="mb-3 form-check form-switch">
+                                <input type="checkbox" class="form-check-input" id="isAvailable" name="isAvailable" value="true" checked>
+                                <label class="form-check-label" for="isAvailable">Có sẵn để bán</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 text-center mt-4">
+                    <button type="submit" class="btn btn-primary">Tạo sách</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <th:block th:if="${flash.success}">
+        <script>
+            window.swalSuccess('[[${flash.success}]]');
+        </script>
+    </th:block>
+    <th:block th:if="${flash.error}">
+        <script>
+            window.swalError('[[${flash.error}]]');
+        </script>
+    </th:block>
+    <script th:src="@{/admin/js/book.js}"></script>
+</div>
+</html>

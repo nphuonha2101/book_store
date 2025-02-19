@@ -7,43 +7,24 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
 @Setter
 public class BookRequestDto extends AbstractRequestDto {
-    @NotBlank
     private String title;
-    @NotBlank
     private String authorName;
     private String description;
-    @Min(10)
     private String isbn;
-    @Positive
-    private double price;
-    @Positive
-    private int quantity;
-    private boolean isAvailable;
-    @Positive
     private Long categoryId;
-    @NotNull
+    private MultipartFile coverImage;
+    private List<MultipartFile> bookImages;
+    private BigDecimal price;
+    private Integer quantity;
+    private boolean isAvailable;
     private LocalDateTime publishedAt;
-    private List<String> imageUrls;
-
-    public BookRequestDto() {
-    }
-
-    public BookRequestDto(String title, String authorName, String description, String isbn, double price, int quantity, boolean isAvailable, Long categoryId, LocalDateTime publishedAt, List<String> imageUrls) {
-        this.title = title;
-        this.authorName = authorName;
-        this.description = description;
-        this.isbn = isbn;
-        this.price = price;
-        this.quantity = quantity;
-        this.isAvailable = isAvailable;
-        this.categoryId = categoryId;
-        this.publishedAt = publishedAt;
-        this.imageUrls = imageUrls;
-    }
 }

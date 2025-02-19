@@ -8,12 +8,15 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfiguration {
 
     private final CustomUserDetailsService userDetailsService;
@@ -26,51 +29,74 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .authenticationProvider(userAuthenticationProvider())
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(authRequests -> authRequests
-                        .requestMatchers("/login", "/register").permitAll()
-                        .anyRequest().authenticated()
-                )
+//        http
+//                .authenticationProvider(userAuthenticationProvider())
+//                .csrf(AbstractHttpConfigurer::disable)
+//                .authorizeHttpRequests(authRequests -> authRequests
+//                        .requestMatchers("/login", "/register").permitAll()
+//                        .anyRequest().authenticated()
+//                )
+//
+//                .formLogin(form -> form
+//                        .loginPage("/login")
+//                        .permitAll()
+//                        .defaultSuccessUrl("/home", true)
+//                        .failureUrl("/login?error=true")
+//                )
+//                .logout(logout -> logout
+//                        .logoutUrl("/logout")
+//                        .logoutSuccessUrl("/login?logout=true")
+//                        .permitAll()
+//                )
+//                .sessionManagement(session -> session
+//                        .invalidSessionUrl("/login")
+//                        .sessionFixation(SessionManagementConfigurer.SessionFixationConfigurer::migrateSession
+//                        )
+//                        .maximumSessions(1)
+//                        .maxSessionsPreventsLogin(true)
+//                        .expiredUrl("/login?expired=true")
+//                );
+//        return http.build();
 
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .permitAll()
-                        .defaultSuccessUrl("/home", true)
-                        .failureUrl("/login?error=true")
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout=true")
-                        .permitAll()
-                );
+        http
+                .authorizeHttpRequests(auth->auth.anyRequest().permitAll())
+                .csrf(AbstractHttpConfigurer::disable);
+
+
         return http.build();
     }
 
-    @Bean
-    public SecurityFilterChain securityFilterChainAdmin(HttpSecurity http) throws Exception {
-        http
-                .authenticationProvider(adminAuthenticationProvider())
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(authRequests -> authRequests
-                        .requestMatchers("/admin/login", "/admin/register").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .formLogin(form -> form
-                        .loginPage("/admin/login")
-                        .loginProcessingUrl("/admin/login")
-                        .permitAll()
-                        .defaultSuccessUrl("/admin/dashboard", true)
-                        .failureUrl("/admin/login?error=true")
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/admin/logout")
-                        .logoutSuccessUrl("/admin/login?logout=true")
-                        .permitAll()
-                );
-        return http.build();
-    }
+//    @Bean
+//    public SecurityFilterChain securityFilterChainAdmin(HttpSecurity http) throws Exception {
+//        http
+//                .authenticationProvider(adminAuthenticationProvider())
+//                .csrf(AbstractHttpConfigurer::disable)
+//                .authorizeHttpRequests(authRequests -> authRequests
+//                        .requestMatchers("/admin/login", "/admin/register").permitAll()
+//                        .anyRequest().authenticated()
+//                )
+//                .formLogin(form -> form
+//                        .loginPage("/admin/login")
+//                        .loginProcessingUrl("/admin/login")
+//                        .permitAll()
+//                        .defaultSuccessUrl("/admin/dashboard", true)
+//                        .failureUrl("/admin/login?error=true")
+//                )
+//                .logout(logout -> logout
+//                        .logoutUrl("/admin/logout")
+//                        .logoutSuccessUrl("/admin/login?logout=true")
+//                        .permitAll()
+//                )
+//                .sessionManagement(session -> session
+//                        .invalidSessionUrl("/admin/login")
+//                        .sessionFixation(SessionManagementConfigurer.SessionFixationConfigurer::migrateSession
+//                        )
+//                        .maximumSessions(1)
+//                        .maxSessionsPreventsLogin(true)
+//                        .expiredUrl("/admin/login?expired=true")
+//                );
+//        return http.build();
+//    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
