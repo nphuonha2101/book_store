@@ -65,16 +65,6 @@
                                 <input type="file" class="form-control" id="coverImage" name="coverImage" accept="image/*">
                                 <div id="coverImagePreview" class="preview-container mt-2"></div>
                             </div>
-                            <div class="mb-4 form-group">
-                                <div class="image-upload-container">
-                                    <label for="imageUpload" class="form-label me-3">Ảnh chi tiết <span class="text-danger">*</span></label>
-                                    <input type="file" id="imageUpload" name="bookImages" accept="image/*" multiple style="display:none">
-                                    <label for="imageUpload" class="upload-btn">
-                                        Tải ảnh lên
-                                    </label>
-                                    <div id="imagePreview" class="preview-container"></div>
-                                </div>
-                            </div>
                             <div class="mb-3 form-group">
                                 <label for="price" class="form-label">Giá <span class="text-danger">*</span></label>
                                 <div class="input-group">
@@ -90,8 +80,8 @@
                                 <label for="publishedAt" class="form-label">Ngày xuất bản <span class="text-danger">*</span></label>
                                 <input type="datetime-local" class="form-control" id="publishedAt" name="publishedAt">
                             </div>
-                            <div class="mb-3 form-check form-group">
-                                <input type="checkbox" class="form-check-input" id="isAvailable" name="isAvailable" checked>
+                            <div class="mb-3 form-check form-switch">
+                                <input type="checkbox" class="form-check-input" id="isAvailable" name="isAvailable" value="true" checked>
                                 <label class="form-check-label" for="isAvailable">Có sẵn để bán</label>
                             </div>
                         </div>
@@ -104,6 +94,17 @@
             </div>
         </form>
     </div>
+
+    <th:block th:if="${flash.success}">
+        <script>
+            window.swalSuccess('[[${flash.success}]]');
+        </script>
+    </th:block>
+    <th:block th:if="${flash.error}">
+        <script>
+            window.swalError('[[${flash.error}]]');
+        </script>
+    </th:block>
     <script th:src="@{/admin/js/book.js}"></script>
 </div>
 </html>

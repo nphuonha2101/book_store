@@ -13,8 +13,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class BookController {
@@ -55,27 +57,51 @@ public class BookController {
         model.addAttribute("categories", categories);
         model.addAttribute("CONTENT_TITLE", "Chỉnh sửa sách");
         model.addAttribute("LAYOUT_TITLE", "Admin BookStore");
-        return "pages/admin/books/create";
+        return "pages/admin/books/edit";
     }
 
     @PostMapping(value = {"/admin/books/store"})
-    public String store(@Valid @ModelAttribute("bookRequestDto") BookRequestDto bookRequestDto, BindingResult result) {
-        if (result.hasErrors()) {
-            return "pages/admin/books/create";
+    public String store(@Valid @ModelAttribute("bookRequestDto") BookRequestDto bookRequestDto, BindingResult result, RedirectAttributes redirectAttributes) {
+        try {
+            if (result.hasErrors()) {
+                return "pages/admin/books/create";
+            }
+
+            bookService.save(bookRequestDto);
+            redirectAttributes.addFlashAttribute("success", "Thêm sách thành công");
+            return "redirect:/admin/books";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Thêm sách thất bại");
+            return "redirect:/admin/books/create";
+        }
+    }
+
+    @PostMapping(value = {"/admin/books/{bookId}/update"})
+    public String update(@PathVariable Long bookId, @Valid @ModelAttribute("bookRequestDto") BookRequestDto bookRequestDto, BindingResult result, RedirectAttributes redirectAttributes) {
+        try {
+            if (result.hasErrors()) {
+                return "pages/admin/books/edit";
+            }
+
+            bookService.update(bookRequestDto, bookId);
+            redirectAttributes.addFlashAttribute("success", "Cập nhật sách thành công");
+            return "redirect:/admin/books";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Cập nhật sách thất bại");
+            return "redirect:/admin/books/edit/" + bookId;
         }
 
-        bookService.save(bookRequestDto);
-        return "redirect:/admin/books";
     }
 
-    @PostMapping(value = {"/admin/books/update"})
-    public String update() {
-        return "pages/admin/books/update";
-    }
-
-    @DeleteMapping(value = {"/admin/books/delete"})
-    public String delete() {
-        return "pages/admin/books/delete";
+    @DeleteMapping(value = {"/admin/books/delete/{id}"})
+    @ResponseBody
+    public Map<String, Object> delete(@PathVariable Long id) {
+        try {
+            bookService.deleteById(id);
+            return Map.of("message", "Xóa sách thành công", "status", 200, "success", true);
+        } catch (Exception e) {
+            return Map.of("message", "Xóa sách thất bại", "status", 500, "success", false);
+        }
     }
 
 }

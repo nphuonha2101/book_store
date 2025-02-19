@@ -160,34 +160,34 @@ public class BookServiceImpl
         entity.setImages(bookImages);
     }
 
-    @Cacheable(value = "books", key = "#id")
-    @Override
-    public Book findById(Long id) {
-        return super.findById(id);
-    }
-
-    @Cacheable(value = "books")
-    @Override
-    public List<Book> findAll() {
-        return super.findAll();
-    }
-
-    @CachePut(value = "books", key = "#result.id")
-    @Override
-    public Book save(BookRequestDto requestDto) {
-        return super.save(requestDto);
-    }
-
-    @CachePut(value = "books", key = "#id")
-    @Override
-    public Book update(BookRequestDto requestDto, Long id) {
-        return super.update(requestDto, id);
-    }
-
-    @CacheEvict(value = "books", key = "#id")
-    @Override
-    public boolean deleteById(Long id) {
-        return super.deleteById(id);
-    }
+//    @Cacheable(value = "books", key = "#id")
+//    @Override
+//    public Book findById(Long id) {
+//        return super.findById(id);
+//    }
+//
+//    @Cacheable(value = "books")
+//    @Override
+//    public List<Book> findAll() {
+//        return super.findAll();
+//    }
+//
+//    @CachePut(value = "books", key = "#result.id")
+//    @Override
+//    public Book save(BookRequestDto requestDto) {
+//        return super.save(requestDto);
+//    }
+//
+//    @CachePut(value = "books", key = "#id")
+//    @Override
+//    public Book update(BookRequestDto requestDto, Long id) {
+//        return super.update(requestDto, id);
+//    }
+//
+//    @CacheEvict(value = "books", key = "#id")
+//    @Override
+//    public boolean deleteById(Long id) {
+//        return super.deleteById(id);
+//    }
 
 }

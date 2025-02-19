@@ -47,7 +47,7 @@
                                     <option th:each="category : ${categories}"
                                             th:value="${category.id}"
                                             th:text="${category.name}"
-                                            th:selected="${book.categoryId == category.id}"></option>
+                                            ></option>
                                 </select>
                             </div>
                         </div>
@@ -65,18 +65,6 @@
                                 <input type="file" class="form-control" id="coverImage" name="coverImage"
                                        accept="image/*" th:data-existing="${book.coverImage}">
                                 <div id="coverImagePreview" class="preview-container mt-2"></div>
-                            </div>
-                            <div class="mb-4 form-group">
-                                <div class="image-upload-container">
-                                    <label for="imageUpload" class="form-label me-3">Ảnh chi tiết</label>
-                                    <input type="file" id="imageUpload" name="bookImages"
-                                           accept="image/*" multiple style="display:none"
-                                           th:data-existing="${book.images}">
-                                    <label for="imageUpload" class="upload-btn">
-                                        Tải ảnh lên
-                                    </label>
-                                    <div id="imagePreview" class="preview-container"></div>
-                                </div>
                             </div>
                             <div class="mb-3 form-group">
                                 <label for="price" class="form-label">Giá <span class="text-danger">*</span></label>
@@ -157,6 +145,17 @@
             background: #0056b3;
         }
     </style>
+
+    <th:block th:if="${flash.success}">
+        <script>
+            window.swalSuccess('[[${flash.success}]]');
+        </script>
+    </th:block>
+    <th:block th:if="${flash.error}">
+        <script>
+            window.swalError('[[${flash.error}]]');
+        </script>
+    </th:block>
 
     <script th:src="@{/admin/js/book.js}"></script>
 </div>
