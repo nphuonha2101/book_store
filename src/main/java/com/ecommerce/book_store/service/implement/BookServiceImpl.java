@@ -12,6 +12,7 @@ import com.ecommerce.book_store.service.abstraction.BookService;
 import com.ecommerce.book_store.service.abstraction.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -22,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -31,12 +33,14 @@ public class BookServiceImpl
 
     private final CategoryService categoryService;
     private final FirebaseStorageService firebaseStorageService;
+    private final BookRepository bookRepository;
 
     @Autowired
-    public BookServiceImpl(BookRepository repository, CategoryService categoryService, FirebaseStorageService firebaseStorageService) {
+    public BookServiceImpl(BookRepository repository, CategoryService categoryService, FirebaseStorageService firebaseStorageService, BookRepository bookRepository) {
         super(repository);
         this.categoryService = categoryService;
         this.firebaseStorageService = firebaseStorageService;
+        this.bookRepository = bookRepository;
     }
 
     @Override
@@ -190,4 +194,8 @@ public class BookServiceImpl
 //        return super.deleteById(id);
 //    }
 
+    @Override
+    public Optional<Book> getBookById(Long id) {
+            return bookRepository.findById(id);
+    }
 }
