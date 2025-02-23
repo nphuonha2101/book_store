@@ -63,7 +63,7 @@
                             <div class="mb-4 form-group">
                                 <label for="coverImage" class="form-label">Ảnh bìa <span class="text-danger">*</span></label>
                                 <input type="file" class="form-control" id="coverImage" name="coverImage" accept="image/*">
-                                <div id="coverImagePreview" class="preview-container mt-2"></div>
+                                <img width="150px" height="150px" id="coverImagePreview" src="https://static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg" class="preview-container mt-2"/>
                             </div>
                             <div class="mb-3 form-group">
                                 <label for="price" class="form-label">Giá <span class="text-danger">*</span></label>
@@ -94,6 +94,19 @@
             </div>
         </form>
     </div>
+
+    <script>
+        $(function() {
+            $('input[type="file"][name="coverImage"]').on('change', function() {
+                const file = this.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#coverImagePreview').attr('src', e.target.result);
+                }
+                reader.readAsDataURL(file);
+            });
+        })
+    </script>
 
     <th:block th:if="${success != null}">
         <script>window.swalSuccess('[[${success}]]');</script>

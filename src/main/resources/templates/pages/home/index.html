@@ -75,7 +75,7 @@
                             <h4 class="title">
                                 <a th:href="@{/books/{id}(id=${book.id})}" th:text="${book.title}"></a>                            </h4>
                             <div class="price">
-                                <span th:text="${book.price + ' VNĐ'}"></span>
+                                <span th:text="${#numbers.formatDecimal(book.price, 1, 'COMMA', 0, 'POINT')} + ' VND'"></span>
                             </div>
                         </div>
                     </div>

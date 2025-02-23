@@ -79,14 +79,13 @@
                                     <span class="fs-6" th:text="${book != null ? book.publishedAt : ''}"></span>
                                 </dd>
 
-
                                 <!-- Add to Cart Form -->
                                 <form th:action="@{/cart/add}" method="post" th:if="${book != null}" class="mt-4">
                                     <input type="hidden" th:value="${book.id}" name="productId">
                                     <div class="row g-3">
                                         <div class="col-lg-4 col-md-4 col-12">
                                             <div class="form-group">
-                                                <label for="quantity" class="form-label fw-bold">Số lượng</label>
+                                                <label for="quantity" class="form-label fs-6 fw-bold">Số lượng</label>
                                                 <input type="number" id="quantity" name="quantity"
                                                        class="form-control form-control-lg rounded-3" value="1" min="1"
                                                        th:max="${book.quantity}">
@@ -117,7 +116,7 @@
                     <h4 class="card-title mb-4 border-bottom pb-3">
                         <i class="bi bi-info-circle me-2"></i>Mô tả chi tiết
                     </h4>
-                    <p class="card-text" th:utext="${book != null ? book.description : ''}">Product Details</p>
+                    <div class="container-lg" th:utext="${book != null ? book.description : ''}">Product Details</div>
                 </div>
             </div>
 

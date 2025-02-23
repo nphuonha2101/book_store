@@ -17,7 +17,7 @@ public class Book extends AbstractEntity implements Serializable {
     private String title;
     @Column(name="author_name")
     private String authorName;
-    @Column(name="description")
+    @Column(name="description", columnDefinition = "TEXT")
     private String description;
     @Column(name="isbn")
     private String isbn;
