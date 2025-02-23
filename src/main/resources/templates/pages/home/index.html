@@ -67,14 +67,13 @@
                         <div class="product-image">
                             <img th:src="${book.coverImage}" alt="#">
                             <div class="button">
-                                <a href="product-details.html" class="btn"><i class="lni lni-cart"></i> Thêm vào giỏ hàng</a>
+                                <a href="" class="btn"><i class="lni lni-cart"></i> Thêm vào giỏ hàng</a>
                             </div>
                         </div>
                         <div class="product-info">
                             <span class="category" th:text="${book.authorName}"></span>
                             <h4 class="title">
-                                <a th:text="${book.title}"></a>
-                            </h4>
+                                <a th:href="@{/books/{id}(id=${book.id})}" th:text="${book.title}"></a>                            </h4>
                             <div class="price">
                                 <span th:text="${book.price + ' VNĐ'}"></span>
                             </div>
