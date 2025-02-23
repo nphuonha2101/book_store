@@ -46,7 +46,7 @@ $(document).ready(function() {
                     min: 1
                 },
                 publishedAt: {
-                    required: false,
+                    required: true,
                     date: true
                 },
                 coverImage: {
@@ -96,6 +96,10 @@ $(document).ready(function() {
                 },
                 "bookImages[]": {
                     extension: "Chỉ chấp nhận các định dạng jpg, jpeg, png, gif."
+                },
+                publishedAt: {
+                    required: "Vui lòng nhập ngày xuất bản.",
+                    date: "Ngày xuất bản không hợp lệ."
                 }
             },
             errorPlacement: function (error, element) {
