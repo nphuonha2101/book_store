@@ -35,7 +35,7 @@
                             </div>
                             <div class="mb-3 form-group">
                                 <label for="description" class="form-label">Mô tả <span class="text-danger">*</span></label>
-                                <textarea class="form-control validate" id="description" name="description" rows="3"></textarea>
+                                <textarea class="form-control validate ckeditor" id="description" name="description" rows="3"></textarea>
                             </div>
                             <div class="mb-3 form-group">
                                 <label for="isbn" class="form-label">ISBN <span class="text-danger">*</span></label>
@@ -95,11 +95,11 @@
         </form>
     </div>
 
-    <th:block th:if="${flash != null and flash.success != null}">
-        <script>window.swalSuccess('[[${flash.success}]]');</script>
+    <th:block th:if="${success != null}">
+        <script>window.swalSuccess('[[${success}]]');</script>
     </th:block>
-    <th:block th:if="${flash != null and flash.error != null}">
-        <script>window.swalError('[[${flash.error}]]');</script>
+    <th:block th:if="${error != null}">
+        <script>window.swalError('[[${error}]]');</script>
     </th:block>
 
     <script th:src="@{/admin/js/book.js}"></script>

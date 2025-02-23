@@ -3,6 +3,21 @@
       layout:decorate="~{/layouts/master.html}">
 <head>
     <title>Chi tiết sản phẩm</title>
+    <style>
+        .current-image {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .images img {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .current-image:hover {
+            transform: scale(1.1);
+        }
+    </style>
 </head>
 <body>
 <th:block layout:fragment="content">
@@ -18,7 +33,7 @@
                                 <main id="gallery">
                                     <div class="main-img mb-4 text-center" th:if="${book != null && !#lists.isEmpty(book.images)}">
                                         <img th:src="${book.images[0].url}" id="current" alt="Product Image"
-                                             class="img-fluid rounded-3 shadow-sm" style="max-height: 400px; object-fit: contain;">
+                                             class="img-fluid rounded-3 shadow-sm current-image" style="max-height: 400px; object-fit: contain;">
                                     </div>
                                     <div class="images d-flex flex-wrap gap-3 justify-content-center" th:if="${book != null && !#lists.isEmpty(book.images)}">
                                         <th:block th:each="image : ${book.images}">
@@ -33,26 +48,37 @@
                         <!-- Product Info -->
                         <div class="col-lg-6 col-md-12">
                             <div class="product-info">
-                                <h1 class="display-6 fw-bold mb-3" th:text="${book != null ? book.title : ''}">Product Title</h1>
-                                <div class="d-flex align-items-center mb-3">
-                                    <div class="rating me-3">
+                                <h3 class="fw-bold mb-3" th:text="${book != null ? book.title : ''}">Product Title</h3>
+                                <div class="rating me-3">
+                                    <th:block th:if="${avgRating != null and avgRating > 0}">
                                         <span th:each="i : ${#numbers.sequence(1, avgRating)}" class="text-warning fs-5">⭐</span>
-                                    </div>
-                                    <span class="text-muted fs-5" th:text="'(' + ${reviews.size()} + ' đánh giá)'"></span>
+                                    </th:block>
+                                    <th:block th:unless="${avgRating != null and avgRating > 0}">
+                                        <span class="text-muted fs-5">Chưa có đánh giá</span>
+                                    </th:block>
                                 </div>
-                                <h2 class="text-primary mb-4" th:if="${book != null}">
-                                    <span th:text="${#numbers.formatDecimal(book.price, 1, 'COMMA', 2, 'POINT')} + ' VND'"
+
+                                <h4 class="text-primary mb-4 mt-3" th:if="${book != null}">
+                                    <span th:text="${#numbers.formatDecimal(book.price, 1, 'COMMA', 0, 'POINT')} + ' VND'"
                                           class="fw-bold fs-2"></span>
-                                </h2>
+                                </h4>
                                 <div class="author-info p-3 bg-light rounded-3 mb-4">
-                                    <h5 class="mb-0">
+                                    <h6 class="mb-0">
                                         <i class="bi bi-person-circle me-2"></i>
                                         <span th:text="${book != null ? 'Tác giả: ' + book.authorName : 'Tác giả không xác định'}"
                                               class="text-muted"></span>
-                                    </h5>
+                                    </h6>
                                 </div>
 
-                                <p class="lead mb-4" th:text="${book != null ? book.description : ''}">Product Description</p>
+                                <dd>
+                                    <span class="fw-bold fs-6">Thể loại:</span>
+                                    <span class="fs-6" th:text="${book != null ? book.category.name : ''}"></span>
+                                </dd>
+                                <dd>
+                                    <span class="fw-bold fs-6">Ngày xuất bản:</span>
+                                    <span class="fs-6" th:text="${book != null ? book.publishedAt : ''}"></span>
+                                </dd>
+
 
                                 <!-- Add to Cart Form -->
                                 <form th:action="@{/cart/add}" method="post" th:if="${book != null}" class="mt-4">
@@ -68,12 +94,12 @@
                                         </div>
                                         <div class="col-12">
                                             <div class="d-flex gap-3">
-                                                <button class="btn btn-primary btn-lg flex-grow-1 rounded-3"
+                                                <button class="btn btn-primary btn-md flex-grow-1 rounded-3"
                                                         th:disabled="${book.quantity == 0}">
                                                     <i class="bi bi-cart-plus me-2"></i> Thêm vào giỏ hàng
                                                 </button>
-                                                <button class="btn btn-primary btn-lg flex-grow-1 rounded-3">
-                                                    <i class="bi bi-heart-fill">Thêm yêu thích</i>
+                                                <button class="btn btn-outline-primary btn-md flex-grow-1 rounded-3">
+                                                    <i class="bi bi-heart-fill"></i> Thêm yêu thích
                                                 </button>
                                             </div>
                                         </div>
@@ -91,7 +117,7 @@
                     <h4 class="card-title mb-4 border-bottom pb-3">
                         <i class="bi bi-info-circle me-2"></i>Mô tả chi tiết
                     </h4>
-                    <p class="card-text" th:text="${book != null ? book.description : ''}">Product Details</p>
+                    <p class="card-text" th:utext="${book != null ? book.description : ''}">Product Details</p>
                 </div>
             </div>
 

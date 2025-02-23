@@ -125,12 +125,13 @@ public class BookServiceImpl
     public void copyProperties(BookRequestDto requestDto, Book entity) {
         Category category = categoryService.findById(requestDto.getCategoryId());
 
-        String coverImageUrl = null;
+        // Check if a new cover image is provided
         if (requestDto.getCoverImage() != null && !requestDto.getCoverImage().isEmpty()) {
-            coverImageUrl = firebaseStorageService.uploadFile(
+            String coverImageUrl = firebaseStorageService.uploadFile(
                     requestDto.getCoverImage(),
                     "books/covers"
             );
+            entity.setCoverImage(coverImageUrl);
         }
 
         // Upload multiple book images if exists
@@ -159,7 +160,6 @@ public class BookServiceImpl
         entity.setQuantity(requestDto.getQuantity());
         entity.setAvailable(requestDto.isAvailable());
         entity.setPublishedAt(requestDto.getPublishedAt());
-        entity.setCoverImage(coverImageUrl);
         entity.setCategory(category);
         entity.setImages(bookImages);
     }

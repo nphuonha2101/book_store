@@ -16,7 +16,7 @@
 
     <div class="container">
         <h2 class="mb-4">Cập nhật sách</h2>
-        <form id="bookForm" th:action="@{/admin/books/update/{id}(id=${book.id})}" method="post" enctype="multipart/form-data">
+        <form id="bookForm" th:action="@{/admin/books/{id}/update(id=${book.id})}" method="post" enctype="multipart/form-data">
             <input type="hidden" name="id" th:value="${book.id}">
             <div class="row g-4">
                 <div class="col-md-6">
@@ -35,7 +35,7 @@
                             </div>
                             <div class="mb-3 form-group">
                                 <label for="description" class="form-label">Mô tả <span class="text-danger">*</span></label>
-                                <textarea class="form-control validate" id="description" name="description" rows="3" th:text="${book.description}"></textarea>
+                                <textarea class="form-control validate ckeditor" id="description" name="description" rows="3" th:text="${book.description}"></textarea>
                             </div>
                             <div class="mb-3 form-group">
                                 <label for="isbn" class="form-label">ISBN <span class="text-danger">*</span></label>
@@ -63,15 +63,15 @@
                             <div class="mb-4 form-group">
                                 <label for="coverImage" class="form-label">Ảnh bìa</label>
                                 <input type="file" class="form-control" id="coverImage" name="coverImage"
-                                       accept="image/*" th:data-existing="${book.coverImage}">
-                                <div id="coverImagePreview" class="preview-container mt-2"></div>
+                                       accept="image/*">
+                                <img width="150px" height="150px" id="coverImagePreview" class="preview-container mt-2" th:src="${book.coverImage != null ? book.coverImage : 'https://static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg'}"/>
                             </div>
                             <div class="mb-3 form-group">
                                 <label for="price" class="form-label">Giá <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text">₫</span>
                                     <input type="number" class="form-control" id="price" name="price"
-                                           step="1000" th:value="${book.price}">
+                                           step="1000" th:value="${T(java.lang.Math).round(book.price)}">
                                 </div>
                             </div>
                             <div class="mb-3 form-group">
@@ -146,11 +146,11 @@
         }
     </style>
 
-    <th:block th:if="${flash != null and flash.success != null}">
-        <script>window.swalSuccess('[[${flash.success}]]');</script>
+    <th:block th:if="${success != null}">
+        <script>window.swalSuccess('[[${success}]]');</script>
     </th:block>
-    <th:block th:if="${flash != null and flash.error != null}">
-        <script>window.swalError('[[${flash.error}]]');</script>
+    <th:block th:if="${error != null}">
+        <script>window.swalError('[[${error}]]');</script>
     </th:block>
 
     <script th:src="@{/admin/js/book.js}"></script>

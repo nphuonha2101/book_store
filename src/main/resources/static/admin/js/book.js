@@ -50,7 +50,9 @@ $(document).ready(function() {
                     date: true
                 },
                 coverImage: {
-                    required: true,
+                    required: function (element) {
+                        return window.location.pathname === '/admin/books/create';
+                    },
                     extension: "jpg|jpeg|png|gif"
                 },
                 "bookImages[]": {
@@ -117,53 +119,6 @@ $(document).ready(function() {
                 });
             }
         });
-        function handleImageUpload(input, previewContainer, isMultiple = true) {
-            const files = Array.from(input.files);
-            previewContainer.innerHTML = '';
-
-            files.forEach((file, index) => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const previewWrapper = document.createElement('div');
-                    previewWrapper.className = 'preview-item';
-
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.className = 'preview-image';
-
-                    const deleteBtn = document.createElement('button');
-                    deleteBtn.innerHTML = '✖';
-                    deleteBtn.className = 'delete-btn';
-                    deleteBtn.onclick = function() {
-                        previewWrapper.remove();
-                        if (isMultiple) {
-                            const dt = new DataTransfer();
-                            const remainingFiles = Array.from(input.files)
-                                .filter((_, i) => i !== index);
-                            remainingFiles.forEach(file => dt.items.add(file));
-                            input.files = dt.files;
-                        } else {
-                            input.value = '';
-                        }
-                        validator.element(input);
-                    };
-
-                    previewWrapper.appendChild(img);
-                    previewWrapper.appendChild(deleteBtn);
-                    previewContainer.appendChild(previewWrapper);
-                };
-                reader.readAsDataURL(file);
-            });
-            validator.element(input);
-        }
-
-        // Cover image preview
-        const coverImage = document.getElementById('coverImage');
-        const coverImagePreview = document.getElementById('coverImagePreview');
-        coverImage.addEventListener('change', function() {
-            handleImageUpload(this, coverImagePreview, false);
-        });
-
     }
 
     exports.validateUpdateForm = function() {

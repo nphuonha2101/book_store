@@ -5,7 +5,6 @@ import com.ecommerce.book_store.persistent.entity.Book;
 import com.ecommerce.book_store.persistent.entity.Category;
 import com.ecommerce.book_store.service.abstraction.BookService;
 import com.ecommerce.book_store.service.abstraction.CategoryService;
-import com.ecommerce.book_store.service.implement.CategoryServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,12 +18,12 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-public class BookController {
+public class BookAdminController {
 
     private final BookService bookService;
     private final CategoryService categoryService;
 
-    public BookController(BookService bookService, CategoryService categoryService) {
+    public BookAdminController(BookService bookService, CategoryService categoryService) {
         this.bookService = bookService;
         this.categoryService = categoryService;
     }
@@ -90,7 +89,6 @@ public class BookController {
             redirectAttributes.addFlashAttribute("error", "Cập nhật sách thất bại");
             return "redirect:/admin/books/edit/" + bookId;
         }
-
     }
 
     @DeleteMapping(value = {"/admin/books/delete/{id}"})

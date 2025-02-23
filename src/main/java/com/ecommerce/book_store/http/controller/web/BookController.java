@@ -1,5 +1,6 @@
-package com.ecommerce.book_store.http.admin.controller.auth;
+package com.ecommerce.book_store.http.controller.web;
 
+import com.ecommerce.book_store.persistent.entity.Book;
 import com.ecommerce.book_store.persistent.entity.Review;
 import com.ecommerce.book_store.service.abstraction.BookService;
 import com.ecommerce.book_store.service.abstraction.ReviewService;
@@ -24,15 +25,17 @@ public class BookController {
 
     @GetMapping("/{id}")
     public String getProductDetail(@PathVariable Long id, Model model) {
-        return bookService.getBookById(id)
-                .map(book -> {
-                    model.addAttribute("book", book);
-                    List<Review> reviews = reviewService.getReviewsByBookId(id);
-                    model.addAttribute("reviews", reviews);
-                    double avgRating = reviewService.getAverageRatingByBookId(id);
-                    model.addAttribute("avgRating", avgRating);
-                    return "pages/auth/detailBook";
-                })
-                .orElse("error/404");
+        if (bookService.getBookById(id).isEmpty()) {
+            return "pages/error/404";
+        }
+        Book book = bookService.getBookById(id).get();
+        model.addAttribute("book", book);
+        List<Review> reviews = reviewService.getReviewsByBookId(id);
+        model.addAttribute("reviews", reviews);
+        double avgRating = reviewService.getAverageRatingByBookId(id);
+        model.addAttribute("avgRating", avgRating);
+        model.addAttribute("CONTENT_TITLE", book.getTitle());
+        model.addAttribute("LAYOUT_TITLE", "BookStore");
+        return "pages/detail/detailBook";
     }
 }

@@ -11,15 +11,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.SQLOutput;
 import java.util.Map;
 @Slf4j
 @Log4j
 @Controller
-public class BookImageController {
+public class BookImageAdminController {
     private final BookImageService bookImageService;
 
-    public BookImageController(BookImageService bookImageService) {
+    public BookImageAdminController(BookImageService bookImageService) {
         this.bookImageService = bookImageService;
     }
 

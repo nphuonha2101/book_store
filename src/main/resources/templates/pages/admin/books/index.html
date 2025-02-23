@@ -54,11 +54,11 @@
 
     <div th:replace="~{fragments/pagination :: pagination(${page}, ${url}, ${params})}"></div>
 
-    <th:block th:if="${flash != null and flash.success != null}">
-        <script>window.swalSuccess('[[${flash.success}]]');</script>
+    <th:block th:if="${success != null}">
+        <script>window.swalSuccess('[[${success}]]');</script>
     </th:block>
-    <th:block th:if="${flash != null and flash.error != null}">
-        <script>window.swalError('[[${flash.error}]]');</script>
+    <th:block th:if="${error != null}">
+        <script>window.swalError('[[${error}]]');</script>
     </th:block>
 
     <script th:src="@{/admin/js/book.js}"></script>
