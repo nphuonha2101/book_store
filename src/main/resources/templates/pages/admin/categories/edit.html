@@ -12,14 +12,14 @@
         </nav>
     </div>
 
-    <form id="categoryForm" th:action="@{/admin/categories/update/{id}(id=${category.id})}" th:object="${category}" method="post">
+    <form id="categoryForm" th:action="@{/admin/categories/update/{id}(id=${category.id})}" method="post">
         <div class="form-group">
             <label for="name">Tên thể loại</label>
-            <input type="text" class="form-control" id="name" name="name" th:field="*{name}" required>
+            <input type="text" class="form-control" id="name" name="name" th:value="${category.name}" required>
         </div>
         <div class="form-group">
             <label for="description">Mô tả</label>
-            <textarea class="form-control ckeditor" id="description" name="description" th:field="*{description}" required></textarea>
+            <textarea class="form-control validate ckeditor" id="description" name="description" rows="3" th:utext="${category.description}"></textarea>
         </div>
         <button type="submit" class="btn btn-primary">Cập nhật</button>
     </form>
