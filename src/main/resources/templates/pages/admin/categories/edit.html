@@ -1,0 +1,26 @@
+<div xmlns:th="http://www.thymeleaf.org" layout:fragment="content"
+     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+     layout:decorate="~{layouts/admin.html}" class="pb-100">
+
+    <div class="breadcrumb-area">
+        <h1>Chỉnh sửa thể loại</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/admin/categories}">Quản lý thể loại sách</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa thể loại</li>
+            </ol>
+        </nav>
+    </div>
+
+    <form id="categoryForm" th:action="@{/admin/categories/update/{id}(id=${category.id})}" th:object="${category}" method="post">
+        <div class="form-group">
+            <label for="name">Tên thể loại</label>
+            <input type="text" class="form-control" id="name" name="name" th:field="*{name}" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Mô tả</label>
+            <textarea class="form-control ckeditor" id="description" name="description" th:field="*{description}" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Cập nhật</button>
+    </form>
+</div>
