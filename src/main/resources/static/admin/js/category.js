@@ -43,7 +43,7 @@ $(document).ready(function() {
                 }
             },
             submitHandler: function (form) {
-                window.swalConfirm("Bạn chắc chắn muốn lưu thể loại này?", "Có", "Không", function() {
+                window.swalConfirm("Bạn chắc chắn muốn lưu/cập nhật thể loại này?", "Có", "Không", function() {
                     form.submit();
                 });
             }
@@ -57,7 +57,7 @@ $(document).ready(function() {
                 type: "DELETE",
                 success: function (res) {
                     if (res.status === 200) {
-                        window.swalSuccess("Xóa thể loại thành công!", "success", "Hủy", "Đóng", function() {
+                        window.swalSuccess("Xóa thể loại thành công!").then(function() {
                             window.location.reload();
                         });
                     } else {

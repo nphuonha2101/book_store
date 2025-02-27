@@ -18,12 +18,12 @@
         <table class="table table-striped table-bordered">
             <thead>
             <tr>
-                <th>Tiêu đề</th>
-                <th>Tên tác giả</th>
-                <th>Giá</th>
-                <th>Số lượng</th>
-                <th>Tình trạng</th>
-                <th>Hành động</th>
+                <th class="text-center">Tiêu đề</th>
+                <th class="text-center">Tên tác giả</th>
+                <th class="text-center">Giá</th>
+                <th class="text-center">Số lượng</th>
+                <th class="text-center">Tình trạng</th>
+                <th class="text-center">Hành động</th>
             </tr>
             </thead>
             <tbody>
@@ -31,12 +31,12 @@
                 <td colspan="6" class="text-center">Không có dữ liệu</td>
             </tr>
             <tr th:each="book : ${page.content}">
-                <td th:text="${book.title}">Tiêu đề</td>
-                <td th:text="${book.authorName}">Tên tác giả</td>
-                <td th:text="${book.price}">Giá</td>
-                <td th:text="${book.quantity}">Số lượng</td>
-                <td><span th:text="${book.isAvailable ? 'Còn hàng' : 'Hết hàng'}" th:classappend="${book.isAvailable ? 'badge bg-success' : 'badge bg-danger'}"></span></td>
-                <td>
+                <td class="text-center" th:text="${book.title}">Tiêu đề</td>
+                <td class="text-center" th:text="${book.authorName}">Tên tác giả</td>
+                <td class="text-center" th:text="${book.price}">Giá</td>
+                <td class="text-center" th:text="${book.quantity}">Số lượng</td>
+                <td class="text-center"><span th:text="${book.isAvailable ? 'Còn hàng' : 'Hết hàng'}" th:classappend="${book.isAvailable ? 'badge bg-success' : 'badge bg-danger'}"></span></td>
+                <td class="text-center">
                     <a class="btn btn-light-success btn-sm" title="View Images" th:href="@{/admin/books/{id}/images(id=${book.id})}">
                         <i class="ti ti-photo" style="font-size: 1.2em"></i>
                     </a>

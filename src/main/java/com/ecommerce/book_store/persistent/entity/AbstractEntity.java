@@ -12,8 +12,6 @@ import java.time.LocalDateTime;
 @FilterDef(name = "deletedFilter", parameters = @ParamDef(name = "isDeleted", type = Boolean.class))
 @Filter(name = "deletedFilter", condition = "deleted_at IS NULL")
 public abstract class AbstractEntity {
-
-
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name="id", insertable = false, updatable = false)
@@ -25,6 +23,13 @@ public abstract class AbstractEntity {
     private LocalDateTime updatedAt;
     @Column(name="deleted_at", nullable = true)
     private LocalDateTime deletedAt;
+
+    public AbstractEntity() {
+    }
+
+    public AbstractEntity(Long id) {
+        this.id = id;
+    }
 
     @PrePersist
     public void prePersist() {

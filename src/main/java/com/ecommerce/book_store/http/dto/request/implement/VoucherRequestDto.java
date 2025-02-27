@@ -6,28 +6,20 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
 public class VoucherRequestDto extends AbstractRequestDto {
-    @NotBlank
+    private MultipartFile thumbnail;
     private String code;
     @Positive
-    private double discount;
+    private int discount;
     @Positive
-    private double minSpend;
-    @NotNull
+    private int minSpend;
     private LocalDateTime expiredDate;
-    public VoucherRequestDto() {
-
-    }
-
-    public VoucherRequestDto(String code, double discount, double minSpend, LocalDateTime expiredDate) {
-        this.code = code;
-        this.discount = discount;
-        this.minSpend = minSpend;
-        this.expiredDate = expiredDate;
-    }
+    private List<Long> categoryIds;
 }

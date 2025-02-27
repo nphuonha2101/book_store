@@ -26,6 +26,10 @@ public class Category extends AbstractEntity implements Serializable {
     public Category() {
     }
 
+    public Category(Long id) {
+        super(id);
+    }
+
     public Category(String name, String description) {
         this.name = name;
         this.description = description;
