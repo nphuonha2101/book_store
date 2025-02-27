@@ -1,6 +1,5 @@
 package com.ecommerce.book_store.http.controller.admin;
 
-import com.ecommerce.book_store.http.dto.request.implement.BookRequestDto;
 import com.ecommerce.book_store.http.dto.request.implement.CategoryRequestDto;
 import com.ecommerce.book_store.persistent.entity.Category;
 import com.ecommerce.book_store.service.abstraction.CategoryService;
