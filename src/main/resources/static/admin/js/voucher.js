@@ -33,7 +33,9 @@ $(function() {
                     greaterThan: "#startDate",
                 },
                 thumbnail: {
-                    required: true,
+                    required: function (element) {
+                        return $("#thumbnailPreview").attr("src") == "" || window.location.pathname.includes("create");
+                    },
                 },
                 categoryIds: {
                     required: true,
