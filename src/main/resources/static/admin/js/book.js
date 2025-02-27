@@ -218,7 +218,7 @@ $(document).ready(function() {
                 }
             },
             submitHandler: function (form) {
-                window.swalConfirm("Bạn chắc chắn muốn lưu sách này?", "Có", "Không", function() {
+                window.swalConfirm("Bạn chắc chắn muốn lưu/cập nhật sách này?", "Có", "Không", function() {
                     form.submit();
                 });
             }
@@ -278,7 +278,7 @@ $(document).ready(function() {
                 type: "DELETE",
                 success: function (res) {
                     if (res.status === 200) {
-                        window.swalSuccess("Xóa sách thành công!", "success", "Hủy", "Đóng", function() {
+                        window.swalSuccess("Xóa sách thành công!").then(function() {
                             window.location.reload();
                         });
                     } else {

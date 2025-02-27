@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -13,14 +14,16 @@ import java.util.List;
 @Getter
 @Setter
 public class Voucher extends AbstractEntity implements Serializable {
+    @Column(name="thumbnail")
+    private String thumbnail;
     @Column(name = "code")
     private String code;
     @Column(name = "discount")
-    private double discount;
+    private int discount;
     @Column(name = "min_spend")
-    private double min_spend;
+    private int minSpend;
     @Column(name = "expired_date")
-    private double expired_date;
+    private LocalDateTime expiredDate;
     @ManyToMany
     @JoinTable(
             name = "voucher_categories",
@@ -32,11 +35,12 @@ public class Voucher extends AbstractEntity implements Serializable {
     public Voucher() {
     }
 
-    public Voucher(String code, double discount, double min_spend, double expired_date) {
+    public Voucher(String thumbnail, String code, int discount, int minSpend, LocalDateTime expiredDate) {
+        this.thumbnail = thumbnail;
         this.code = code;
         this.discount = discount;
-        this.min_spend = min_spend;
-        this.expired_date = expired_date;
+        this.minSpend = minSpend;
+        this.expiredDate = expiredDate;
     }
 
 }
