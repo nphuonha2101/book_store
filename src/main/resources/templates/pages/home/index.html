@@ -7,55 +7,88 @@
 <body>
 <th:block layout:fragment="content">
     <!-- Start Hero Area -->
-    <section class="hero-area">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12 col-12 custom-padding-right">
-                    <div class="slider-head">
-                        <!-- Start Hero Slider -->
-                        <div class="hero-slider">
-                            <!-- Start Single Slider -->
-                            <div class="single-slider"
-                                 style="background-image: url(static/images/hero/slider-bg1.jpg);">
-                                <div class="content">
-                                    <h2><span>No restocking fee ($35 savings)</span>
-                                        M75 Sport Watch
-                                    </h2>
-                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                                        incididunt ut labore et dolore magna aliqua.</p>
-                                    <h3><span>Now Only</span> $320.99</h3>
-                                    <div class="button">
-                                        <a href="product-grids.html" class="btn">Shop Now</a>
+    <th:block th:if="${#lists.isEmpty(sliders)}">
+        <section class="hero-area">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 col-12 custom-padding-right">
+                        <div class="slider-head">
+                            <!-- Start Hero Area -->
+                            <section class="hero-area">
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-lg-12 col-12 custom-padding-right">
+                                            <div class="slider-head">
+                                                <!-- Start Hero Slider -->
+                                                <div class="hero-slider">
+                                                    <!-- Start Single Slider -->
+                                                    <div class="single-slider"
+                                                         th:style="|background-image: linear-gradient(to right, white, transparent), url('https://static.vecteezy.com/system/resources/previews/008/424/987/original/bookstore-bookshop-showcase-and-shelves-with-books-flat-illustration-vector.jpg');|">
+                                                        <div class="content">
+                                                            <h2>Chào mừng bạn đến với Bookstore</h2>
+                                                            <p>Chúng tôi cung cấp những cuốn sách hay nhất cho bạn</p>
+                                                            <div class="button">
+                                                                <a href="/books" class="btn">Xem ngay</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <!-- End Single Slider -->
+                                                </div>
+                                                <!-- End Hero Slider -->
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <!-- End Single Slider -->
-                            <!-- Start Single Slider -->
-                            <div class="single-slider"
-                                 style="background-image: url(static/images/hero/slider-bg2.jpg);">
-                                <div class="content">
-                                    <h2><span>Big Sale Offer</span>
-                                        Get the Best Deal on CCTV Camera
-                                    </h2>
-                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                                        incididunt ut labore et dolore magna aliqua.</p>
-                                    <h3><span>Combo Only:</span> $590.00</h3>
-                                    <div class="button">
-                                        <a href="product-grids.html" class="btn">Shop Now</a>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- End Single Slider -->
+                            </section>
+                            <!-- End Hero Area -->
                         </div>
-                        <!-- End Hero Slider -->
                     </div>
                 </div>
-
             </div>
-        </div>
-    </section>
+        </section>
+    </th:block>
+    <th:block th:if="${!#lists.isEmpty(sliders)}">
+        <section class="hero-area">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 col-12 custom-padding-right">
+                        <div class="slider-head">
+                            <!-- Start Hero Area -->
+                            <section class="hero-area">
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-lg-12 col-12 custom-padding-right">
+                                            <div class="slider-head">
+                                                <!-- Start Hero Slider -->
+                                                <div class="hero-slider">
+                                                    <!-- Start Single Slider -->
+                                                    <div th:each="slider : ${sliders}" class="single-slider"
+                                                         th:style="|background-image: linear-gradient(to right, white, transparent), url('${slider.image}');|">
+                                                        <div class="content">
+                                                            <h2 th:text="${slider.title}"></h2>
+                                                            <p th:text="${slider.description}"></p>
+                                                            <div class="button">
+                                                                <a th:href="${slider.url}" class="btn">Xem ngay</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <!-- End Single Slider -->
+                                                </div>
+                                                <!-- End Hero Slider -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            <!-- End Hero Area -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </th:block>
     <!-- End Hero Area -->
-    <section class="top-latest-product-section">
+    <section class="top-latest-product-section mt-5">
         <div class="container">
             <div class="section-title">
                 <h2>LATEST PRODUCTS</h2>

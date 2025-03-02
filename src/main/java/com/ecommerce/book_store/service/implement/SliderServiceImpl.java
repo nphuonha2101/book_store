@@ -10,7 +10,8 @@ import com.ecommerce.book_store.service.abstraction.SliderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.List;
+
 
 @Service
 public class SliderServiceImpl extends IServiceImpl<SliderRequestDto, SliderResponseDto, Slider> implements SliderService {
@@ -76,4 +77,9 @@ public class SliderServiceImpl extends IServiceImpl<SliderRequestDto, SliderResp
         entity.setUrl(requestDto.getUrl());
     }
 
+    @Override
+    public List<Slider> getAllSliders() {
+        return sliderRepository.findAll();
+
+    }
 }
