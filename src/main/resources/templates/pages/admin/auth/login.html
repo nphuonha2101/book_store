@@ -13,8 +13,8 @@
                             </a>
                             <p class="text-center">Book Store Admin</p>
 
-                            <div th:if="${param.error}" class="alert alert-danger" role="alert">
-                                Sai tên đăng nhập hoặc  mật khẩu
+                            <div th:if="${param.error}" class="alert alert-danger" role="alert" th:text="${errorMessage}">
+<!--                                Sai tên đăng nhập hoặc  mật khẩu-->
                             </div>
 
                             <form th:action="@{/admin/login}" method="POST">

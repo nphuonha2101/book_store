@@ -26,11 +26,11 @@ public class AuthController {
     }
     @PostMapping("/register")
     public ModelAndView registerUser(
-//                                    @RequestParam("username") String username,
-                                     @RequestParam("email") String email,
-                                     @RequestParam("password") String password,
-                                     @RequestParam("phone") String phone,
-                                     @RequestParam("address") String address) {
+//           @RequestParam("username") String username,
+             @RequestParam("email") String email,
+             @RequestParam("password") String password,
+             @RequestParam("phone") String phone,
+             @RequestParam("address") String address) {
         UserRequestDto userRequestDto = new UserRequestDto();
 //        userRequestDto.setUsername(username);
         userRequestDto.setEmail(email);
