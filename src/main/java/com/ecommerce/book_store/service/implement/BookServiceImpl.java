@@ -164,38 +164,26 @@ public class BookServiceImpl
         entity.setImages(bookImages);
     }
 
-//    @Cacheable(value = "books", key = "#id")
-//    @Override
-//    public Book findById(Long id) {
-//        return super.findById(id);
-//    }
-//
-//    @Cacheable(value = "books")
-//    @Override
-//    public List<Book> findAll() {
-//        return super.findAll();
-//    }
-//
-//    @CachePut(value = "books", key = "#result.id")
-//    @Override
-//    public Book save(BookRequestDto requestDto) {
-//        return super.save(requestDto);
-//    }
-//
-//    @CachePut(value = "books", key = "#id")
-//    @Override
-//    public Book update(BookRequestDto requestDto, Long id) {
-//        return super.update(requestDto, id);
-//    }
-//
-//    @CacheEvict(value = "books", key = "#id")
-//    @Override
-//    public boolean deleteById(Long id) {
-//        return super.deleteById(id);
-//    }
-
     @Override
     public Optional<Book> getBookById(Long id) {
             return bookRepository.findById(id);
+    }
+
+    @Override
+    public Page<Book> findBooksContainingTitle(String title, int page, int size) {
+        Pageable pageable = Pageable.ofSize(size).withPage(page);
+        return bookRepository.findByTitleContaining(title, pageable);
+    }
+
+    @Override
+    public Page<Book> findBooksByTitleIn(List<String> titles, int page, int size) {
+        Pageable pageable = Pageable.ofSize(size).withPage(page);
+        return bookRepository.findByTitleIn(titles, pageable);
+    }
+
+    @Override
+    public Page<Book> filter(String authorName, String title, List<Long> categoryIds, Double minPrice, Double maxPrice, int page, int size) {
+        Pageable pageable = Pageable.ofSize(size).withPage(page);
+        return bookRepository.filter(authorName, title, categoryIds, minPrice, maxPrice, pageable);
     }
 }

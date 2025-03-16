@@ -118,7 +118,7 @@
         </div>
     </section>
 
-    <div class="container mb-5">
+    <div class="container mb-5" th:if="${page.totalPages > 0}">
         <div class="row justify-content-center">
             <div class="col-auto">
                 <nav aria-label="Page navigation">
@@ -131,9 +131,9 @@
 
                         <th:block th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}">
                             <li th:if="${page.totalPages <= 6 ||
-                                        i < 4 ||
-                                        (i >= page.number - 2 && i <= page.number + 2) ||
-                                        i >= page.totalPages - 4}"
+                                    i < 4 ||
+                                    (i >= page.number - 2 && i <= page.number + 2) ||
+                                    i >= page.totalPages - 4}"
                                 class="page-item"
                                 th:classappend="${page.number == i ? 'active' : ''}">
                                 <a class="page-link"
@@ -153,13 +153,14 @@
                         <li class="page-item" th:classappend="${!page.hasNext()} ? 'disabled'">
                             <a class="page-link" th:href="@{/(page=${page.number + 1})}" aria-label="Next">
                                 <span aria-hidden="true">&raquo;</span>
-                               </a>
+                            </a>
                         </li>
                     </ul>
                 </nav>
             </div>
         </div>
     </div>
+
 </th:block>
 
 </body>

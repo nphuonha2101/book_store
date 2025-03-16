@@ -1,8 +1,8 @@
-<div th:fragment="pagination(page, url, params)" class="container mb-5">
+<div th:fragment="pagination(page, url, params)" class="container mb-5" th:if="${page.totalPages > 0}">
     <div class="row justify-content-center">
         <div class="col-auto">
             <nav aria-label="Page navigation">
-                <ul class="pagination d-flex align-items-center">
+                <ul id="paginationList" class="pagination d-flex align-items-center">
                     <li class="page-item" th:classappend="${!page.hasPrevious()} ? 'disabled'">
                         <a class="page-link"
                            th:attr="href=${#strings.isEmpty(params)} ? @{${url}(page=${page.number - 1})} : @{${url}(page=${page.number - 1})} + ${params}"

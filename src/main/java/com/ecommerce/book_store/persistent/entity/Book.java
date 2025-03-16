@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,6 +24,7 @@ public class Book extends AbstractEntity implements Serializable {
     private String isbn;
     @Column(name="cover_image")
     private String coverImage;
+    @JsonManagedReference
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "book")
     private List<BookImage> images;
     @Column(name="price")
