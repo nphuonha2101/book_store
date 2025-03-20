@@ -1,5 +1,6 @@
 package com.ecommerce.book_store.http.controller.api.vosk;
 
+import com.ecommerce.book_store.http.ApiResponse;
 import com.ecommerce.book_store.service.abstraction.VoskService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class VoskController {
     }
 
     @PostMapping("/transcribe")
-    public ResponseEntity<?> transcribeAudio(@RequestParam("audio") MultipartFile audio) {
+    public ResponseEntity<ApiResponse<Object>> transcribeAudio(@RequestParam("audio") MultipartFile audio) {
         try {
             System.out.println("Nhận file: " + audio.getOriginalFilename() +
                     ", Kích thước: " + audio.getSize() +
@@ -32,16 +33,10 @@ public class VoskController {
             BufferedInputStream bufferedStream = new BufferedInputStream(audio.getInputStream());
 
             String result = this.voskService.transcribeAudio(bufferedStream);
-
-            Map<String, String> response = new HashMap<>();
-            response.put("text", result);
-            return ResponseEntity.ok(response);
+            return ApiResponse.success(result, "Kết quả được trả về thành công");
         } catch (Exception e) {
             e.printStackTrace();
-
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+            return ApiResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
