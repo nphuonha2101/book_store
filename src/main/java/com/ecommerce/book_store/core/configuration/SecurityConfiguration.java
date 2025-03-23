@@ -1,70 +1,63 @@
 package com.ecommerce.book_store.core.configuration;
 
+import com.ecommerce.book_store.core.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
     private final UserDetailsService userDetailsService;
     private final UserDetailsService adminDetailsService;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     public SecurityConfiguration(
             @Qualifier("userDetailsService") UserDetailsService userDetailsService,
-            @Qualifier("adminDetailsService") UserDetailsService adminDetailsService
+            @Qualifier("adminDetailsService") UserDetailsService adminDetailsService,
+            JwtAuthenticationFilter jwtAuthenticationFilter
     ) {
         this.userDetailsService = userDetailsService;
         this.adminDetailsService = adminDetailsService;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
     @Bean
-    public SecurityFilterChain userSecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/user/**", "/login")
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/user/**").hasAuthority("ROLE_USER")
-                        .requestMatchers("/login").permitAll()
-                        .anyRequest().authenticated()
+                .csrf(AbstractHttpConfigurer::disable) // Tắt CSRF vì API dùng JWT
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/v1/auth/**").authenticated()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")  // Admin phải có role ADMIN
+                        .anyRequest().permitAll() // Các request khác không cần xác thực
                 )
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/user/dashboard")
-                        .failureUrl("/login?error=true")
-                )
-                .authenticationProvider(userAuthenticationProvider());
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) // Giữ session-based cho admin
+                .formLogin(Customizer.withDefaults()) // Giữ login form cho admin
+                .httpBasic(Customizer.withDefaults()) // Giữ Basic Auth cho API
+                .oauth2Login(Customizer.withDefaults()) // Giữ đăng nhập Google, Facebook
+                .authenticationProvider(userAuthenticationProvider()) // Xác thực user qua database
+                .authenticationProvider(adminAuthenticationProvider()) // Xác thực admin qua database
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Thêm JWT filter
 
         return http.build();
     }
-
-//    @Bean
-//    public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .securityMatcher("/admin/**", "/login/admin")
-//                .authorizeHttpRequests(authorize -> authorize
-//                        .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
-//                        .requestMatchers("/login/admin").permitAll()
-//                        .anyRequest().authenticated()
-//                )
-//                .formLogin(form -> form
-//                        .loginPage("/login/admin")
-//                        .loginProcessingUrl("/admin/login")
-//                        .defaultSuccessUrl("/admin/dashboard")
-//                        .failureUrl("/login/admin?error=true")
-//                )
-//                .authenticationProvider(adminAuthenticationProvider());
-//
-//        return http.build();
-//    }
 
     @Bean
     public AuthenticationProvider userAuthenticationProvider() {
@@ -85,5 +78,10 @@ public class SecurityConfiguration {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager() {
+        return new ProviderManager(List.of(userAuthenticationProvider(), adminAuthenticationProvider()));
     }
 }

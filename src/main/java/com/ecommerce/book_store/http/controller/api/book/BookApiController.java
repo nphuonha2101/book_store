@@ -38,7 +38,7 @@ public class BookApiController {
     @PostMapping("/suggest")
     public ResponseEntity<ApiResponse<List<Book>>> suggestBooks(@RequestBody List<String> terms,
                                              @RequestParam(defaultValue = "0") int page,
-                                             @RequestParam(defaultValue = "10") int size
+                                             @RequestParam(defaultValue = "4") int size
     ) {
         try {
             Page<Book> books = bookService.findBooksByTitleIn(terms, page, size);
