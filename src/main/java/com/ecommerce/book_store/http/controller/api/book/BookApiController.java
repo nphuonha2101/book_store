@@ -4,6 +4,7 @@ import com.ecommerce.book_store.http.ApiResponse;
 import com.ecommerce.book_store.persistent.entity.Book;
 import com.ecommerce.book_store.service.abstraction.BookService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @RequestMapping("/api/v1/books")
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 public class BookApiController {
     private final BookService bookService;
 
@@ -47,19 +49,37 @@ public class BookApiController {
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<ApiResponse<List<Book>>> filterBooks(@RequestParam(required = false) String authorName,
-                                         @RequestParam(required = false) String title,
-                                         @RequestParam(required = false) List<Long> categoryIds,
-                                         @RequestParam(required = false) Double minPrice,
-                                         @RequestParam(required = false) Double maxPrice,
-                                         Pageable pageable
+    public ResponseEntity<ApiResponse<List<Book>>> filterBooks(
+            @RequestParam(value = "authorName", required = false) String authorName,
+            @RequestParam(value = "title", required = false) String title,
+            @RequestParam(value = "categoryIds", required = false, defaultValue = "") List<Long> categoryIds,
+            @RequestParam(value = "minPrice", required = false) Double minPrice,
+            @RequestParam(value = "maxPrice", required = false) Double maxPrice,
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "size", defaultValue = "10") Integer size
     ) {
         try {
-            Page<Book> books = this.bookService.filter(authorName, title, categoryIds, minPrice, maxPrice, pageable.getPageNumber(), pageable.getPageSize());
-            return books != null ? ApiResponse.successWithPagination(books, "Tất cả sách được lấy thành công") : ApiResponse.error("Không tìm thấy", HttpStatus.NOT_FOUND);
+            if (categoryIds != null && categoryIds.isEmpty()) {
+                categoryIds = null;
+            }
+
+            Page<Book> books = bookService.filter(
+                    authorName,
+                    title,
+                    categoryIds,
+                    minPrice,
+                    maxPrice,
+                    page,
+                    size
+            );
+
+            return books != null && !books.isEmpty()
+                    ? ApiResponse.successWithPagination(books, "Tất cả sách được lấy thành công")
+                    : ApiResponse.error("Không tìm thấy", HttpStatus.NOT_FOUND);
 
         } catch (Exception e) {
             return ApiResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 }

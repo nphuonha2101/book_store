@@ -46,25 +46,25 @@ public class SecurityConfiguration {
         return http.build();
     }
 
-    @Bean
-    public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .securityMatcher("/admin/**", "/login/admin")
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers("/login/admin").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .formLogin(form -> form
-                        .loginPage("/login/admin")
-                        .loginProcessingUrl("/admin/login")
-                        .defaultSuccessUrl("/admin/dashboard")
-                        .failureUrl("/login/admin?error=true")
-                )
-                .authenticationProvider(adminAuthenticationProvider());
-
-        return http.build();
-    }
+//    @Bean
+//    public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .securityMatcher("/admin/**", "/login/admin")
+//                .authorizeHttpRequests(authorize -> authorize
+//                        .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
+//                        .requestMatchers("/login/admin").permitAll()
+//                        .anyRequest().authenticated()
+//                )
+//                .formLogin(form -> form
+//                        .loginPage("/login/admin")
+//                        .loginProcessingUrl("/admin/login")
+//                        .defaultSuccessUrl("/admin/dashboard")
+//                        .failureUrl("/login/admin?error=true")
+//                )
+//                .authenticationProvider(adminAuthenticationProvider());
+//
+//        return http.build();
+//    }
 
     @Bean
     public AuthenticationProvider userAuthenticationProvider() {
