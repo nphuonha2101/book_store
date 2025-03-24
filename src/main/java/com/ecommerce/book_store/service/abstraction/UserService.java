@@ -4,6 +4,9 @@ import com.ecommerce.book_store.http.dto.request.implement.UserRequestDto;
 import com.ecommerce.book_store.http.dto.response.implement.UserResponseDto;
 import com.ecommerce.book_store.persistent.entity.User;
 
+import java.util.Optional;
+
 public interface UserService extends IService<UserRequestDto, UserResponseDto, User> {
     User registerUser(UserRequestDto userRequestDto);
+    Optional<User> findByEmail(String email);
 }

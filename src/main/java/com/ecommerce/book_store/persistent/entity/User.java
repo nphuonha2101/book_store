@@ -1,9 +1,10 @@
 package com.ecommerce.book_store.persistent.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import net.minidev.json.annotate.JsonIgnore;
+
 
 import java.io.Serializable;
 
@@ -16,8 +17,8 @@ public class User extends AbstractEntity implements Serializable {
     private String name;
     @Column(name = "email", unique = true)
     private String email;
-    @JsonIgnore
     @Column(name = "password")
+    @JsonIgnore
     private String password;
     @Column(name = "avatar")
     private String avatar;

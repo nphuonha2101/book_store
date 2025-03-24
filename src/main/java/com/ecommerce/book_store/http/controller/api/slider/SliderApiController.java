@@ -14,7 +14,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/sliders")
-@CrossOrigin(origins = "http://localhost:5173")
 public class SliderApiController {
     private final SliderService sliderService;
 

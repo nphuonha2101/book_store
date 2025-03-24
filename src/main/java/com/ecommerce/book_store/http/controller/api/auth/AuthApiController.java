@@ -17,8 +17,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
 public class AuthApiController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
@@ -32,7 +33,7 @@ public class AuthApiController {
         this.userService = userService;
     }
 
-    @PostMapping("api/v1/login")
+    @PostMapping("/api/v1/login")
     public ResponseEntity<ApiResponse<String>> login(@RequestBody AuthRequest request) {
         try {
             Authentication authentication = authenticationManager.authenticate(
@@ -52,7 +53,7 @@ public class AuthApiController {
         }
     }
 
-    @PostMapping("api/v1/register")
+    @PostMapping("/api/v1/register")
     public ResponseEntity<ApiResponse<User>> registerUser(
             @RequestParam("email") String email,
             @RequestParam("password") String password,
@@ -73,8 +74,20 @@ public class AuthApiController {
         }
     }
 
-    @PostMapping("api/v1/auth/logout")
+    @PostMapping("/api/v1/auth/logout")
     public ResponseEntity<ApiResponse<String>> logout() {
         return ApiResponse.success(null, "Logout successfully");
+    }
+
+    @PostMapping("/api/v1/auth/me")
+    public ResponseEntity<ApiResponse<User>> me(@RequestHeader("Authorization") String token) {
+        try {
+            String jwtToken = token.substring(7);
+            String email = jwtUtils.extractUserEmail(jwtToken);
+            Optional<User> userOptional = userService.findByEmail(email);
+            return userOptional.map(user -> ApiResponse.success(user, "Get user successfully")).orElseGet(() -> ApiResponse.error("User not found", HttpStatus.NOT_FOUND));
+        } catch (Exception e) {
+            return ApiResponse.error("Internal Server Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

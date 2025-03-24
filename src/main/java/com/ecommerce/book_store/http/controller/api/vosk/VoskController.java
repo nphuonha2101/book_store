@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-        @RequestMapping("/api/v1/vosk")
+@RequestMapping("/api/v1/vosk")
 public class VoskController {
     private final VoskService voskService;
 
