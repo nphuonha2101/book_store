@@ -55,20 +55,11 @@ public class AuthApiController {
 
     @PostMapping("/api/v1/register")
     public ResponseEntity<ApiResponse<User>> registerUser(
-            @RequestParam("email") String email,
-            @RequestParam("password") String password,
-            @RequestParam("phone") String phone,
-            @RequestParam("address") String address) {
-        UserRequestDto userRequestDto = new UserRequestDto();
-        userRequestDto.setEmail(email);
-        userRequestDto.setPassword(password);
-        userRequestDto.setPhone(phone);
-        userRequestDto.setAddress(address);
-
+            @RequestBody UserRequestDto userRequestDto) {
         try {
             User user = userService.registerUser(userRequestDto);
-            return user != null ? ApiResponse.success(user, "Register successfully"):
-                ApiResponse.error("Register failed", HttpStatus.BAD_REQUEST);
+            return user != null ? ApiResponse.success(user, "Register successfully") :
+                    ApiResponse.error("Register failed", HttpStatus.BAD_REQUEST);
         } catch (RuntimeException e) {
             return ApiResponse.error(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

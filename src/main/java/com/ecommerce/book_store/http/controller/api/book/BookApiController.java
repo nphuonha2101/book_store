@@ -21,6 +21,19 @@ public class BookApiController {
         this.bookService = bookService;
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<List<Book>>> getAllBooks(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        try {
+            Page<Book> books = bookService.findAll(PageRequest.of(page, size));
+            return books != null ? ApiResponse.successWithPagination(books, "Tất cả sách được lấy thành công") : ApiResponse.error("Không tìm thấy", HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return ApiResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<List<Book>>> searchBooks(@RequestParam("term") String term,
                                                    @RequestParam(defaultValue = "0") int page,

@@ -50,19 +50,11 @@ public class UserServiceImpl extends IServiceImpl<UserRequestDto, UserResponseDt
     @Override
     public User registerUser(UserRequestDto userDto) {
         // Check if user already exists
-        if (userRepository.findByEmail(userDto.getEmail()) != null) {
+        if (userRepository.findByEmail(userDto.getEmail()).isPresent()) {
             throw new RuntimeException("User already exists");
         }
+       return this.save(userDto);
 
-        // Create new user
-        User user = new User();
-//        user.setName(userDto.getUsername());
-        user.setEmail(userDto.getEmail());
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        user.setPhone(userDto.getPhone());
-        user.setAddress(userDto.getAddress());
-
-        return userRepository.save(user);
     }
 
     @Override
