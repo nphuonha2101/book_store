@@ -14,16 +14,18 @@ import java.util.Optional;
 
 @Service
 public class UserServiceImpl extends IServiceImpl<UserRequestDto, UserResponseDto, User>
-            implements UserService {
+        implements UserService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final FirebaseStorageService firebaseStorageService;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, FirebaseStorageService firebaseStorageService) {
         super(userRepository);
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.firebaseStorageService = firebaseStorageService;
     }
 
     @Override
@@ -44,19 +46,41 @@ public class UserServiceImpl extends IServiceImpl<UserRequestDto, UserResponseDt
 
     @Override
     public void copyProperties(UserRequestDto requestDto, User entity) {
+        if (requestDto.getUsername() != null && !requestDto.getUsername().isEmpty()) {
+            entity.setName(requestDto.getUsername());
+        }
 
+        if (requestDto.getEmail() != null && !requestDto.getEmail().isEmpty()) {
+            entity.setEmail(requestDto.getEmail());
+        }
+
+        if (requestDto.getPassword() != null && !requestDto.getPassword().isEmpty()) {
+            entity.setPassword(passwordEncoder.encode(requestDto.getPassword()));
+        }
+
+        if (requestDto.getPhone() != null && !requestDto.getPhone().isEmpty()) {
+            entity.setPhone(requestDto.getPhone());
+        }
+
+        if (requestDto.getAddress() != null && !requestDto.getAddress().isEmpty()) {
+            entity.setAddress(requestDto.getAddress());
+        }
+
+        if (requestDto.getAvatar() != null && !requestDto.getAvatar().isEmpty()) {
+            String imageUrl = firebaseStorageService.uploadFile(requestDto.getAvatar(), "users/avatar");
+            entity.setAvatar(imageUrl);
+        }
     }
 
     @Override
     public User registerUser(UserRequestDto userDto) {
         // Check if user already exists
-        if (userRepository.findByEmail(userDto.getEmail()) != null) {
+        if (userRepository.findByEmail(userDto.getEmail()).isPresent()) {
             throw new RuntimeException("User already exists");
         }
 
         // Create new user
         User user = new User();
-//        user.setName(userDto.getUsername());
         user.setEmail(userDto.getEmail());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setPhone(userDto.getPhone());
@@ -68,5 +92,10 @@ public class UserServiceImpl extends IServiceImpl<UserRequestDto, UserResponseDt
     @Override
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    @Override
+    public Optional<Long> findIdByEmail(String email) {
+        return userRepository.findIdByEmail(email);
     }
 }

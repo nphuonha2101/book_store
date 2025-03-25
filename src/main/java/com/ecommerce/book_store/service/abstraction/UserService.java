@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface UserService extends IService<UserRequestDto, UserResponseDto, User> {
     User registerUser(UserRequestDto userRequestDto);
     Optional<User> findByEmail(String email);
+    Optional<Long> findIdByEmail(String email);
 }

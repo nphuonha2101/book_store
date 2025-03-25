@@ -18,7 +18,7 @@ public class UserServiceTest {
 //        userRequestDto.setUsername("user");
         userRequestDto.setEmail("21130488@st.hcmuaf.edu.vn");
         userRequestDto.setPassword(new BCryptPasswordEncoder().encode("123456"));
-        userRequestDto.setAvatar("https://i.pravatar.cc/150?img=68");
+//        userRequestDto.setAvatar("https://i.pravatar.cc/150?img=68");
         userRequestDto.setPhone("0123456789");
         userRequestDto.setAddress("HCM");
         userRequestDto.setRoleId(1L);

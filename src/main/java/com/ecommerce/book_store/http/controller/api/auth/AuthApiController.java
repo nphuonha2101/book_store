@@ -90,4 +90,21 @@ public class AuthApiController {
             return ApiResponse.error("Internal Server Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PostMapping("/api/v1/auth/update")
+    public ResponseEntity<ApiResponse<User>> update(@RequestHeader("Authorization") String token, @ModelAttribute UserRequestDto userRequestDto) {
+        try {
+            String jwtToken = token.substring(7);
+            String email = jwtUtils.extractUserEmail(jwtToken);
+            Optional<Long> userOptional = userService.findIdByEmail(email);
+            if (userOptional.isEmpty()) {
+                return ApiResponse.error("User not found", HttpStatus.NOT_FOUND);
+            }
+            Long userId = userOptional.get();
+            User updatedUser = userService.update(userRequestDto, userId);
+            return ApiResponse.success(updatedUser, "Update user successfully");
+        } catch (Exception e) {
+            return ApiResponse.error("Internal Server Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
