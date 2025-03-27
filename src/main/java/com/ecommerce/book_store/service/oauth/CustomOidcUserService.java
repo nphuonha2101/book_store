@@ -17,7 +17,6 @@ public class CustomOidcUserService extends OidcUserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Autowired
     public CustomOidcUserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -28,7 +27,6 @@ public class CustomOidcUserService extends OidcUserService {
         OidcUser oidcUser = super.loadUser(userRequest);
         String email = oidcUser.getAttribute("email");
         String avatar = oidcUser.getAttribute("picture");
-        System.out.println(oidcUser.getAttributes());
 
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> {
