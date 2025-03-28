@@ -31,9 +31,9 @@ public class UserServiceImpl extends IServiceImpl<UserRequestDto, UserResponseDt
     @Override
     public User toEntity(UserRequestDto requestDto) {
         return new User(
-                requestDto.getUsername(),
+                requestDto.getName(),
                 requestDto.getEmail(),
-                requestDto.getPassword(),
+                passwordEncoder.encode(requestDto.getPassword()),
                 requestDto.getPhone(),
                 requestDto.getAddress()
         );
@@ -46,8 +46,8 @@ public class UserServiceImpl extends IServiceImpl<UserRequestDto, UserResponseDt
 
     @Override
     public void copyProperties(UserRequestDto requestDto, User entity) {
-        if (requestDto.getUsername() != null && !requestDto.getUsername().isBlank()) {
-            entity.setName(requestDto.getUsername());
+        if (requestDto.getName() != null && !requestDto.getName().isEmpty()) {
+            entity.setName(requestDto.getName());
         }
 
         if (requestDto.getEmail() != null && !requestDto.getEmail().isBlank()) {
@@ -78,15 +78,7 @@ public class UserServiceImpl extends IServiceImpl<UserRequestDto, UserResponseDt
         if (userRepository.findByEmail(userDto.getEmail()).isPresent()) {
             throw new RuntimeException("User already exists");
         }
-
-        // Create new user
-        User user = new User();
-        user.setEmail(userDto.getEmail());
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        user.setPhone(userDto.getPhone());
-        user.setAddress(userDto.getAddress());
-
-        return userRepository.save(user);
+       return this.save(userDto);
     }
 
     @Override

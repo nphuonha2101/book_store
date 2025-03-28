@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Getter
 @Setter
 public class UserRequestDto extends AbstractRequestDto {
-    private String username;
+    private String name;
     private String password;
     private String email;
     private MultipartFile avatar;
