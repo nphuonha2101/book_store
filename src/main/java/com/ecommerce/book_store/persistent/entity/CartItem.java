@@ -11,9 +11,8 @@ import java.io.Serializable;
 @Table(name = "cart_items")
 @Entity
 public class CartItem extends AbstractEntity implements Serializable {
-    @ManyToOne
-    @JoinColumn(name = "cart_id")
-    private Cart cart;
+    @Column(name = "user_id")
+    private Long userId;
     @ManyToOne
     @JoinColumn(name = "book_id")
     private Book book;
@@ -24,12 +23,10 @@ public class CartItem extends AbstractEntity implements Serializable {
 
     public CartItem() {
     }
-
-    public CartItem(Cart cart, Book book, int quantity, double price) {
-        this.cart = cart;
+   public CartItem(Long userId, Book book, int quantity, double price) {
+        this.userId = userId;
         this.book = book;
         this.quantity = quantity;
         this.price = price;
     }
-
 }
