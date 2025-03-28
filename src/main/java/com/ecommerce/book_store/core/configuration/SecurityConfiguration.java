@@ -66,7 +66,7 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174")); // Frontend URLs
+        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174", "https://book-store-react-beta.vercel.app")); // Frontend URLs
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Phương thức API cho phép
         configuration.setAllowedHeaders(List.of("*")); // Chấp nhận tất cả headers
         configuration.setAllowCredentials(true); // Cho phép gửi credentials (JWT, session)
