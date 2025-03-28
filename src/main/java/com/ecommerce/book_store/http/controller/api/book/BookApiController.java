@@ -5,7 +5,6 @@ import com.ecommerce.book_store.persistent.entity.Book;
 import com.ecommerce.book_store.service.abstraction.BookService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +32,15 @@ public class BookApiController {
             return ApiResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<Book>> getBookById(@PathVariable("id") Long id) {
+        try {
+            Book book = bookService.findById(id);
+            return book != null ? ApiResponse.success(book, "Sách được lấy thành công") : ApiResponse.error("Không tìm thấy", HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return ApiResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<List<Book>>> searchBooks(@RequestParam("term") String term,
                                                    @RequestParam(defaultValue = "0") int page,
