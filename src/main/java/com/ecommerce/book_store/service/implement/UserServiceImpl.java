@@ -50,11 +50,11 @@ public class UserServiceImpl extends IServiceImpl<UserRequestDto, UserResponseDt
             entity.setName(requestDto.getName());
         }
 
-        if (requestDto.getEmail() != null && !requestDto.getEmail().isEmpty()) {
+        if (requestDto.getEmail() != null && !requestDto.getEmail().isBlank()) {
             entity.setEmail(requestDto.getEmail());
         }
 
-        if (requestDto.getPassword() != null && !requestDto.getPassword().isEmpty()) {
+        if (requestDto.getPassword() != null && !requestDto.getPassword().isBlank()) {
             entity.setPassword(passwordEncoder.encode(requestDto.getPassword()));
         }
 
@@ -62,7 +62,7 @@ public class UserServiceImpl extends IServiceImpl<UserRequestDto, UserResponseDt
             entity.setPhone(requestDto.getPhone());
         }
 
-        if (requestDto.getAddress() != null && !requestDto.getAddress().isEmpty()) {
+        if (requestDto.getAddress() != null && !requestDto.getAddress().isBlank()) {
             entity.setAddress(requestDto.getAddress());
         }
 

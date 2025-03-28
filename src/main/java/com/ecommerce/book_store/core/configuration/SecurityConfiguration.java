@@ -1,15 +1,22 @@
 package com.ecommerce.book_store.core.configuration;
 
 import com.ecommerce.book_store.core.security.JwtAuthenticationFilter;
+import com.ecommerce.book_store.core.security.JwtUtils;
+import com.ecommerce.book_store.service.oauth.CustomOAuth2UserService;
+import com.ecommerce.book_store.service.oauth.CustomOidcUserService;
+import com.ecommerce.book_store.service.oauth.CustomUser;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -18,6 +25,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -31,35 +40,65 @@ public class SecurityConfiguration {
     private final UserDetailsService userDetailsService;
     private final UserDetailsService adminDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomOidcUserService customOidcUserService;
+    @Value("${react.client.url}")
+    private String CLIENT_URL;
 
     public SecurityConfiguration(
             @Qualifier("userDetailsService") UserDetailsService userDetailsService,
             @Qualifier("adminDetailsService") UserDetailsService adminDetailsService,
-            JwtAuthenticationFilter jwtAuthenticationFilter
+            JwtAuthenticationFilter jwtAuthenticationFilter,
+            CustomOAuth2UserService customOAuth2UserService,
+            @Lazy CustomOidcUserService customOidcUserService
     ) {
         this.userDetailsService = userDetailsService;
         this.adminDetailsService = adminDetailsService;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.customOAuth2UserService = customOAuth2UserService;
+        this.customOidcUserService = customOidcUserService;
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    @Order(1)
+    public SecurityFilterChain apiFilterChain(HttpSecurity http, JwtUtils jwtUtils) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Cấu hình CORS
-                .csrf(AbstractHttpConfigurer::disable) // Tắt CSRF vì API dùng JWT
+//                .securityMatcher("/api/**")
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").authenticated()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")  // Admin phải có role ADMIN
-                        .anyRequest().permitAll() // Các request khác không cần xác thực
+                        .anyRequest().permitAll()
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) // Giữ session-based cho admin
-                .formLogin(Customizer.withDefaults()) // Giữ login form cho admin
-                .httpBasic(Customizer.withDefaults()) // Giữ Basic Auth cho API
-                .oauth2Login(Customizer.withDefaults()) // Giữ đăng nhập Google, Facebook
-                .authenticationProvider(userAuthenticationProvider()) // Xác thực user qua database
-                .authenticationProvider(adminAuthenticationProvider()) // Xác thực admin qua database
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Thêm JWT filter
+                .httpBasic(Customizer.withDefaults())
+//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService)
+                                .oidcUserService(customOidcUserService)
+                        )
+                        .successHandler(oAuth2SuccessHandler(jwtUtils))
+                        .failureHandler(oAuth2FailureHandler())
+                )
+                .authenticationProvider(userAuthenticationProvider())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        return http.build();
+    }
 
+    @Bean
+    @Order(2)
+    public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/admin/**")
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().permitAll()
+                )
+                .formLogin(Customizer.withDefaults())
+                .authenticationProvider(adminAuthenticationProvider());
         return http.build();
     }
 
@@ -74,6 +113,23 @@ public class SecurityConfiguration {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler oAuth2SuccessHandler(JwtUtils jwtUtils) {
+        return (request, response, authentication) -> {
+            CustomUser customUser = (CustomUser) authentication.getPrincipal();
+            String jwt = jwtUtils.generateToken(customUser.getUser().getEmail());
+            response.sendRedirect(CLIENT_URL + "/signin?from=oauth2&token=" + jwt);
+        };
+    }
+
+    @Bean
+    public AuthenticationFailureHandler oAuth2FailureHandler() {
+        return (request, response, exception) -> {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\": \"OAuth2 authentication failed: " + exception.getMessage() + "\"}");
+        };
     }
 
     @Bean
