@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -33,6 +34,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
+
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -61,9 +64,32 @@ public class SecurityConfiguration {
 
     @Bean
     @Order(1)
+    public SecurityFilterChain oauth2FilterChain(HttpSecurity http, JwtUtils jwtUtils) throws Exception {
+        http
+                .securityMatchers(matcher -> matcher
+                        .requestMatchers(antMatcher("/oauth2/**"))
+                        .requestMatchers(antMatcher("/oidc/**"))
+                        .requestMatchers(antMatcher("/login/oauth2/**"))
+                )
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService)
+                                .oidcUserService(customOidcUserService)
+                        )
+                        .successHandler(oAuth2SuccessHandler(jwtUtils))
+                        .failureHandler(oAuth2FailureHandler())
+                );
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
     public SecurityFilterChain apiFilterChain(HttpSecurity http, JwtUtils jwtUtils) throws Exception {
         http
-//                .securityMatcher("/api/**")
+                .securityMatcher("/api/**")
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -72,33 +98,40 @@ public class SecurityConfiguration {
                         .anyRequest().permitAll()
                 )
                 .httpBasic(Customizer.withDefaults())
-//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-                .oauth2Login(oauth2 -> oauth2
-                        .userInfoEndpoint(userInfo -> userInfo
-                                .userService(customOAuth2UserService)
-                                .oidcUserService(customOidcUserService)
-                        )
-                        .successHandler(oAuth2SuccessHandler(jwtUtils))
-                        .failureHandler(oAuth2FailureHandler())
-                )
                 .authenticationProvider(userAuthenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
     @Bean
-    @Order(2)
+    @Order(3)
     public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/admin/**")
                 .csrf(AbstractHttpConfigurer::disable)
+                .authenticationManager(adminAuthenticationManager())
+                .authenticationProvider(adminAuthenticationProvider())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().permitAll()
                 )
-                .formLogin(Customizer.withDefaults())
-                .authenticationProvider(adminAuthenticationProvider());
+                .formLogin(form -> form
+                        .loginPage("/admin/login")
+                        .loginProcessingUrl("/admin/login-process")
+                        .defaultSuccessUrl("/admin/dashboard")
+                        .failureHandler((request, response, exception) -> {
+                            System.out.println("❌ Login failed: " + exception.getMessage());
+                            response.sendRedirect("/admin/login?error=" + exception.getMessage());
+                        })
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/admin/logout")
+                        .logoutSuccessUrl("/admin/login")
+                        .permitAll()
+                );
+
         return http.build();
     }
 
@@ -154,7 +187,13 @@ public class SecurityConfiguration {
     }
 
     @Bean
+    @Primary
     public AuthenticationManager authenticationManager() {
         return new ProviderManager(List.of(userAuthenticationProvider(), adminAuthenticationProvider()));
+    }
+
+    @Bean
+    public AuthenticationManager adminAuthenticationManager() {
+        return new ProviderManager(List.of(adminAuthenticationProvider()));
     }
 }

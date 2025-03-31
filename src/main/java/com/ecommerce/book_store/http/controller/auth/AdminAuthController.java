@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class AdminAuthController {
 
-    @GetMapping("/login/admin")
+    @GetMapping("/admin/login")
     public String login(
             Model model
     ) {
@@ -21,9 +21,4 @@ public class AdminAuthController {
 
         return "pages/admin/auth/login";
     }
-
-//    @PostMapping("/admin/login")
-//    public String login() {
-//        return "redirect:/admin/dashboard";
-//    }
 }
