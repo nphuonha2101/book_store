@@ -66,6 +66,17 @@ spring.servlet.multipart.max-request-size=10MB
 firebase.credentials.url=
 firebase.storage.bucket=
 
-spring.security.oauth2.client.registration.google.client-id=YOUR_GOOGLE_CLIENT_ID
-spring.security.oauth2.client.registration.google.client-secret=YOUR_GOOGLE_CLIENT_SECRET
-spring.security.oauth2.client.registration.google.scope=profile,email
+spring.security.oauth2.client.registration.google.client-id=
+spring.security.oauth2.client.registration.google.client-secret=
+spring.security.oauth2.client.registration.google.scope=profile,email,openid
+spring.security.oauth2.client.registration.google.redirect-uri=http://localhost:8080/login/oauth2/code/google
+spring.security.oauth2.client.provider.google.authorization-uri=https://accounts.google.com/o/oauth2/v2/auth
+spring.security.oauth2.client.provider.google.token-uri=https://oauth2.googleapis.com/token
+spring.security.oauth2.client.provider.google.user-info-uri=https://www.googleapis.com/oauth2/v3/userinfo
+spring.security.oauth2.client.provider.google.user-name-attribute=sub
+
+jwt.secret.key=9e295ad5303aa56fe78e8fed2203d8d3213c466b49951ba010f0a9ec4abd0704
+jwt.expiration.time=86400000
+
+spring.devtools.restart.enabled=false
+react.client.url=http://localhost:5173

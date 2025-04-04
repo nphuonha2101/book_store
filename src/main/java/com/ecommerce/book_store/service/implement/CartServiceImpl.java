@@ -92,25 +92,24 @@ public class CartServiceImpl extends IServiceImpl<CartItemRequestDto, CartItemRe
     }
 
     @Override
-    public CartItem updateCartItem(Long userId, Long bookId, int quantity) {
-        List<CartItem> existing = cartItemReponsitory.findByUserId(userId);
-        for (CartItem cartItem : existing) {
-            if (cartItem.getBook().getId().equals(bookId)) {
-                cartItem.setQuantity(quantity);
-                return cartItemReponsitory.save(cartItem);
-            }
+    public CartItem updateCartItem(Long cartItemId, int quantity) {
+        Optional<CartItem> cartItem = cartItemReponsitory.findById(cartItemId);
+        if (cartItem.isPresent()) {
+            CartItem existingCartItem = cartItem.get();
+            existingCartItem.setQuantity(quantity);
+            return cartItemReponsitory.save(existingCartItem);
+        } else {
+            throw new RuntimeException("Cart item not found");
         }
-        return null;
     }
 
     @Override
-    public void deleteCartItem(Long userId, Long bookId) {
-        List<CartItem> existing = cartItemReponsitory.findByUserId(userId);
-        for (CartItem cartItem : existing) {
-            if (cartItem.getBook().getId().equals(bookId)) {
-                cartItemReponsitory.delete(cartItem);
-                return;
-            }
+    public void deleteCartItem(Long cartItemId) {
+        Optional<CartItem> cartItem = cartItemReponsitory.findById(cartItemId);
+        if (cartItem.isPresent()) {
+            cartItemReponsitory.delete(cartItem.get());
+        } else {
+            throw new RuntimeException("Cart item not found");
         }
 
     }

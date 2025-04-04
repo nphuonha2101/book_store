@@ -61,10 +61,10 @@ public class CartApiController {
         }
     }
 
-    @PutMapping("/update")
+    @PostMapping("/update")
     public ResponseEntity<ApiResponse<CartItem>> updateCartItem(@RequestBody CartItemRequestDto request) {
         try {
-            CartItem updated = cartItemService.updateCartItem(request.getUserId(), request.getBookId(), request.getQuantity());
+            CartItem updated = cartItemService.updateCartItem(request.getCartItemId(), request.getQuantity());
             return updated != null
                     ? ApiResponse.success(updated, "Cart item updated")
                     : ApiResponse.error("Not found", HttpStatus.NOT_FOUND);
@@ -73,15 +73,14 @@ public class CartApiController {
         }
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<ApiResponse<Void>> deleteCartItem(
-            @RequestParam Long userId,
-            @RequestParam Long bookId) {
+    @DeleteMapping("/delete/{cartItemId}")
+    public ResponseEntity<ApiResponse<Void>> deleteCartItem(@PathVariable Long cartItemId) {
         try {
-            cartItemService.deleteCartItem(userId, bookId);
+            cartItemService.deleteCartItem(cartItemId);
             return ApiResponse.success(null, "Cart item deleted");
         } catch (Exception e) {
             return ApiResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
     }
 }

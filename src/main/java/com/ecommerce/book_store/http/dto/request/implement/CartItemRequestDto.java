@@ -7,6 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CartItemRequestDto extends AbstractRequestDto {
+    private Long cartItemId;
     private Long userId;
     private Long bookId;
     private int quantity;

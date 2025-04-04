@@ -17,7 +17,7 @@ public class AdminLoader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         Admin admin = new Admin();
-        admin.setEmail("21130122@st.hcmuaf.edu.vn");
+        admin.setEmail("21130488@st.hcmuaf.edu.vn");
         admin.setPassword(new BCryptPasswordEncoder().encode("123456Admin"));
         admin.setName("Admin");
         adminRepository.save(admin);
