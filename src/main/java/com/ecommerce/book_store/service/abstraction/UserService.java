@@ -10,4 +10,5 @@ public interface UserService extends IService<UserRequestDto, UserResponseDto, U
     User registerUser(UserRequestDto userRequestDto);
     Optional<User> findByEmail(String email);
     Optional<Long> findIdByEmail(String email);
+    boolean existsByUserId(Long userId);
 }

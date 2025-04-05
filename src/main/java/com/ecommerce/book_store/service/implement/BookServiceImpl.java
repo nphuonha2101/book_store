@@ -186,4 +186,9 @@ public class BookServiceImpl
         Pageable pageable = Pageable.ofSize(size).withPage(page);
         return bookRepository.filter(authorName, title, categoryIds, minPrice, maxPrice, pageable);
     }
+
+    @Override
+    public boolean existsByBookId(Long bookId) {
+        return bookRepository.existsById(bookId);
+    }
 }

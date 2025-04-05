@@ -63,12 +63,6 @@ public class CartServiceImpl extends IServiceImpl<CartItemRequestDto, CartItemRe
         entity.setPrice(requestDto.getPrice());
 
     }
-
-//    @Override
-//    public Optional<CartItem> findCartItem(Long userId) {
-//        return cartItemReponsitory.findById(userId);
-//    }
-
     @Override
     public List<CartItem> getCartItemsByUserId(Long userId) {
         return cartItemReponsitory.findByUserId(userId);
