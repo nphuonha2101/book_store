@@ -90,4 +90,9 @@ public class UserServiceImpl extends IServiceImpl<UserRequestDto, UserResponseDt
     public Optional<Long> findIdByEmail(String email) {
         return userRepository.findIdByEmail(email);
     }
+
+    @Override
+    public boolean existsByUserId(Long userId) {
+        return userRepository.existsById(userId);
+    }
 }

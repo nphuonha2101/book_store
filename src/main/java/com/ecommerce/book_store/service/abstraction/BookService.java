@@ -15,4 +15,5 @@ public interface BookService
     Page<Book> findBooksContainingTitle(String title, int page, int size);
     Page<Book> findBooksByTitleIn(List<String> titles, int page, int size);
     Page<Book> filter(String authorName, String title, List<Long> categoryIds, Double minPrice, Double maxPrice,  int page, int size);
+    boolean existsByBookId(Long bookId);
 }
