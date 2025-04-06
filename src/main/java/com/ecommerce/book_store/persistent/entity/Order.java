@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -31,9 +30,11 @@ public class Order extends AbstractEntity implements Serializable {
     private OrderStatus status;
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @JsonManagedReference
-    private List<OrderItem> orderDetails;
+    private List<OrderItem> orderItems;
     @Column(name = "total_amount")
     private double totalAmount;
+    @Column(name = "total_discount")
+    private double totalDiscount;
 
 
     public Order() {
