@@ -7,7 +7,7 @@ import com.ecommerce.book_store.persistent.entity.User;
 import java.util.Optional;
 
 public interface UserService extends IService<UserRequestDto, UserResponseDto, User> {
-    User registerUser(UserRequestDto userRequestDto);
+    UserResponseDto registerUser(UserRequestDto userRequestDto);
     Optional<User> findByEmail(String email);
     Optional<Long> findIdByEmail(String email);
     boolean existsByUserId(Long userId);

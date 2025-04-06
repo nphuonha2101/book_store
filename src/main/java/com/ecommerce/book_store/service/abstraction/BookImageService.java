@@ -7,5 +7,5 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface BookImageService extends IService<BookImageRequestDto, BookImageResponseDto, BookImage> {
-    Page<BookImage> findAllByBookId(Long bookId, Pageable pageable);
+    Page<BookImageResponseDto> findAllByBookId(Long bookId, Pageable pageable);
 }

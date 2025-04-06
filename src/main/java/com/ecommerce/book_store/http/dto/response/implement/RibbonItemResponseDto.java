@@ -10,8 +10,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookImageResponseDto extends AbstractResponseDto {
+public class RibbonItemResponseDto extends AbstractResponseDto {
     private Long id;
-    private Long bookId;
-    private String url;
+    private Long ribbonId;
+    private BookResponseDto book;
 }

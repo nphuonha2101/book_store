@@ -1,7 +1,7 @@
 package com.ecommerce.book_store.http.controller.admin;
 
 import com.ecommerce.book_store.http.dto.request.implement.CategoryRequestDto;
-import com.ecommerce.book_store.persistent.entity.Category;
+import com.ecommerce.book_store.http.dto.response.implement.CategoryResponseDto;
 import com.ecommerce.book_store.service.abstraction.CategoryService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -18,17 +18,17 @@ import java.util.Map;
 @Slf4j
 @Controller
 @RequestMapping("/admin/categories")
-public class CategoryController {
+public class CategoryAdminController {
     private final CategoryService categoryService;
 
-    public CategoryController(CategoryService categoryService) {
+    public CategoryAdminController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
 
     @GetMapping
     public String listCategories(Model model, Pageable pageable) {
         try {
-        Page<Category> page = categoryService.findAll(pageable);
+        Page<CategoryResponseDto> page = categoryService.findAll(pageable);
         model.addAttribute("page", page);
         model.addAttribute("url", "/admin/categories");
         return "pages/admin/categories/index";
@@ -40,8 +40,8 @@ public class CategoryController {
 
     @GetMapping(value = {"/edit/{id}"})
     public String edit(@PathVariable Long id, Model model) {
-        Category categories = categoryService.findById(id);
-        model.addAttribute("category", categories);
+        CategoryResponseDto category = categoryService.findById(id);
+        model.addAttribute("category", category);
         model.addAttribute("CONTENT_TITLE", "Chỉnh sửa thể loại");
         model.addAttribute("LAYOUT_TITLE", "Admin BookStore");
         return "pages/admin/categories/edit";

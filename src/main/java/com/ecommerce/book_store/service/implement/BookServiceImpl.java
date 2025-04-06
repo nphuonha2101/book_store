@@ -1,6 +1,7 @@
 package com.ecommerce.book_store.service.implement;
 
 import com.ecommerce.book_store.http.dto.request.implement.BookRequestDto;
+import com.ecommerce.book_store.http.dto.response.implement.BookImageResponseDto;
 import com.ecommerce.book_store.http.dto.response.implement.BookResponseDto;
 import com.ecommerce.book_store.http.dto.response.implement.CategoryResponseDto;
 import com.ecommerce.book_store.persistent.entity.AbstractEntity;
@@ -8,14 +9,17 @@ import com.ecommerce.book_store.persistent.entity.Book;
 import com.ecommerce.book_store.persistent.entity.BookImage;
 import com.ecommerce.book_store.persistent.entity.Category;
 import com.ecommerce.book_store.persistent.repository.abstraction.BookRepository;
+import com.ecommerce.book_store.service.abstraction.BookImageService;
 import com.ecommerce.book_store.service.abstraction.BookService;
 import com.ecommerce.book_store.service.abstraction.CategoryService;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,13 +38,15 @@ public class BookServiceImpl
     private final CategoryService categoryService;
     private final FirebaseStorageService firebaseStorageService;
     private final BookRepository bookRepository;
+    private final BookImageService bookImageService;
 
     @Autowired
-    public BookServiceImpl(BookRepository repository, CategoryService categoryService, FirebaseStorageService firebaseStorageService, BookRepository bookRepository) {
+    public BookServiceImpl(BookRepository repository, CategoryService categoryService, FirebaseStorageService firebaseStorageService, BookRepository bookRepository, @Lazy BookImageService bookImageService) {
         super(repository);
         this.categoryService = categoryService;
         this.firebaseStorageService = firebaseStorageService;
         this.bookRepository = bookRepository;
+        this.bookImageService = bookImageService;
     }
 
     @Override
@@ -73,7 +79,7 @@ public class BookServiceImpl
                 requestDto.getDescription(),
                 requestDto.getIsbn(),
                 coverImageUrl,
-                requestDto.getPrice().doubleValue(),
+                requestDto.getPrice(),
                 requestDto.getQuantity(),
                 requestDto.isAvailable(),
                 requestDto.getPublishedAt(),
@@ -81,7 +87,9 @@ public class BookServiceImpl
         );
 
         // Set category
-        Category category = categoryService.findById(requestDto.getCategoryId());
+        Category category = categoryService.getRepository().findById(requestDto.getCategoryId()).orElseThrow(
+                () -> new RuntimeException("Category not found")
+        );
         result.setCategory(category);
 
         // Create BookImage entities from uploaded URLs
@@ -97,13 +105,12 @@ public class BookServiceImpl
 
     @Override
     public BookResponseDto toResponseDto(AbstractEntity entity) {
-        Book book = (Book) entity;
+        if (entity == null) {
+            return null;
+        }
 
-        CategoryResponseDto categoryResponseDto = new CategoryResponseDto(
-                book.getCategory().getId(),
-                book.getCategory().getName(),
-                book.getCategory().getDescription()
-        );
+        Book book = (Book) entity;
+        CategoryResponseDto categoryResponseDto = categoryService.toResponseDto(book.getCategory());
 
         return new BookResponseDto(
                 book.getId(),
@@ -111,19 +118,24 @@ public class BookServiceImpl
                 book.getAuthorName(),
                 book.getDescription(),
                 book.getIsbn(),
-                book.getImages(),
+                book.getImages().stream()
+                        .map(bookImageService::toResponseDto)
+                        .toList(),
+                book.getCoverImage(),
                 book.getPrice(),
                 book.getQuantity(),
                 book.isAvailable(),
-                categoryResponseDto,
-                book.getPublishedAt()
+                book.getPublishedAt(),
+                categoryResponseDto
         );
     }
 
 
     @Override
     public void copyProperties(BookRequestDto requestDto, Book entity) {
-        Category category = categoryService.findById(requestDto.getCategoryId());
+        Category category = categoryService.getRepository().findById(requestDto.getCategoryId()).orElseThrow(
+                () -> new RuntimeException("Category not found")
+        );
 
         // Check if a new cover image is provided
         if (requestDto.getCoverImage() != null && !requestDto.getCoverImage().isEmpty()) {
@@ -156,7 +168,7 @@ public class BookServiceImpl
         entity.setAuthorName(requestDto.getAuthorName());
         entity.setDescription(requestDto.getDescription());
         entity.setIsbn(requestDto.getIsbn());
-        entity.setPrice(requestDto.getPrice().doubleValue());
+        entity.setPrice(requestDto.getPrice());
         entity.setQuantity(requestDto.getQuantity());
         entity.setAvailable(requestDto.isAvailable());
         entity.setPublishedAt(requestDto.getPublishedAt());
@@ -165,30 +177,20 @@ public class BookServiceImpl
     }
 
     @Override
-    public Optional<Book> getBookById(Long id) {
-            return bookRepository.findById(id);
-    }
-
-    @Override
-    public Page<Book> findBooksContainingTitle(String title, int page, int size) {
+    public Page<BookResponseDto> findBooksContainingTitle(String title, int page, int size) {
         Pageable pageable = Pageable.ofSize(size).withPage(page);
-        return bookRepository.findByTitleContaining(title, pageable);
+        return bookRepository.findByTitleContaining(title, pageable).map(this::toResponseDto);
     }
 
     @Override
-    public Page<Book> findBooksByTitleIn(List<String> titles, int page, int size) {
+    public Page<BookResponseDto> findBooksByTitleIn(List<String> titles, int page, int size) {
         Pageable pageable = Pageable.ofSize(size).withPage(page);
-        return bookRepository.findByTitleIn(titles, pageable);
+        return bookRepository.findByTitleIn(titles, pageable).map(this::toResponseDto);
     }
 
     @Override
-    public Page<Book> filter(String authorName, String title, List<Long> categoryIds, Double minPrice, Double maxPrice, int page, int size) {
+    public Page<BookResponseDto> filter(String authorName, String title, List<Long> categoryIds, Double minPrice, Double maxPrice, int page, int size) {
         Pageable pageable = Pageable.ofSize(size).withPage(page);
-        return bookRepository.filter(authorName, title, categoryIds, minPrice, maxPrice, pageable);
-    }
-
-    @Override
-    public boolean existsByBookId(Long bookId) {
-        return bookRepository.existsById(bookId);
+        return bookRepository.filter(authorName, title, categoryIds, minPrice, maxPrice, pageable).map(this::toResponseDto);
     }
 }

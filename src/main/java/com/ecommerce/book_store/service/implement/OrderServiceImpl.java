@@ -10,6 +10,7 @@ import com.ecommerce.book_store.persistent.entity.Order;
 import com.ecommerce.book_store.persistent.entity.User;
 import com.ecommerce.book_store.persistent.entity.Voucher;
 import com.ecommerce.book_store.persistent.repository.abstraction.OrderRepository;
+import com.ecommerce.book_store.persistent.repository.abstraction.UserRepository;
 import com.ecommerce.book_store.service.abstraction.OrderService;
 import com.ecommerce.book_store.service.abstraction.RoleService;
 import com.ecommerce.book_store.service.abstraction.UserService;
@@ -43,10 +44,16 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
                 requestDto.getAddress(),
                 requestDto.getPhone(),
                 requestDto.getNote(),
-                OrderStatus.valueOf(requestDto.getStatus().toUpperCase())
+                OrderStatus.valueOf(requestDto.getStatus().toUpperCase()),
+                requestDto.getTotalAmount(),
+                requestDto.getTotalDiscount()
         );
-        User user = userService.findById(requestDto.getUserId());
-        Voucher voucher = voucherService.findById(requestDto.getVoucherId());
+        User user = userService.getRepository().findById(requestDto.getUserId()).orElseThrow(
+                () -> new RuntimeException("User not found")
+        );
+        Voucher voucher = voucherService.getRepository().findById(requestDto.getVoucherId()).orElseThrow(
+                () -> new RuntimeException("Voucher not found")
+        );
 
         orderResult.setUser(user);
         orderResult.setVoucher(voucher);
@@ -56,6 +63,10 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
 
     @Override
     public OrderResponseDto toResponseDto(AbstractEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+
         Order order = (Order) entity;
         UserResponseDto userResponseDto = userService.toResponseDto(order.getUser());
         VoucherResponseDto voucherResponseDto= voucherService.toResponseDto(order.getVoucher());
@@ -67,15 +78,19 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
                 order.getPhone(),
                 order.getNote(),
                 String.valueOf(order.getStatus()),
-                order.getTotalAmount()
-
+                order.getTotalAmount(),
+                order.getTotalDiscount()
                 );
     }
 
     @Override
     public void copyProperties(OrderRequestDto requestDto, Order entity) {
-        User user = userService.findById(requestDto.getUserId());
-        Voucher voucher = voucherService.findById(requestDto.getVoucherId());
+        User user = userService.getRepository().findById(requestDto.getUserId()).orElseThrow(
+                () -> new RuntimeException("User not found")
+        );
+        Voucher voucher = voucherService.getRepository().findById(requestDto.getVoucherId()).orElseThrow(
+                () -> new RuntimeException("Voucher not found")
+        );
         entity.setUser(user);
         entity.setVoucher(voucher);
         entity.setAddress(requestDto.getAddress());
@@ -84,31 +99,31 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
         entity.setStatus(OrderStatus.valueOf(requestDto.getStatus()));
     }
 
-    @Cacheable(value = "orders")
+//    @Cacheable(value = "orders")
     @Override
-    public List<Order> findAll() {
+    public List<OrderResponseDto> findAll() {
         return super.findAll();
     }
 
-    @Cacheable(value = "orders", key = "#id")
+//    @Cacheable(value = "orders", key = "#id")
     @Override
-    public Order findById(Long id) {
+    public OrderResponseDto findById(Long id) {
         return super.findById(id);
     }
 
-    @CachePut(value = "orders", key = "#result.id")
+//    @CachePut(value = "orders", key = "#result.id")
     @Override
-    public Order save(OrderRequestDto requestDto) {
+    public OrderResponseDto save(OrderRequestDto requestDto) {
         return super.save(requestDto);
     }
 
-    @CachePut(value = "orders", key = "#id")
+//    @CachePut(value = "orders", key = "#id")
     @Override
-    public Order update(OrderRequestDto requestDto, Long id) {
+    public OrderResponseDto update(OrderRequestDto requestDto, Long id) {
         return super.update(requestDto, id);
     }
 
-    @CacheEvict(value = "orders", key = "#id")
+//    @CacheEvict(value = "orders", key = "#id")
     @Override
     public boolean deleteById(Long id) {
         return super.deleteById(id);

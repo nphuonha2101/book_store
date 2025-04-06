@@ -23,7 +23,7 @@ public class BookRequestDto extends AbstractRequestDto {
     private Long categoryId;
     private MultipartFile coverImage;
     private List<MultipartFile> bookImages;
-    private BigDecimal price;
+    private Integer price;
     private Integer quantity;
     private boolean isAvailable;
     private LocalDateTime publishedAt;

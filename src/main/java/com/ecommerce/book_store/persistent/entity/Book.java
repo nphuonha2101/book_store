@@ -28,7 +28,7 @@ public class Book extends AbstractEntity implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "book")
     private List<BookImage> images;
     @Column(name="price")
-    private double price;
+    private int price;
     @Column(name="quantity")
     private int  quantity;
     @Column(name="is_available")
@@ -42,7 +42,7 @@ public class Book extends AbstractEntity implements Serializable {
     public Book() {
     }
 
-    public Book(String title, String authorName, String description, String isbn, String coverImage, double price, int quantity, boolean isAvailable, LocalDateTime publishedAt, Category category) {
+    public Book(String title, String authorName, String description, String isbn, String coverImage, int price, int quantity, boolean isAvailable, LocalDateTime publishedAt, Category category) {
         this.title = title;
         this.authorName = authorName;
         this.description = description;

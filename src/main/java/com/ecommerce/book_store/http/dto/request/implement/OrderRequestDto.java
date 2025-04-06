@@ -21,17 +21,6 @@ public class OrderRequestDto extends AbstractRequestDto {
     private String note;
     @NotBlank
     private String status;
-
-    public OrderRequestDto () {
-
-    }
-
-    public OrderRequestDto(Long userId, Long voucherId, String address, String phone, String note, String status) {
-        this.userId = userId;
-        this.voucherId = voucherId;
-        this.address = address;
-        this.phone = phone;
-        this.note = note;
-        this.status = status;
-    }
+    private Double totalAmount;
+    private Double totalDiscount;
 }

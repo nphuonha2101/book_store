@@ -1,6 +1,7 @@
 package com.ecommerce.book_store.http.controller.admin;
 
 import com.ecommerce.book_store.http.dto.request.implement.BookImageRequestDto;
+import com.ecommerce.book_store.http.dto.response.implement.BookImageResponseDto;
 import com.ecommerce.book_store.persistent.entity.BookImage;
 import com.ecommerce.book_store.service.abstraction.BookImageService;
 import groovy.util.logging.Log4j;
@@ -26,7 +27,7 @@ public class BookImageAdminController {
     public String index(@PathVariable Long bookId, Model model, Pageable pageable) {
         try {
             System.out.println("bookId: " + bookId);
-            Page<BookImage> page = bookImageService.findAllByBookId(bookId, pageable);
+            Page<BookImageResponseDto> page = bookImageService.findAllByBookId(bookId, pageable);
 
             model.addAttribute("page", page);
             model.addAttribute("url", "/admin/book/" + bookId + "/images");

@@ -30,6 +30,9 @@ public class CategoryServiceImpl extends IServiceImpl<CategoryRequestDto, Catego
 
     @Override
     public CategoryResponseDto toResponseDto(AbstractEntity entity) {
+        if (entity == null) {
+            return null;
+        }
         Category category = (Category) entity;
         return new CategoryResponseDto(category.getId(), category.getName(), category.getDescription());
     }

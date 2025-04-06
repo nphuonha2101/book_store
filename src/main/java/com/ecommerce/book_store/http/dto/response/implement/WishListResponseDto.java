@@ -1,18 +1,18 @@
 package com.ecommerce.book_store.http.dto.response.implement;
 
 import com.ecommerce.book_store.http.dto.response.AbstractResponseDto;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
 public class WishListResponseDto extends AbstractResponseDto {
-    private final Long id;
-    private final Long userId;
-    private final BookResponseDto book;
-
-    public WishListResponseDto(Long id, Long userId, BookResponseDto book) {
-        this.id = id;
-        this.userId = userId;
-        this.book = book;
-    }
+    private Long id;
+    private Long userId;
+    private BookResponseDto book;
 }
 

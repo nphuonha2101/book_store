@@ -31,18 +31,23 @@ public class CartServiceImpl extends IServiceImpl<CartItemRequestDto, CartItemRe
 
     @Override
     public CartItem toEntity(CartItemRequestDto requestDto) {
-        CartItem result = new CartItem(
+        Book book = bookService.getRepository().findById(requestDto.getBookId()).orElseThrow(
+                () -> new RuntimeException("Book not found")
+        );
+        return new CartItem(
                 requestDto.getUserId(),
-                null,
+                book,
                 requestDto.getQuantity(),
                 requestDto.getPrice()
         );
-        Book book = bookService.findById(requestDto.getBookId());
-        return result;
-    };
+    }
 
     @Override
     public CartItemResponseDto toResponseDto(AbstractEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+
         CartItem cartItem = (CartItem) entity;
         BookResponseDto cartBook = bookService.toResponseDto(cartItem.getBook());
 
@@ -51,47 +56,64 @@ public class CartServiceImpl extends IServiceImpl<CartItemRequestDto, CartItemRe
                 cartItem.getUserId(),
                 cartBook,
                 cartItem.getQuantity(),
-                cartItem.getPrice()
+                cartItem.getPrice(),
+                cartBook.getId()
         );
     }
 
     @Override
     public void copyProperties(CartItemRequestDto requestDto, CartItem entity) {
-        entity.setUserId(requestDto.getUserId());
-        entity.setBook(bookService.findById(requestDto.getBookId()));
-        entity.setQuantity(requestDto.getQuantity());
-        entity.setPrice(requestDto.getPrice());
-
+        if (requestDto.getUserId() != null) {
+            entity.setUserId(requestDto.getUserId());
+        }
+        if (requestDto.getBookId() != null) {
+            Book book = bookService.getRepository().findById(requestDto.getBookId()).orElseThrow(
+                    () -> new RuntimeException("Book not found")
+            );
+            entity.setBook(book);
+        }
+        if (requestDto.getPrice() != null) {
+            entity.setPrice(requestDto.getPrice());
+        }
+        if (requestDto.getQuantity() != null) {
+            entity.setQuantity(requestDto.getQuantity());
+        }
     }
     @Override
-    public List<CartItem> getCartItemsByUserId(Long userId) {
-        return cartItemReponsitory.findByUserId(userId);
+    public List<CartItemResponseDto> getCartItemsByUserId(Long userId) {
+        return cartItemReponsitory.findByUserId(userId).stream()
+                .map(this::toResponseDto)
+                .toList();
     }
 
     @Override
-    public CartItem addCartItem(Long userId, Long bookId, int quantity) {
+    public CartItemResponseDto addCartItem(Long userId, Long bookId, int quantity) {
         List<CartItem> existing = cartItemReponsitory.findByUserId(userId);
         for (CartItem cartItem : existing) {
             if (cartItem.getBook().getId().equals(bookId)) {
                 cartItem.setQuantity(cartItem.getQuantity() + quantity);
-                return cartItemReponsitory.save(cartItem);
+                CartItem cartItemSaved = cartItemReponsitory.save(cartItem);
+                return toResponseDto(cartItemSaved);
             }
         }
+        Book book = bookService.getRepository().findById(bookId).orElseThrow(
+                () -> new RuntimeException("Book not found")
+        );
     // create new cart item if not exist
         CartItem cartItem = new CartItem();
         cartItem.setUserId(userId);
-        cartItem.setBook(bookService.findById(bookId));
+        cartItem.setBook(book);
         cartItem.setQuantity(quantity);
-        return cartItemReponsitory.save(cartItem);
+        return toResponseDto(cartItemReponsitory.save(cartItem));
     }
 
     @Override
-    public CartItem updateCartItem(Long cartItemId, int quantity) {
+    public CartItemResponseDto updateCartItem(Long cartItemId, int quantity) {
         Optional<CartItem> cartItem = cartItemReponsitory.findById(cartItemId);
         if (cartItem.isPresent()) {
             CartItem existingCartItem = cartItem.get();
             existingCartItem.setQuantity(quantity);
-            return cartItemReponsitory.save(existingCartItem);
+            return toResponseDto(cartItemReponsitory.save(existingCartItem));
         } else {
             throw new RuntimeException("Cart item not found");
         }

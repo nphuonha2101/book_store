@@ -4,6 +4,7 @@ import com.ecommerce.book_store.http.dto.request.AbstractRequestDto;
 import com.ecommerce.book_store.http.dto.response.AbstractResponseDto;
 import com.ecommerce.book_store.persistent.entity.AbstractEntity;
 import com.ecommerce.book_store.service.abstraction.IService;
+import lombok.Getter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Getter
 public abstract class IServiceImpl<RQ extends AbstractRequestDto, RS extends AbstractResponseDto, E extends AbstractEntity> implements IService<RQ, RS, E> {
     protected JpaRepository<E, Long> repository;
 
@@ -21,33 +23,33 @@ public abstract class IServiceImpl<RQ extends AbstractRequestDto, RS extends Abs
     }
 
     @Override
-    public E findById(Long id) {
-        return repository.findById(id).orElse(null);
+    public RS findById(Long id) {
+        return repository.findById(id).map(this::toResponseDto).orElse(null);
     }
 
     @Override
-    public List<E> findAll() {
-        return repository.findAll();
+    public List<RS> findAll() {
+        return repository.findAll().stream().map(this::toResponseDto).collect(Collectors.toList());
     }
 
     @Override
-    public List<E> findAll(Sort sort) {
-        return repository.findAll(sort);
+    public List<RS> findAll(Sort sort) {
+        return repository.findAll(sort).stream().map(this::toResponseDto).collect(Collectors.toList());
     }
 
     @Override
-    public Page<E> findAll(Pageable pageable) {
-        return repository.findAll(pageable);
+    public Page<RS> findAll(Pageable pageable) {
+        return repository.findAll(pageable).map(this::toResponseDto);
     }
 
     @Override
-    public E save(RQ requestDto) {
+    public RS save(RQ requestDto) {
         E entity = toEntity(requestDto);
-        return repository.save(entity);
+        return toResponseDto(repository.save(entity));
     }
 
     @Override
-    public E update(RQ requestDto, Long id) {
+    public RS update(RQ requestDto, Long id) {
         E entity = repository.findById(id).orElse(null);
         if (entity == null) {
             return null;
@@ -55,7 +57,7 @@ public abstract class IServiceImpl<RQ extends AbstractRequestDto, RS extends Abs
         this.copyProperties(requestDto, entity);
 
         repository.save(entity);
-        return entity;
+        return toResponseDto(entity);
     }
 
     @Override

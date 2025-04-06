@@ -8,9 +8,12 @@ import com.ecommerce.book_store.persistent.entity.BookImage;
 import com.ecommerce.book_store.persistent.repository.abstraction.BookImageRepository;
 import com.ecommerce.book_store.service.abstraction.BookImageService;
 import com.ecommerce.book_store.service.abstraction.BookService;
+import lombok.Getter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class BookImageServiceImpl extends IServiceImpl<BookImageRequestDto, BookImageResponseDto, BookImage> implements BookImageService {
@@ -25,7 +28,9 @@ public class BookImageServiceImpl extends IServiceImpl<BookImageRequestDto, Book
 
     @Override
     public BookImage toEntity(BookImageRequestDto requestDto) {
-        Book book = bookService.findById(requestDto.getBookId());
+        Book book = bookService.getRepository().findById(requestDto.getBookId()).orElseThrow(
+                () -> new RuntimeException("Book not found")
+        );
         BookImage bookImage = new BookImage();
         bookImage.setBook(book);
 
@@ -42,13 +47,18 @@ public class BookImageServiceImpl extends IServiceImpl<BookImageRequestDto, Book
 
     @Override
     public BookImageResponseDto toResponseDto(AbstractEntity entity) {
+        if (entity == null) {
+            return null;
+        }
         BookImage bookImage = (BookImage) entity;
         return new BookImageResponseDto(bookImage.getId(), bookImage.getBook().getId(), bookImage.getUrl());
     }
 
     @Override
     public void copyProperties(BookImageRequestDto requestDto, BookImage entity) {
-        Book book = bookService.findById(requestDto.getBookId());
+        Book book = bookService.getRepository().findById(requestDto.getBookId()).orElseThrow(
+                () -> new RuntimeException("Book not found")
+        );
         entity.setBook(book);
 
         // Upload book image
@@ -60,7 +70,8 @@ public class BookImageServiceImpl extends IServiceImpl<BookImageRequestDto, Book
     }
 
     @Override
-    public Page<BookImage> findAllByBookId(Long bookId, Pageable pageable) {
-        return ((BookImageRepository) repository).findAllByBookId(bookId, pageable);
+    public Page<BookImageResponseDto> findAllByBookId(Long bookId, Pageable pageable) {
+        Page<BookImage> bookImages = ((BookImageRepository) repository).findAllByBookId(bookId, pageable);
+        return bookImages.map(this::toResponseDto);
     }
 }

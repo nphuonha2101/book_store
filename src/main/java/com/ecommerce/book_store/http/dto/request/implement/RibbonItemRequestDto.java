@@ -6,12 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CartItemRequestDto extends AbstractRequestDto {
-    private Long cartItemId;
-    private Long userId;
+public class RibbonItemRequestDto extends AbstractRequestDto {
+    private Long ribbonId;
     private Long bookId;
-    private Integer quantity;
-    private Double price;
-
-
 }

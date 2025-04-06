@@ -1,6 +1,8 @@
 package com.ecommerce.book_store.http.controller.admin;
 
 import com.ecommerce.book_store.http.dto.request.implement.BookRequestDto;
+import com.ecommerce.book_store.http.dto.response.implement.BookResponseDto;
+import com.ecommerce.book_store.http.dto.response.implement.CategoryResponseDto;
 import com.ecommerce.book_store.persistent.entity.Book;
 import com.ecommerce.book_store.persistent.entity.Category;
 import com.ecommerce.book_store.service.abstraction.BookService;
@@ -30,7 +32,7 @@ public class BookAdminController {
 
     @GetMapping(value = {"/admin/books", "/admin/books/index"})
     public String index(Model model, Pageable pageable) {
-        Page<Book> page = bookService.findAll(pageable);
+        Page<BookResponseDto> page = bookService.findAll(pageable);
 
         model.addAttribute("page", page);
         model.addAttribute("url", "/admin/books");
@@ -41,7 +43,7 @@ public class BookAdminController {
 
     @GetMapping(value = {"/admin/books/create"})
     public String create(Model model) {
-        List<Category> categories = categoryService.findAll();
+        List<CategoryResponseDto> categories = categoryService.findAll();
         model.addAttribute("categories", categories);
         model.addAttribute("CONTENT_TITLE", "Thêm sách");
         model.addAttribute("LAYOUT_TITLE", "Admin BookStore");
@@ -50,8 +52,8 @@ public class BookAdminController {
 
     @GetMapping(value = {"/admin/books/edit/{id}"})
     public String edit(@PathVariable Long id, Model model) {
-        Book book = bookService.findById(id);
-        List<Category> categories = categoryService.findAll();
+        BookResponseDto book = bookService.findById(id);
+        List<CategoryResponseDto> categories = categoryService.findAll();
         model.addAttribute("book", book);
         model.addAttribute("categories", categories);
         model.addAttribute("CONTENT_TITLE", "Chỉnh sửa sách");

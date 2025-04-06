@@ -1,21 +1,20 @@
 package com.ecommerce.book_store.http.dto.response.implement;
 
 import com.ecommerce.book_store.http.dto.response.AbstractResponseDto;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class CartItemResponseDto extends AbstractResponseDto {
-    private final Long id;
-    private final Long userId;
-    private final BookResponseDto book;
-    private final int quantity;
-    private final double price;
-
-    public CartItemResponseDto(Long id, Long userId, BookResponseDto book, int quantity, double price) {
-        this.id = id;
-        this.userId = userId;
-        this.book = book;
-        this.quantity = quantity;
-        this.price = price;
-    }
+    private Long id;
+    private Long userId;
+    private BookResponseDto book;
+    private int quantity;
+    private double price;
+    private Long bookId;
 }

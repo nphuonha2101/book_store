@@ -6,6 +6,7 @@ import com.ecommerce.book_store.persistent.entity.AbstractEntity;
 import com.ecommerce.book_store.persistent.entity.Category;
 import com.ecommerce.book_store.persistent.entity.Voucher;
 import com.ecommerce.book_store.persistent.repository.abstraction.VoucherRepository;
+import com.ecommerce.book_store.service.abstraction.CategoryService;
 import com.ecommerce.book_store.service.abstraction.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,10 +18,12 @@ import java.util.List;
 public class VoucherServiceImpl extends IServiceImpl<VoucherRequestDto, VoucherResponseDto, Voucher>
         implements VoucherService {
     private final FirebaseStorageService firebaseStorageService;
+    private final CategoryService categoryService;
     @Autowired
-    public VoucherServiceImpl(VoucherRepository voucherRepository, FirebaseStorageService firebaseStorageService) {
+    public VoucherServiceImpl(VoucherRepository voucherRepository, FirebaseStorageService firebaseStorageService, CategoryService categoryService) {
         super(voucherRepository);
         this.firebaseStorageService = firebaseStorageService;
+        this.categoryService = categoryService;
     }
 
     @Override
@@ -47,13 +50,19 @@ public class VoucherServiceImpl extends IServiceImpl<VoucherRequestDto, VoucherR
 
     @Override
     public VoucherResponseDto toResponseDto(AbstractEntity entity) {
+        if (entity == null) {
+            return null;
+        }
         return new VoucherResponseDto(
                 entity.getId(),
                 ((Voucher) entity).getThumbnail(),
                 ((Voucher) entity).getCode(),
                 ((Voucher) entity).getDiscount(),
                 ((Voucher) entity).getMinSpend(),
-                ((Voucher) entity).getExpiredDate()
+                ((Voucher) entity).getExpiredDate(),
+                ((Voucher) entity).getCategories().stream()
+                        .map(categoryService::toResponseDto)
+                        .toList()
         );
     }
 
@@ -88,12 +97,20 @@ public class VoucherServiceImpl extends IServiceImpl<VoucherRequestDto, VoucherR
     }
 
     @Override
-    public List<Voucher> getVoucherWithConditions(List<Long> categoryIds, Double minSpend) {
-        return ((VoucherRepository) repository).getVoucherWithConditions(categoryIds, minSpend);
+    public List<VoucherResponseDto> getVoucherWithConditions(List<Long> categoryIds, Double minSpend) {
+        return ((VoucherRepository) repository).getVoucherWithConditions(categoryIds, minSpend)
+                .stream()
+                .map(this::toResponseDto)
+                .toList();
+
     }
 
     @Override
-    public Voucher findByCode(String code) {
-        return ((VoucherRepository) repository).findByCode(code);
+    public VoucherResponseDto findByCode(String code) {
+        Voucher voucher = ((VoucherRepository) repository).findByCode(code);
+        if (voucher == null) {
+            return null;
+        }
+        return toResponseDto(voucher);
     }
 }

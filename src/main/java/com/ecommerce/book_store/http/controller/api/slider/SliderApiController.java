@@ -1,6 +1,7 @@
 package com.ecommerce.book_store.http.controller.api.slider;
 
 import com.ecommerce.book_store.http.ApiResponse;
+import com.ecommerce.book_store.http.dto.response.implement.SliderResponseDto;
 import com.ecommerce.book_store.persistent.entity.Slider;
 import com.ecommerce.book_store.service.abstraction.SliderService;
 import org.springframework.http.HttpStatus;
@@ -22,8 +23,8 @@ public class SliderApiController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<ApiResponse<Object>> getAllSliders() {
-        List<Slider> sliders = sliderService.getAllSliders();
+    public ResponseEntity<ApiResponse<List<SliderResponseDto>>> getAllSliders() {
+        List<SliderResponseDto> sliders = sliderService.findAll();
         if (sliders.isEmpty()) {
             return ApiResponse.error("No slider found", HttpStatus.NOT_FOUND);
         }

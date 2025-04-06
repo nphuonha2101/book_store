@@ -9,6 +9,7 @@ import com.ecommerce.book_store.service.abstraction.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -41,7 +42,19 @@ public class UserServiceImpl extends IServiceImpl<UserRequestDto, UserResponseDt
 
     @Override
     public UserResponseDto toResponseDto(AbstractEntity entity) {
-        return null;
+        if (entity == null) {
+            return null;
+        }
+
+        User user = (User) entity;
+        return new UserResponseDto(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getPhone(),
+                user.getAddress(),
+                user.getAvatar()
+        );
     }
 
     @Override
@@ -73,12 +86,13 @@ public class UserServiceImpl extends IServiceImpl<UserRequestDto, UserResponseDt
     }
 
     @Override
-    public User registerUser(UserRequestDto userDto) {
+    @Transactional
+    public UserResponseDto registerUser(UserRequestDto userDto) {
         // Check if user already exists
         if (userRepository.findByEmail(userDto.getEmail()).isPresent()) {
-            throw new RuntimeException("User already exists");
+            throw new IllegalArgumentException("User already exists");
         }
-       return this.save(userDto);
+        return this.save(userDto);
     }
 
     @Override

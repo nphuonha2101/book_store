@@ -11,9 +11,7 @@ import java.util.Optional;
 
 public interface BookService
         extends IService<BookRequestDto, BookResponseDto, Book> {
-    Optional<Book> getBookById(Long id);
-    Page<Book> findBooksContainingTitle(String title, int page, int size);
-    Page<Book> findBooksByTitleIn(List<String> titles, int page, int size);
-    Page<Book> filter(String authorName, String title, List<Long> categoryIds, Double minPrice, Double maxPrice,  int page, int size);
-    boolean existsByBookId(Long bookId);
+    Page<BookResponseDto> findBooksContainingTitle(String title, int page, int size);
+    Page<BookResponseDto> findBooksByTitleIn(List<String> titles, int page, int size);
+    Page<BookResponseDto> filter(String authorName, String title, List<Long> categoryIds, Double minPrice, Double maxPrice,  int page, int size);
 }

@@ -3,9 +3,11 @@ package com.ecommerce.book_store.service.abstraction;
 import com.ecommerce.book_store.http.dto.request.AbstractRequestDto;
 import com.ecommerce.book_store.http.dto.response.AbstractResponseDto;
 import com.ecommerce.book_store.persistent.entity.AbstractEntity;
+import lombok.Getter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -19,7 +21,7 @@ public interface IService<RQ extends AbstractRequestDto, RS extends AbstractResp
      * @return Entity that has the id
      */
     @Transactional(readOnly = true)
-    E findById(Long id);
+    RS findById(Long id);
 
     /**
      * Find all entities
@@ -27,7 +29,7 @@ public interface IService<RQ extends AbstractRequestDto, RS extends AbstractResp
      * @return List of all entities
      */
     @Transactional(readOnly = true)
-    List<E> findAll();
+    List<RS> findAll();
 
     /**
      * Find all entities and sort them. How to use: new Sort(Sort.Direction.ASC, "field1", "field2", ...)
@@ -36,7 +38,7 @@ public interface IService<RQ extends AbstractRequestDto, RS extends AbstractResp
      * @return List of all entities that are sorted
      */
     @Transactional(readOnly = true)
-    List<E> findAll(Sort sort);
+    List<RS> findAll(Sort sort);
 
     /**
      * Find all entities and paginate them. How to use: PageRequest.of(page, size, sort)
@@ -45,7 +47,7 @@ public interface IService<RQ extends AbstractRequestDto, RS extends AbstractResp
      * @return List of entities that are paginated
      */
     @Transactional(readOnly = true)
-    Page<E> findAll(Pageable pageable);
+    Page<RS> findAll(Pageable pageable);
 
     /**
      * Save requestDto to database
@@ -54,7 +56,7 @@ public interface IService<RQ extends AbstractRequestDto, RS extends AbstractResp
      * @return ResponseDto object that is saved to database
      */
     @Transactional
-    E save(RQ requestDto);
+    RS save(RQ requestDto);
 
     /**
      * Update requestDto to database
@@ -64,7 +66,7 @@ public interface IService<RQ extends AbstractRequestDto, RS extends AbstractResp
      * @return ResponseDto object that is updated to database
      */
     @Transactional
-    E update(RQ requestDto, Long id);
+    RS update(RQ requestDto, Long id);
 
     /**
      * Delete entity by id
@@ -107,5 +109,7 @@ public interface IService<RQ extends AbstractRequestDto, RS extends AbstractResp
      * @param entity     is an object get from database
      */
     void copyProperties(RQ requestDto, E entity);
+
+    JpaRepository<E, Long> getRepository();
 
 }

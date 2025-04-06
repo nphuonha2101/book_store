@@ -1,17 +1,12 @@
 package com.ecommerce.book_store.http.controller.admin;
 
-import com.ecommerce.book_store.http.dto.request.implement.BookRequestDto;
-import com.ecommerce.book_store.http.dto.request.implement.CategoryRequestDto;
 import com.ecommerce.book_store.http.dto.request.implement.SliderRequestDto;
 import com.ecommerce.book_store.http.dto.response.implement.SliderResponseDto;
-import com.ecommerce.book_store.persistent.entity.Category;
-import com.ecommerce.book_store.persistent.entity.Slider;
 import com.ecommerce.book_store.service.abstraction.SliderService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -24,15 +19,15 @@ import java.util.Map;
 @Slf4j
 @Controller
 @RequestMapping("/admin/sliders")
-public class SliderController {
+public class SliderAdminController {
     private final SliderService sliderService;
-    public SliderController(SliderService sliderService) {
+    public SliderAdminController(SliderService sliderService) {
         this.sliderService = sliderService;
     }
     @GetMapping
     public String listSlider(Model model, Pageable pageable) {
         try {
-            Page<Slider> page = sliderService.findAll(pageable);
+            Page<SliderResponseDto> page = sliderService.findAll(pageable);
             model.addAttribute("page", page);
             model.addAttribute("url", "/admin/sliders");
             return "pages/admin/sliders/index";
@@ -43,8 +38,8 @@ public class SliderController {
     }
     @GetMapping(value = {"/edit/{id}"})
     public String edit(@PathVariable Long id, Model model) {
-        Slider sliders = sliderService.findById(id);
-        model.addAttribute("slider", sliders);
+        SliderResponseDto slider = sliderService.findById(id);
+        model.addAttribute("slider", slider);
         model.addAttribute("CONTENT_TITLE", "Chỉnh sửa thể loại");
         model.addAttribute("LAYOUT_TITLE", "Admin BookStore");
         return "pages/admin/sliders/edit";
@@ -67,7 +62,7 @@ public class SliderController {
 // create slider
 @GetMapping(value = {"/create"})
 public String create(Model model) {
-    List<Slider> sliders = sliderService.findAll();
+    List<SliderResponseDto> sliders = sliderService.findAll();
     model.addAttribute("slider", sliders);
     model.addAttribute("CONTENT_TITLE", "Thêm sách");
     model.addAttribute("LAYOUT_TITLE", "Admin BookStore");

@@ -5,13 +5,8 @@ import com.ecommerce.book_store.http.dto.response.implement.BookResponseDto;
 import com.ecommerce.book_store.http.dto.response.implement.ReviewResponseDto;
 import com.ecommerce.book_store.http.dto.response.implement.UserResponseDto;
 import com.ecommerce.book_store.persistent.entity.*;
-import com.ecommerce.book_store.persistent.repository.abstraction.BookRepository;
 import com.ecommerce.book_store.persistent.repository.abstraction.ReviewRepository;
-import com.ecommerce.book_store.persistent.repository.abstraction.UserRepository;
-import com.ecommerce.book_store.service.abstraction.BookService;
-import com.ecommerce.book_store.service.abstraction.ReviewService;
-import com.ecommerce.book_store.service.abstraction.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.ecommerce.book_store.service.abstraction.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,17 +18,12 @@ public class ReviewServiceImpl extends IServiceImpl<ReviewRequestDto, ReviewResp
     private final ReviewRepository reviewRepository;
     private final BookService bookService;
     private final UserService userService;
-    private final BookRepository bookRepository;
-    private final UserRepository userRepository;
 
-    @Autowired
-    public ReviewServiceImpl(ReviewRepository repository, BookService bookService, UserService userService, BookRepository bookRepository, UserRepository userRepository) {
+    public ReviewServiceImpl(ReviewRepository repository, BookService bookService, UserService userService) {
         super(repository);
         this.reviewRepository = repository;
         this.bookService = bookService;
         this.userService = userService;
-        this.bookRepository = bookRepository;
-        this.userRepository = userRepository;
     }
     @Override
     public Review toEntity(ReviewRequestDto requestDto) {
@@ -43,37 +33,26 @@ public class ReviewServiceImpl extends IServiceImpl<ReviewRequestDto, ReviewResp
                 requestDto.getRating(),
                 requestDto.getComment()
         );
-        User user = userService.findById(requestDto.getUserId());
-        Book book = bookService.findById(requestDto.getBookId());
+        User user = userService.getRepository().findById(requestDto.getUserId()).orElseThrow(
+                () -> new RuntimeException("User not found")
+        );
+        Book book = bookService.getRepository().findById(requestDto.getBookId()).orElseThrow(
+                () -> new RuntimeException("Book not found")
+        );
         result.setUser(user);
         result.setBook(book);
         return result;
     }
     @Override
     public ReviewResponseDto toResponseDto(AbstractEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+
         Review review = (Review) entity;
-        UserResponseDto userResponseDto = new UserResponseDto(
-                review.getUser().getId(),
-                review.getUser().getName(),
-                review.getUser().getEmail(),
-                review.getUser().getAvatar(),
-                review.getUser().getPhone(),
-                review.getUser().getAddress(),
-                null
-                );
-        BookResponseDto bookResponseDto = new BookResponseDto(
-                review.getBook().getId(),
-                review.getBook().getTitle(),
-                review.getBook().getAuthorName(),
-                review.getBook().getDescription(),
-                review.getBook().getIsbn(),
-                review.getBook().getImages(),
-                review.getBook().getPrice(),
-                review.getBook().getQuantity(),
-                review.getBook().isAvailable(),
-                null,
-                review.getBook().getPublishedAt()
-        );
+        UserResponseDto userResponseDto = userService.toResponseDto(review.getUser());
+        BookResponseDto bookResponseDto = bookService.toResponseDto(review.getBook());
+
         return new ReviewResponseDto(
                 review.getId(),
                 userResponseDto,
@@ -96,9 +75,9 @@ public class ReviewServiceImpl extends IServiceImpl<ReviewRequestDto, ReviewResp
 
     @Override
     public Review addReview(Long bookId, Long userId, int rating, String comment) {
-        Optional<Book> bookOpt = bookRepository.findById(bookId);
+        Optional<Book> bookOpt = bookService.getRepository().findById(bookId);
         // TODO: Temporary solution
-        Optional<User> userOpt = userRepository.findById(3L);
+        Optional<User> userOpt = userService.getRepository().findById(3L);
         if (bookOpt.isPresent() && userOpt.isPresent()) {
             Review review = new Review();
             review.setBook(bookOpt.get());

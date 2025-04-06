@@ -4,17 +4,15 @@ import com.ecommerce.book_store.core.security.JwtUtils;
 import com.ecommerce.book_store.http.ApiResponse;
 import com.ecommerce.book_store.http.dto.request.implement.AuthRequest;
 import com.ecommerce.book_store.http.dto.request.implement.UserRequestDto;
+import com.ecommerce.book_store.http.dto.response.implement.UserResponseDto;
 import com.ecommerce.book_store.persistent.entity.User;
 import com.ecommerce.book_store.service.abstraction.UserService;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -23,13 +21,11 @@ import java.util.Optional;
 public class AuthApiController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
-    private final UserDetailsService userDetailsService;
     private final UserService userService;
 
-    public AuthApiController(AuthenticationManager authenticationManager, JwtUtils jwtService, @Qualifier("userDetailsService") UserDetailsService userDetailsService, UserService userService) {
+    public AuthApiController(AuthenticationManager authenticationManager, JwtUtils jwtService, UserService userService) {
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtService;
-        this.userDetailsService = userDetailsService;
         this.userService = userService;
     }
 
@@ -54,10 +50,10 @@ public class AuthApiController {
     }
 
     @PostMapping("/api/v1/register")
-    public ResponseEntity<ApiResponse<User>> registerUser(
+    public ResponseEntity<ApiResponse<UserResponseDto>> registerUser(
             @RequestBody UserRequestDto userRequestDto) {
         try {
-            User user = userService.registerUser(userRequestDto);
+            UserResponseDto user = userService.registerUser(userRequestDto);
             return user != null ? ApiResponse.success(user, "Register successfully") :
                     ApiResponse.error("Register failed", HttpStatus.BAD_REQUEST);
         } catch (RuntimeException e) {
@@ -83,7 +79,7 @@ public class AuthApiController {
     }
 
     @PostMapping("/api/v1/auth/update")
-    public ResponseEntity<ApiResponse<User>> update(@RequestHeader("Authorization") String token, @ModelAttribute UserRequestDto userRequestDto) {
+    public ResponseEntity<ApiResponse<UserResponseDto>> update(@RequestHeader("Authorization") String token, @ModelAttribute UserRequestDto userRequestDto) {
         try {
             String jwtToken = token.substring(7);
             String email = jwtUtils.extractUserEmail(jwtToken);
@@ -92,7 +88,7 @@ public class AuthApiController {
                 return ApiResponse.error("User not found", HttpStatus.NOT_FOUND);
             }
             Long userId = userOptional.get();
-            User updatedUser = userService.update(userRequestDto, userId);
+            UserResponseDto updatedUser = userService.update(userRequestDto, userId);
             return ApiResponse.success(updatedUser, "Update user successfully");
         } catch (Exception e) {
             return ApiResponse.error("Internal Server Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

@@ -3,7 +3,9 @@ package com.ecommerce.book_store.persistent.entity;
 import com.ecommerce.book_store.core.constant.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
@@ -13,6 +15,8 @@ import java.util.List;
 @Table(name = "orders")
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Order extends AbstractEntity implements Serializable {
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -36,18 +40,14 @@ public class Order extends AbstractEntity implements Serializable {
     @Column(name = "total_discount")
     private double totalDiscount;
 
-
-    public Order() {
-    }
-
-    public Order(User user, Voucher voucher, String address, String phone, String note, OrderStatus status) {
+    public Order(User user, Voucher voucher, String address, String phone, String note, OrderStatus status, double totalAmount, double totalDiscount) {
         this.user = user;
         this.voucher = voucher;
         this.address = address;
         this.phone = phone;
         this.note = note;
         this.status = status;
-
+        this.totalAmount = totalAmount;
+        this.totalDiscount = totalDiscount;
     }
-
 }

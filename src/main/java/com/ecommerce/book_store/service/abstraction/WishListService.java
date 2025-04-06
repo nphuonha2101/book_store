@@ -7,9 +7,9 @@ import com.ecommerce.book_store.persistent.entity.WishList;
 import java.util.List;
 
 public interface WishListService extends IService<WishListRequestDto, WishListResponseDto, WishList> {
-    WishList addBookToWishList(Long userId, Long bookId);
+    WishListResponseDto addBookToWishList(Long userId, Long bookId);
     void removeBookFromWishList(Long userId, Long bookId);
-    List<WishList> getWishListByUserId(Long userId);
+    List<WishListResponseDto> getWishListByUserId(Long userId);
     boolean isBookInWishList(Long userId, Long bookId);
     boolean toggleWishList(Long userId, Long bookId);
 }

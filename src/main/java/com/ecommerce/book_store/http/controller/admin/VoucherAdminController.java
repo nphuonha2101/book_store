@@ -1,8 +1,8 @@
 package com.ecommerce.book_store.http.controller.admin;
 
 import com.ecommerce.book_store.http.dto.request.implement.VoucherRequestDto;
-import com.ecommerce.book_store.persistent.entity.Category;
-import com.ecommerce.book_store.persistent.entity.Voucher;
+import com.ecommerce.book_store.http.dto.response.implement.CategoryResponseDto;
+import com.ecommerce.book_store.http.dto.response.implement.VoucherResponseDto;
 import com.ecommerce.book_store.service.abstraction.CategoryService;
 import com.ecommerce.book_store.service.abstraction.VoucherService;
 import org.springframework.data.domain.Page;
@@ -28,7 +28,7 @@ public class VoucherAdminController {
 
     @GetMapping()
     public String index(Pageable pageable, Model model, RedirectAttributes redirectAttributes) {
-        Page<Voucher> page = voucherService.findAll(pageable);
+        Page<VoucherResponseDto> page = voucherService.findAll(pageable);
 
         model.addAttribute("page", page);
         model.addAttribute("url", "/admin/vouchers");
@@ -39,7 +39,7 @@ public class VoucherAdminController {
 
     @GetMapping("/create")
     public String create(Model model) {
-        List<Category> categories = categoryService.findAll();
+        List<CategoryResponseDto> categories = categoryService.findAll();
         model.addAttribute("CONTENT_TITLE", "Thêm voucher");
         model.addAttribute("LAYOUT_TITLE", "Admin BookStore");
         model.addAttribute("categories", categories);
@@ -60,8 +60,8 @@ public class VoucherAdminController {
 
     @GetMapping("/edit/{id}")
     public String edit(@PathVariable Long id, Model model) {
-        Voucher voucher = voucherService.findById(id);
-        List<Category> categories = categoryService.findAll();
+        VoucherResponseDto voucher = voucherService.findById(id);
+        List<CategoryResponseDto> categories = categoryService.findAll();
 
         model.addAttribute("voucher", voucher);
         model.addAttribute("categories", categories);

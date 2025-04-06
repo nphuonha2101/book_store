@@ -9,8 +9,8 @@ import java.util.Optional;
 
 public interface CartItemService extends IService<CartItemRequestDto, CartItemResponseDto, CartItem>
 {
-    List<CartItem> getCartItemsByUserId(Long userId);
-    CartItem addCartItem(Long userId, Long bookId, int quantity);
-    CartItem updateCartItem(Long cartItemId, int quantity);
+    List<CartItemResponseDto> getCartItemsByUserId(Long userId);
+    CartItemResponseDto addCartItem(Long userId, Long bookId, int quantity);
+    CartItemResponseDto updateCartItem(Long cartItemId, int quantity);
     void deleteCartItem(Long cartItemId);
 }

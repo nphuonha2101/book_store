@@ -2,6 +2,7 @@ package com.ecommerce.book_store.http.controller.api.wishList;
 
 import com.ecommerce.book_store.http.ApiResponse;
 import com.ecommerce.book_store.http.dto.request.implement.WishListRequestDto;
+import com.ecommerce.book_store.http.dto.response.implement.WishListResponseDto;
 import com.ecommerce.book_store.persistent.entity.WishList;
 import com.ecommerce.book_store.service.abstraction.WishListService;
 import org.springframework.data.domain.Page;
@@ -18,12 +19,12 @@ public class WishListApiController {
     private final WishListService wishListService;
     public WishListApiController(WishListService wishListService) {this.wishListService = wishListService;}
     @GetMapping("/all")
-    public ResponseEntity<ApiResponse<List<WishList>>> getAllWishLists(
+    public ResponseEntity<ApiResponse<List<WishListResponseDto>>> getAllWishLists(
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size
     ){
         try {
-            Page<WishList> wishLists = wishListService.findAll(PageRequest.of(page, size));
+            Page<WishListResponseDto> wishLists = wishListService.findAll(PageRequest.of(page, size));
             return wishLists != null
                 ? ApiResponse.successWithPagination(wishLists, "All wish lists fetched")
                 : ApiResponse.error("Not found", org.springframework.http.HttpStatus.NOT_FOUND);
@@ -32,9 +33,9 @@ public class WishListApiController {
         }
     }
     @GetMapping("/{userId}")
-    public ResponseEntity<ApiResponse<List<WishList>>> getWishListsByUserId(@PathVariable Long userId) {
+    public ResponseEntity<ApiResponse<List<WishListResponseDto>>> getWishListsByUserId(@PathVariable Long userId) {
         try {
-            List<WishList> wishLists = wishListService.getWishListByUserId(userId);
+            List<WishListResponseDto> wishLists = wishListService.getWishListByUserId(userId);
             return wishLists != null
                 ? ApiResponse.success(wishLists, "Wish lists fetched")
                 : ApiResponse.error("Not found", org.springframework.http.HttpStatus.NOT_FOUND);
@@ -43,9 +44,9 @@ public class WishListApiController {
         }
     }
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse<WishList>> addWishList(@RequestBody WishListRequestDto request) {
+    public ResponseEntity<ApiResponse<WishListResponseDto>> addWishList(@RequestBody WishListRequestDto request) {
         try {
-            WishList added = wishListService.addBookToWishList(request.getUserId(), request.getBookId());
+            WishListResponseDto added = wishListService.addBookToWishList(request.getUserId(), request.getBookId());
             return added != null
                 ? ApiResponse.success(added, "Wish list added")
                 : ApiResponse.error("Not found", org.springframework.http.HttpStatus.NOT_FOUND);

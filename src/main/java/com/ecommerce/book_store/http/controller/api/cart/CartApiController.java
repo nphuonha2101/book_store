@@ -2,7 +2,7 @@ package com.ecommerce.book_store.http.controller.api.cart;
 
 import com.ecommerce.book_store.http.ApiResponse;
 import com.ecommerce.book_store.http.dto.request.implement.CartItemRequestDto;
-import com.ecommerce.book_store.persistent.entity.CartItem;
+import com.ecommerce.book_store.http.dto.response.implement.CartItemResponseDto;
 import com.ecommerce.book_store.service.abstraction.CartItemService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,12 +22,12 @@ public class CartApiController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<ApiResponse<List<CartItem>>> getAllCartItems(
+    public ResponseEntity<ApiResponse<List<CartItemResponseDto>>> getAllCartItems(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         try {
-            Page<CartItem> cartItems = cartItemService.findAll(PageRequest.of(page, size));
+            Page<CartItemResponseDto> cartItems = cartItemService.findAll(PageRequest.of(page, size));
             return cartItems != null
                     ? ApiResponse.successWithPagination(cartItems, "All cart items fetched")
                     : ApiResponse.error("Not found", HttpStatus.NOT_FOUND);
@@ -37,9 +37,9 @@ public class CartApiController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<ApiResponse<List<CartItem>>> getCartItemsByUserId(@PathVariable Long userId) {
+    public ResponseEntity<ApiResponse<List<CartItemResponseDto>>> getCartItemsByUserId(@PathVariable Long userId) {
         try {
-            List<CartItem> cartItems = cartItemService.getCartItemsByUserId(userId);
+            List<CartItemResponseDto> cartItems = cartItemService.getCartItemsByUserId(userId);
             return cartItems != null
                     ? ApiResponse.success(cartItems, "Cart items fetched")
                     : ApiResponse.error("Not found", HttpStatus.NOT_FOUND);
@@ -49,9 +49,9 @@ public class CartApiController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse<CartItem>> addCartItem(@RequestBody CartItemRequestDto request) {
+    public ResponseEntity<ApiResponse<CartItemResponseDto>> addCartItem(@RequestBody CartItemRequestDto request) {
         try {
-            CartItem added = cartItemService.addCartItem(request.getUserId(), request.getBookId(), request.getQuantity());
+            CartItemResponseDto added = cartItemService.addCartItem(request.getUserId(), request.getBookId(), request.getQuantity());
             return added != null
                     ? ApiResponse.success(added, "Cart item added")
                     : ApiResponse.error("Not found", HttpStatus.NOT_FOUND);
@@ -62,9 +62,9 @@ public class CartApiController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<ApiResponse<CartItem>> updateCartItem(@RequestBody CartItemRequestDto request) {
+    public ResponseEntity<ApiResponse<CartItemResponseDto>> updateCartItem(@RequestBody CartItemRequestDto request) {
         try {
-            CartItem updated = cartItemService.updateCartItem(request.getCartItemId(), request.getQuantity());
+            CartItemResponseDto updated = cartItemService.updateCartItem(request.getCartItemId(), request.getQuantity());
             return updated != null
                     ? ApiResponse.success(updated, "Cart item updated")
                     : ApiResponse.error("Not found", HttpStatus.NOT_FOUND);

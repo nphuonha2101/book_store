@@ -6,12 +6,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookImageResponseDto extends AbstractResponseDto {
+public class RibbonResponseDto extends AbstractResponseDto {
     private Long id;
-    private Long bookId;
-    private String url;
+    private String name;
+    private String description;
+    private boolean status;
+    private List<RibbonItemResponseDto> ribbonItems;
 }

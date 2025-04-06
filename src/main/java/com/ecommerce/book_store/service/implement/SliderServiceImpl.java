@@ -1,7 +1,6 @@
 package com.ecommerce.book_store.service.implement;
 
 import com.ecommerce.book_store.http.dto.request.implement.SliderRequestDto;
-import com.ecommerce.book_store.http.dto.response.implement.CategoryResponseDto;
 import com.ecommerce.book_store.http.dto.response.implement.SliderResponseDto;
 import com.ecommerce.book_store.persistent.entity.AbstractEntity;
 import com.ecommerce.book_store.persistent.entity.Slider;
@@ -37,18 +36,20 @@ public class SliderServiceImpl extends IServiceImpl<SliderRequestDto, SliderResp
         }
 
         // Create slider entity
-        Slider result = new Slider(
+        return new Slider(
                 requestDto.getTitle(),
                 requestDto.getDescription(),
                 imageUrl,
                 requestDto.getUrl()
         );
-
-        return result;
     }
 
     @Override
     public SliderResponseDto toResponseDto(AbstractEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+
         Slider slider = (Slider) entity;
 
         return new SliderResponseDto(

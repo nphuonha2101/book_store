@@ -9,6 +9,6 @@ import java.util.List;
 
 
 public interface VoucherService extends IService<VoucherRequestDto, VoucherResponseDto, Voucher> {
-    List<Voucher> getVoucherWithConditions(List<Long> categoryIds, Double minSpend);
-    Voucher findByCode(String code);
+    List<VoucherResponseDto> getVoucherWithConditions(List<Long> categoryIds, Double minSpend);
+    VoucherResponseDto findByCode(String code);
 }

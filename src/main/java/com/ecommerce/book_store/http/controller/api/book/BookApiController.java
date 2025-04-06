@@ -1,7 +1,7 @@
 package com.ecommerce.book_store.http.controller.api.book;
 
 import com.ecommerce.book_store.http.ApiResponse;
-import com.ecommerce.book_store.persistent.entity.Book;
+import com.ecommerce.book_store.http.dto.response.implement.BookResponseDto;
 import com.ecommerce.book_store.service.abstraction.BookService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,33 +21,33 @@ public class BookApiController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<ApiResponse<List<Book>>> getAllBooks(
+    public ResponseEntity<ApiResponse<List<BookResponseDto>>> getAllBooks(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         try {
-            Page<Book> books = bookService.findAll(PageRequest.of(page, size));
+            Page<BookResponseDto> books = bookService.findAll(PageRequest.of(page, size));
             return books != null ? ApiResponse.successWithPagination(books, "Tất cả sách được lấy thành công") : ApiResponse.error("Không tìm thấy", HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return ApiResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Book>> getBookById(@PathVariable("id") Long id) {
+    public ResponseEntity<ApiResponse<BookResponseDto>> getBookById(@PathVariable("id") Long id) {
         try {
-            Book book = bookService.findById(id);
+            BookResponseDto book = bookService.findById(id);
             return book != null ? ApiResponse.success(book, "Sách được lấy thành công") : ApiResponse.error("Không tìm thấy", HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return ApiResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<List<Book>>> searchBooks(@RequestParam("term") String term,
-                                                   @RequestParam(defaultValue = "0") int page,
-                                                   @RequestParam(defaultValue = "10") int size
+    public ResponseEntity<ApiResponse<List<BookResponseDto>>> searchBooks(@RequestParam("term") String term,
+                                                                          @RequestParam(defaultValue = "0") int page,
+                                                                          @RequestParam(defaultValue = "10") int size
     ) {
         try {
-            Page<Book> books = bookService.findBooksContainingTitle(term, page, size);
+            Page<BookResponseDto> books = bookService.findBooksContainingTitle(term, page, size);
             return books != null ? ApiResponse.successWithPagination(books, "Tất cả sách được lấy thành công") : ApiResponse.error("Không tìm thấy", HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return ApiResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -55,12 +55,12 @@ public class BookApiController {
     }
 
     @PostMapping("/suggest")
-    public ResponseEntity<ApiResponse<List<Book>>> suggestBooks(@RequestBody List<String> terms,
+    public ResponseEntity<ApiResponse<List<BookResponseDto>>> suggestBooks(@RequestBody List<String> terms,
                                              @RequestParam(defaultValue = "0") int page,
                                              @RequestParam(defaultValue = "4") int size
     ) {
         try {
-            Page<Book> books = bookService.findBooksByTitleIn(terms, page, size);
+            Page<BookResponseDto> books = bookService.findBooksByTitleIn(terms, page, size);
             return books != null ? ApiResponse.successWithPagination(books, "Tất cả sách được lấy thành công") : ApiResponse.error("Không tìm thấy", HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return ApiResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -68,7 +68,7 @@ public class BookApiController {
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<ApiResponse<List<Book>>> filterBooks(
+    public ResponseEntity<ApiResponse<List<BookResponseDto>>> filterBooks(
             @RequestParam(value = "authorName", required = false) String authorName,
             @RequestParam(value = "title", required = false) String title,
             @RequestParam(value = "categoryIds", required = false, defaultValue = "") List<Long> categoryIds,
@@ -82,7 +82,7 @@ public class BookApiController {
                 categoryIds = null;
             }
 
-            Page<Book> books = bookService.filter(
+            Page<BookResponseDto> books = bookService.filter(
                     authorName,
                     title,
                     categoryIds,

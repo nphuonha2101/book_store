@@ -17,34 +17,34 @@ public class FcmController {
         this.fcmService = fcmService;
     }
 
-    @PostMapping("/token")
-    public ResponseEntity<ApiResponse<FcmToken>> saveToken(@RequestBody FcmTokenRequestDto requestDto) {
-        try {
-            System.out.println(requestDto.getToken());
-            FcmToken fcmToken = fcmService.save(requestDto);
-            return fcmToken != null ? ApiResponse.success(fcmToken, "Fcm token đã được lưu") : ApiResponse.error("Lưu fcm token thất bại", HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return ApiResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @GetMapping("/tokens")
-    public ResponseEntity<ApiResponse<Iterable<FcmToken>>> getTokens(@RequestParam(required = false) Long userId) {
-        try {
-            Iterable<FcmToken> fcmTokens = fcmService.findByUserId(userId);
-            return ApiResponse.success(fcmTokens, "Danh sách fcm token");
-        } catch (Exception e) {
-            return ApiResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @DeleteMapping("/token")
-    public ResponseEntity<ApiResponse<String>> deleteToken(@RequestParam String token) {
-        try {
-            fcmService.deleteByToken(token);
-            return ApiResponse.success(null, "Xóa fcm token thành công");
-        } catch (Exception e) {
-            return ApiResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+//    @PostMapping("/token")
+//    public ResponseEntity<ApiResponse<FcmToken>> saveToken(@RequestBody FcmTokenRequestDto requestDto) {
+//        try {
+//            System.out.println(requestDto.getToken());
+//            FcmToken fcmToken = fcmService.save(requestDto);
+//            return fcmToken != null ? ApiResponse.success(fcmToken, "Fcm token đã được lưu") : ApiResponse.error("Lưu fcm token thất bại", HttpStatus.BAD_REQUEST);
+//        } catch (Exception e) {
+//            return ApiResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
+//
+//    @GetMapping("/tokens")
+//    public ResponseEntity<ApiResponse<Iterable<FcmToken>>> getTokens(@RequestParam(required = false) Long userId) {
+//        try {
+//            Iterable<FcmToken> fcmTokens = fcmService.findByUserId(userId);
+//            return ApiResponse.success(fcmTokens, "Danh sách fcm token");
+//        } catch (Exception e) {
+//            return ApiResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
+//
+//    @DeleteMapping("/token")
+//    public ResponseEntity<ApiResponse<String>> deleteToken(@RequestParam String token) {
+//        try {
+//            fcmService.deleteByToken(token);
+//            return ApiResponse.success(null, "Xóa fcm token thành công");
+//        } catch (Exception e) {
+//            return ApiResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
 }

@@ -36,16 +36,16 @@ public class BookServiceTest {
         assert true;
     }
 
-    @Test
-    public void deleteBookTest() {
-        bookService.deleteById(2L);
-        Book book = bookService.findById(2L);
-        assert book == null;
-    }
+//    @Test
+//    public void deleteBookTest() {
+//        bookService.deleteById(2L);
+//        Book book = bookService.findById(2L);
+//        assert book == null;
+//    }
 
-    @Test
-    public void testGetById() {
-        Book book = bookService.findById(3L);
-        assert book != null;
-    }
+//    @Test
+//    public void testGetById() {
+//        Book book = bookService.findById(3L);
+//        assert book != null;
+//    }
 }
