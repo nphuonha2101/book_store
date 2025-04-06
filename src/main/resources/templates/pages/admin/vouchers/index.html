@@ -44,7 +44,7 @@
                           th:classappend="${#temporals.createNow().isBefore(voucher.expiredDate) ? 'badge bg-success' : 'badge bg-danger'}"></span>
                 </td>
                 <td class="text-center">
-                    <a class="btn btn-primary btn-sm" title="Edit" th:href="@{/public.admin/vouchers/edit/{id}(id=${voucher.id})}">
+                    <a class="btn btn-primary btn-sm" title="Edit" th:href="@{/admin/vouchers/edit/{id}(id=${voucher.id})}">
                         <i class="ti ti-pencil" style="font-size: 1.2em"></i>
                     </a>
                     <button class="btn btn-danger btn-sm delete-voucher-btn" th:data-id="${voucher.id}" title="Delete">

@@ -1,5 +1,6 @@
 package com.ecommerce.book_store.persistent.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,6 +13,7 @@ import java.io.Serializable;
 @Entity
 public class OrderItem extends AbstractEntity implements Serializable {
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "order_id")
     private Order order;
     @ManyToOne

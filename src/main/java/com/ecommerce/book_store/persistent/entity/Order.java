@@ -1,12 +1,14 @@
 package com.ecommerce.book_store.persistent.entity;
 
 import com.ecommerce.book_store.core.constant.OrderStatus;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -27,7 +29,9 @@ public class Order extends AbstractEntity implements Serializable {
     private String note;
     @Column(name = "status")
     private OrderStatus status;
-    //    private List<OrderDetail> orderDetails;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<OrderItem> orderDetails;
     @Column(name = "total_amount")
     private double totalAmount;
 

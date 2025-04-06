@@ -86,4 +86,14 @@ public class VoucherServiceImpl extends IServiceImpl<VoucherRequestDto, VoucherR
             entity.setCategories(categories);
         }
     }
+
+    @Override
+    public List<Voucher> getVoucherWithConditions(List<Long> categoryIds, Double minSpend) {
+        return ((VoucherRepository) repository).getVoucherWithConditions(categoryIds, minSpend);
+    }
+
+    @Override
+    public Voucher findByCode(String code) {
+        return ((VoucherRepository) repository).findByCode(code);
+    }
 }

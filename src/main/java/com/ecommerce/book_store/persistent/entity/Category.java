@@ -1,5 +1,6 @@
 package com.ecommerce.book_store.persistent.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
@@ -21,6 +22,7 @@ public class Category extends AbstractEntity implements Serializable {
     private String description;
 
     @ManyToMany(mappedBy = "categories")
+    @JsonIgnore
     private List<Voucher> vouchers;
 
     public Category() {
