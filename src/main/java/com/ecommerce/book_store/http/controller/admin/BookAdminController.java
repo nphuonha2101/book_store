@@ -104,4 +104,11 @@ public class BookAdminController {
         }
     }
 
+    @GetMapping("/admin/books/api/search")
+    @ResponseBody
+    public Map<String, Object> search(@RequestParam String term) {
+        Page<BookResponseDto> books = bookService.findBooksContainingTitle(term, 0, 50);
+        return Map.of("books", books.getContent(), "status", 200, "success", true);
+    }
+
 }

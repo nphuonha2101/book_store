@@ -29,6 +29,11 @@ public class RibbonItemServiceImpl extends IServiceImpl<RibbonItemRequestDto, Ri
     }
 
     @Override
+    public boolean deleteByRibbonId(Long ribbonId) {
+        return ((RibbonItemRepository) repository).deleteAllByRibbonId(ribbonId) > 0;
+    }
+
+    @Override
     public RibbonItem toEntity(RibbonItemRequestDto requestDto) {
         RibbonItem entity = new RibbonItem();
         Ribbon ribbon = ribbonService.getRepository().findById(requestDto.getRibbonId()).orElseThrow(

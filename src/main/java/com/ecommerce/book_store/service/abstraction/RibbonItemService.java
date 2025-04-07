@@ -6,4 +6,5 @@ import com.ecommerce.book_store.persistent.entity.RibbonItem;
 
 public interface RibbonItemService extends IService<RibbonItemRequestDto, RibbonItemResponseDto, RibbonItem> {
     boolean existsByRibbonIdAndBookId(Long ribbonId, Long bookId);
+    boolean deleteByRibbonId(Long ribbonId);
 }

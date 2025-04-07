@@ -7,5 +7,7 @@ import com.ecommerce.book_store.persistent.entity.Ribbon;
 import java.util.List;
 
 public interface RibbonService extends IService<RibbonRequestDto, RibbonResponseDto, Ribbon> {
-    List<Ribbon> findAllByStatusTrue();
+    List<RibbonResponseDto> findAllByStatusTrue();
+    void saveRibbonWithRibbonItems(RibbonRequestDto requestDto);
+    void updateRibbonWithRibbonItems(RibbonRequestDto requestDto, Long id);
 }

@@ -12,6 +12,7 @@ import com.ecommerce.book_store.service.abstraction.RibbonItemService;
 import com.ecommerce.book_store.service.abstraction.RibbonService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -26,8 +27,49 @@ public class RibbonServiceImpl extends IServiceImpl<RibbonRequestDto, RibbonResp
     }
 
     @Override
-    public List<Ribbon> findAllByStatusTrue() {
-        return ((RibbonRepository) repository).findAllByStatusTrue();
+    public List<RibbonResponseDto> findAllByStatusTrue() {
+        return ((RibbonRepository) repository).findAllByStatusTrue().stream().map(this::toResponseDto).toList();
+    }
+
+    @Override
+    @Transactional
+    public void saveRibbonWithRibbonItems(RibbonRequestDto requestDto) {
+        Ribbon ribbon = toEntity(requestDto);
+        Ribbon ribbonSaved = repository.save(ribbon);
+
+        List<RibbonItem> ribbonItems = requestDto.getBookIds().stream()
+                .map(bookId -> {
+                    RibbonItem ribbonItem = new RibbonItem();
+                    ribbonItem.setRibbonId(ribbonSaved.getId());
+                    ribbonItem.setBookId(bookId);
+                    return ribbonItem;
+                })
+                .toList();
+
+        ribbonItemService.getRepository().saveAll(ribbonItems);
+    }
+
+    @Transactional
+    @Override
+    public void updateRibbonWithRibbonItems(RibbonRequestDto requestDto, Long id) {
+        Ribbon ribbon = repository.findById(id).orElseThrow(
+                () -> new RuntimeException("Ribbon not found")
+        );
+
+        copyProperties(requestDto, ribbon);
+        repository.save(ribbon);
+        ribbonItemService.deleteByRibbonId(ribbon.getId());
+
+        List<RibbonItem> ribbonItems = requestDto.getBookIds().stream()
+                .map(bookId -> {
+                    RibbonItem ribbonItem = new RibbonItem();
+                    ribbonItem.setRibbonId(ribbon.getId());
+                    ribbonItem.setBookId(bookId);
+                    return ribbonItem;
+                })
+                .toList();
+
+        ribbonItemService.getRepository().saveAll(ribbonItems);
     }
 
     @Override
@@ -36,11 +78,12 @@ public class RibbonServiceImpl extends IServiceImpl<RibbonRequestDto, RibbonResp
 
         entity.setName(requestDto.getName());
         entity.setDescription(requestDto.getDescription());
-        entity.setStatus(requestDto.isStatus());
+        entity.setStatus(requestDto.getStatus());
 
-        List<RibbonItem> ribbonItems = requestDto.getRibbonItems().stream()
-                .map(item -> {
-                    RibbonItem ribbonItem = ribbonItemService.toEntity(item);
+        List<RibbonItem> ribbonItems = requestDto.getBookIds().stream()
+                .map(bookId -> {
+                    RibbonItem ribbonItem = new RibbonItem();
+                    ribbonItem.setBookId(bookId);
                     ribbonItem.setRibbon(entity);
                     return ribbonItem;
                 })
@@ -81,16 +124,8 @@ public class RibbonServiceImpl extends IServiceImpl<RibbonRequestDto, RibbonResp
         if (requestDto.getDescription() != null) {
             entity.setDescription(requestDto.getDescription());
         }
-
-        if (requestDto.getRibbonItems() != null) {
-            List<RibbonItem> ribbonItems = requestDto.getRibbonItems().stream()
-                    .map(item -> {
-                        RibbonItem ribbonItem = ribbonItemService.toEntity(item);
-                        ribbonItem.setRibbon(entity);
-                        return ribbonItem;
-                    })
-                    .toList();
-            entity.setRibbonItems(ribbonItems);
+        if (requestDto.getStatus() != null) {
+            entity.setStatus(requestDto.getStatus());
         }
     }
 }
