@@ -71,7 +71,7 @@
                                 <div class="input-group">
                                     <span class="input-group-text">₫</span>
                                     <input type="number" class="form-control" id="price" name="price"
-                                           step="1000" th:value="${T(java.lang.Math).round(book.price)}">
+                                           step="1000" th:value="${book.price}">
                                 </div>
                             </div>
                             <div class="mb-3 form-group">
@@ -85,8 +85,7 @@
                                        name="publishedAt" th:value="${book.publishedAt}">
                             </div>
                             <div class="mb-3 form-check form-group">
-                                <input type="checkbox" class="form-check-input" id="isAvailable"
-                                       name="isAvailable" th:checked="${book.isAvailable}">
+                                <input class="form-check-input" type="checkbox" id="isAvailable" name="isAvailable" th:checked="${book.isAvailable}">
                                 <label class="form-check-label" for="isAvailable">Có sẵn để bán</label>
                             </div>
                         </div>

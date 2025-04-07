@@ -81,7 +81,7 @@ public class BookServiceImpl
                 coverImageUrl,
                 requestDto.getPrice(),
                 requestDto.getQuantity(),
-                requestDto.isAvailable(),
+                requestDto.getIsAvailable(),
                 requestDto.getPublishedAt(),
                 null
         );
@@ -170,7 +170,7 @@ public class BookServiceImpl
         entity.setIsbn(requestDto.getIsbn());
         entity.setPrice(requestDto.getPrice());
         entity.setQuantity(requestDto.getQuantity());
-        entity.setAvailable(requestDto.isAvailable());
+        entity.setAvailable(requestDto.getIsAvailable());
         entity.setPublishedAt(requestDto.getPublishedAt());
         entity.setCategory(category);
         entity.setImages(bookImages);

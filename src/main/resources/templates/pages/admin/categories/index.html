@@ -29,7 +29,7 @@
             </tr>
             <tr th:each="category : ${page.content}">
                 <td th:text="${category.name}">Tên thể loại</td>
-                <td th:text="${category.description}">Mô tả</td>
+                <td th:text="${#strings.abbreviate(category.description, 100)}">Mô tả</td>
                 <td>
                     <a class="btn btn-primary btn-sm" title="Edit" th:href="@{/admin/categories/edit/{id}(id=${category.id})}">
                         <i class="ti ti-pencil" style="font-size: 1.2em"></i>

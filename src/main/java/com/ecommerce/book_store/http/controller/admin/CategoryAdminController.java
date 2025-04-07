@@ -46,6 +46,31 @@ public class CategoryAdminController {
         model.addAttribute("LAYOUT_TITLE", "Admin BookStore");
         return "pages/admin/categories/edit";
     }
+
+    @GetMapping(value = {"/create"})
+    public String create(Model model) {
+        model.addAttribute("CONTENT_TITLE", "Thêm thể loại");
+        model.addAttribute("LAYOUT_TITLE", "Admin BookStore");
+        return "pages/admin/categories/create";
+    }
+
+    @PostMapping(value = {"/store"})
+    public String store(@Valid @ModelAttribute("categoriesRequestDto") CategoryRequestDto categoriesRequestDto, BindingResult result, RedirectAttributes redirectAttributes) {
+        try {
+            if (result.hasErrors()) {
+                return "pages/admin/categories/create";
+            }
+
+            categoryService.save(categoriesRequestDto);
+            redirectAttributes.addFlashAttribute("success", "Thêm thể loại sách thành công");
+            return "redirect:/admin/categories";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Thêm thể loại sách thất bại");
+            return "redirect:/admin/categories/create";
+        }
+    }
+
+
     @PostMapping(value = {"/update/{id}"})
     public String update(@PathVariable Long id, @Valid @ModelAttribute("categoriesRequestDto") CategoryRequestDto categoriesRequestDto, BindingResult result, RedirectAttributes redirectAttributes) {
         try {
