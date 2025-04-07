@@ -1,10 +1,7 @@
 package com.ecommerce.book_store.persistent.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,7 +19,7 @@ public class Ribbon extends AbstractEntity implements Serializable {
     private String name;
     @Column(name = "description", nullable = true)
     private String description;
-    @OneToMany(mappedBy = "ribbon")
+    @OneToMany(mappedBy = "ribbon", cascade = CascadeType.REMOVE)
     @JsonManagedReference
     private List<RibbonItem> ribbonItems;
     @Column(name = "status")

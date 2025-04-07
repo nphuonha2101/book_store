@@ -21,6 +21,6 @@ public class BookRequestDto extends AbstractRequestDto {
     private List<MultipartFile> bookImages;
     private Integer price;
     private Integer quantity;
-    private boolean isAvailable;
+    private Boolean isAvailable;
     private LocalDateTime publishedAt;
 }

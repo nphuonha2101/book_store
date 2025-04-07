@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RibbonItemRepository extends JpaRepository<RibbonItem, Long> {
     boolean existsByRibbonIdAndBookId(Long ribbonId, Long bookId);
+    int deleteAllByRibbonId(Long ribbonId);
 }

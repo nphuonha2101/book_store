@@ -1,10 +1,7 @@
 package com.ecommerce.book_store.persistent.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,10 +15,10 @@ import java.util.List;
 public class Category extends AbstractEntity implements Serializable {
     @Column(name = "name")
     private String name;
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @ManyToMany(mappedBy = "categories")
+    @ManyToMany(mappedBy = "categories", cascade = CascadeType.PERSIST)
     @JsonIgnore
     private List<Voucher> vouchers;
 

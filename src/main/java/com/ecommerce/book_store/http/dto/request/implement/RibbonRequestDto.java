@@ -11,6 +11,6 @@ import java.util.List;
 public class RibbonRequestDto extends AbstractRequestDto {
     private String name;
     private String description;
-    private boolean status;
-    List<RibbonItemRequestDto> ribbonItems;
+    private Boolean status;
+    List<Long> bookIds;
 }
