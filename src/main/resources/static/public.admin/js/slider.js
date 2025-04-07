@@ -24,7 +24,6 @@ $(document).ready(function() {
                 },
                 url: {
                     required: true,
-                    url: true
                 },
                 image: {
                     required: function (element) {
@@ -44,7 +43,6 @@ $(document).ready(function() {
                 },
                 url: {
                     required: "Vui lòng nhập URL.",
-                    url: "URL không hợp lệ."
                 },
                 image: {
                     required: "Vui lòng tải lên hình ảnh.",

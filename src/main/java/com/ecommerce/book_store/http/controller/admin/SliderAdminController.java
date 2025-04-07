@@ -21,29 +21,35 @@ import java.util.Map;
 @RequestMapping("/admin/sliders")
 public class SliderAdminController {
     private final SliderService sliderService;
+
     public SliderAdminController(SliderService sliderService) {
         this.sliderService = sliderService;
     }
+
     @GetMapping
     public String listSlider(Model model, Pageable pageable) {
         try {
             Page<SliderResponseDto> page = sliderService.findAll(pageable);
             model.addAttribute("page", page);
             model.addAttribute("url", "/admin/sliders");
+            model.addAttribute("CONTENT_TITLE", "Quản lý slider");
+            model.addAttribute("LAYOUT_TITLE", "Admin BookStore");
             return "pages/admin/sliders/index";
         } catch (Exception e) {
             log.error(e.getMessage());
             return "redirect:/admin/sliders";
         }
     }
+
     @GetMapping(value = {"/edit/{id}"})
     public String edit(@PathVariable Long id, Model model) {
         SliderResponseDto slider = sliderService.findById(id);
         model.addAttribute("slider", slider);
-        model.addAttribute("CONTENT_TITLE", "Chỉnh sửa thể loại");
+        model.addAttribute("CONTENT_TITLE", "Chỉnh sửa slider");
         model.addAttribute("LAYOUT_TITLE", "Admin BookStore");
         return "pages/admin/sliders/edit";
     }
+
     @PostMapping(value = {"/{id}/update"})
     public String update(@PathVariable Long id, @Valid @ModelAttribute("slidersRequestDto") SliderRequestDto slidersRequestDto, BindingResult result, RedirectAttributes redirectAttributes) {
         try {
@@ -59,15 +65,17 @@ public class SliderAdminController {
             return "redirect:/admin/sliders/edit/" + id;
         }
     }
-// create slider
-@GetMapping(value = {"/create"})
-public String create(Model model) {
-    List<SliderResponseDto> sliders = sliderService.findAll();
-    model.addAttribute("slider", sliders);
-    model.addAttribute("CONTENT_TITLE", "Thêm sách");
-    model.addAttribute("LAYOUT_TITLE", "Admin BookStore");
-    return "pages/admin/sliders/create";
-}
+
+    // create slider
+    @GetMapping(value = {"/create"})
+    public String create(Model model) {
+        List<SliderResponseDto> sliders = sliderService.findAll();
+        model.addAttribute("slider", sliders);
+        model.addAttribute("CONTENT_TITLE", "Thêm slider");
+        model.addAttribute("LAYOUT_TITLE", "Admin BookStore");
+        return "pages/admin/sliders/create";
+    }
+
     @PostMapping(value = {"/store"})
     public String store(@Valid @ModelAttribute("sliderRequestDto") SliderRequestDto sliderRequestDto, BindingResult result, RedirectAttributes redirectAttributes) {
         try {
@@ -76,10 +84,10 @@ public String create(Model model) {
             }
 
             sliderService.save(sliderRequestDto);
-            redirectAttributes.addFlashAttribute("success", "Thêm sách thành công");
+            redirectAttributes.addFlashAttribute("success", "Thêm slider thành công");
             return "redirect:/admin/sliders";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Thêm sách thất bại");
+            redirectAttributes.addFlashAttribute("error", "Thêm slider thất bại");
             return "redirect:/admin/sliders/create";
         }
     }
