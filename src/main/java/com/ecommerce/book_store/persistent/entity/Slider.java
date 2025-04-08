@@ -15,7 +15,7 @@ import java.io.Serializable;
 public class Slider extends AbstractEntity implements Serializable {
     @Column(name = "title")
     private String title;
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
     @Column(name = "image")
     private String image;
