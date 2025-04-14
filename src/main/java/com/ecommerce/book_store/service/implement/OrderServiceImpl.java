@@ -99,33 +99,4 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
         entity.setStatus(OrderStatus.valueOf(requestDto.getStatus()));
     }
 
-//    @Cacheable(value = "orders")
-    @Override
-    public List<OrderResponseDto> findAll() {
-        return super.findAll();
-    }
-
-//    @Cacheable(value = "orders", key = "#id")
-    @Override
-    public OrderResponseDto findById(Long id) {
-        return super.findById(id);
-    }
-
-//    @CachePut(value = "orders", key = "#result.id")
-    @Override
-    public OrderResponseDto save(OrderRequestDto requestDto) {
-        return super.save(requestDto);
-    }
-
-//    @CachePut(value = "orders", key = "#id")
-    @Override
-    public OrderResponseDto update(OrderRequestDto requestDto, Long id) {
-        return super.update(requestDto, id);
-    }
-
-//    @CacheEvict(value = "orders", key = "#id")
-    @Override
-    public boolean deleteById(Long id) {
-        return super.deleteById(id);
-    }
 }
