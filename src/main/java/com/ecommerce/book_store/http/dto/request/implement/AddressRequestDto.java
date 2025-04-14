@@ -7,6 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class AddressRequestDto extends AbstractRequestDto {
+    private Long addressId;
     private Long userId;
     private String fullName;
     private String phone;

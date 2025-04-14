@@ -7,9 +7,8 @@ import com.ecommerce.book_store.persistent.entity.Address;
 import java.util.List;
 
 public interface AddressService extends IService<AddressRequestDto, AddressResponseDto, Address> {
-    Address addAddress(AddressRequestDto request);
-    Address updateAddress(Long addressId, AddressRequestDto request);
-    void deleteAddress(Long addressId, Long userId);
-    List<Address> getUserAddresses(Long userId);
-    Address getDefaultAddress(Long userId);
+    AddressResponseDto addAddress(AddressRequestDto request);
+    AddressResponseDto updateAddress(Long addressId, AddressRequestDto request);
+    void deleteAddress(Long addressId);
+    List<AddressResponseDto> getAddressesByUserId(Long userId);
 }
