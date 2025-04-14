@@ -29,6 +29,8 @@ public class AddressServiceImpl extends IServiceImpl<AddressRequestDto, AddressR
         address.setDistrict(requestDto.getDistrict());
         address.setWard(requestDto.getWard());
         address.setAddInfo(requestDto.getAddInfo());
+        address.setDefault(requestDto.getIsDefault());
+        address.setUserId(requestDto.getUserId());
         return address;
     }
 

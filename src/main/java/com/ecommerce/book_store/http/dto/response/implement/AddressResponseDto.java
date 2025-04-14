@@ -17,7 +17,7 @@ public class AddressResponseDto extends AbstractResponseDto {
     private String district;
     private String ward;
     private String addInfo;
-    private boolean isDefault;
+    private Boolean isDefault;
 
 
 

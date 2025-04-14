@@ -12,6 +12,7 @@ import java.util.List;
 
 @Repository
 public interface AddressRepository extends JpaRepository<Address, Long> {
+    @Query("SELECT a FROM Address a WHERE a.userId = :userId ORDER BY a.isDefault DESC")
     List<Address> findByUserId(Long userId);
     Address findByUserIdAndIsDefaultTrue(Long userId);
     @Transactional
