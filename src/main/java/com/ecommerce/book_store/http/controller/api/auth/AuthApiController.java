@@ -94,4 +94,15 @@ public class AuthApiController {
             return ApiResponse.error("Internal Server Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @PostMapping("/api/v1/forgot-password")
+    public ResponseEntity<ApiResponse<String>> forgotPassword(@RequestBody AuthRequest request) {
+        try {
+            boolean forgotPasswordSuccess = userService.forgotPassword(request.getEmail());
+
+            return forgotPasswordSuccess ? ApiResponse.success(null, "Forgot password successfully") :
+                    ApiResponse.error("Forgot password failed", HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ApiResponse.error("Internal Server Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
