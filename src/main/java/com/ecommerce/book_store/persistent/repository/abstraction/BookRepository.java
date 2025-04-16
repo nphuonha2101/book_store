@@ -16,7 +16,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     @Query("SELECT b FROM Book b WHERE " +
             "(:authorName IS NULL OR :authorName = '' OR b.authorName LIKE %:authorName%) AND " +
             "(:title IS NULL OR :title = '' OR b.title LIKE %:title%) AND " +
-            "(:categoryIds IS NULL OR :categoryIds = '' OR b.category.id IN :categoryIds) AND " +
+            "(:categoryIds IS NULL OR b.category.id IN :categoryIds) AND " +
             "(:minPrice IS NULL OR b.price >= :minPrice) AND " +
             "(:maxPrice IS NULL OR b.price <= :maxPrice)")
     Page<Book> filter(String authorName, String title, List<Long> categoryIds, Double minPrice, Double maxPrice, Pageable pageable);

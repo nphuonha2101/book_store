@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequestMapping("/api/v1/books")
@@ -71,7 +72,7 @@ public class BookApiController {
     public ResponseEntity<ApiResponse<List<BookResponseDto>>> filterBooks(
             @RequestParam(value = "authorName", required = false) String authorName,
             @RequestParam(value = "title", required = false) String title,
-            @RequestParam(value = "categoryIds", required = false, defaultValue = "") List<Long> categoryIds,
+            @RequestParam(value = "categoryIds", required = false) List<Long> categoryIds,
             @RequestParam(value = "minPrice", required = false) Double minPrice,
             @RequestParam(value = "maxPrice", required = false) Double maxPrice,
             @RequestParam(value = "page", defaultValue = "0") Integer page,
@@ -94,7 +95,7 @@ public class BookApiController {
 
             return books != null && !books.isEmpty()
                     ? ApiResponse.successWithPagination(books, "Tất cả sách được lấy thành công")
-                    : ApiResponse.error("Không tìm thấy", HttpStatus.NOT_FOUND);
+                    : ApiResponse.success(new ArrayList<>(), "Không tìm thấy sách nào");
 
         } catch (Exception e) {
             return ApiResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

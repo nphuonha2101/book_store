@@ -38,7 +38,8 @@ public class WishListServiceImpl  extends IServiceImpl<WishListRequestDto, WishL
     @Override
     public void removeBookFromWishList(Long userId, Long bookId) {
         if (!wishListRepository.existsByUserIdAndBookId(userId, bookId)) {
-            throw new RuntimeException("Book not found in wish list");
+//            throw new RuntimeException("Book not found in wish list");
+            return;
         }
         wishListRepository.deleteByUserIdAndBookId(userId, bookId);
 
