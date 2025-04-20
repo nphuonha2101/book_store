@@ -13,4 +13,5 @@ public interface CartItemService extends IService<CartItemRequestDto, CartItemRe
     CartItemResponseDto addCartItem(Long userId, Long bookId, int quantity);
     CartItemResponseDto updateCartItem(Long cartItemId, int quantity);
     void deleteCartItem(Long cartItemId);
+    void deleteAllCartItems(Long userId);
 }

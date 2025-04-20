@@ -6,21 +6,20 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
+
 @Getter
 @Setter
 public class OrderRequestDto extends AbstractRequestDto {
-    @Positive
     private Long userId;
-    @Positive
     private Long voucherId;
-    @NotBlank
-    private String address;
-    @NotBlank
+    private Long addressId;
     private String phone;
-    @NotBlank
-    private String note;
-    @NotBlank
     private String status;
+    private String note;
     private Double totalAmount;
     private Double totalDiscount;
+    List<OrderItemRequestDto> orderItems;
+    private Integer paymentMethod;
 }

@@ -1,25 +1,21 @@
 package com.ecommerce.book_store.service.implement;
 
 import com.ecommerce.book_store.core.constant.OrderStatus;
+import com.ecommerce.book_store.http.dto.request.implement.AddressRequestDto;
+import com.ecommerce.book_store.http.dto.request.implement.OrderItemRequestDto;
 import com.ecommerce.book_store.http.dto.request.implement.OrderRequestDto;
-import com.ecommerce.book_store.http.dto.response.implement.OrderResponseDto;
-import com.ecommerce.book_store.http.dto.response.implement.UserResponseDto;
-import com.ecommerce.book_store.http.dto.response.implement.VoucherResponseDto;
-import com.ecommerce.book_store.persistent.entity.AbstractEntity;
-import com.ecommerce.book_store.persistent.entity.Order;
-import com.ecommerce.book_store.persistent.entity.User;
-import com.ecommerce.book_store.persistent.entity.Voucher;
+import com.ecommerce.book_store.http.dto.response.implement.*;
+import com.ecommerce.book_store.persistent.entity.*;
 import com.ecommerce.book_store.persistent.repository.abstraction.OrderRepository;
 import com.ecommerce.book_store.persistent.repository.abstraction.UserRepository;
-import com.ecommerce.book_store.service.abstraction.OrderService;
-import com.ecommerce.book_store.service.abstraction.RoleService;
-import com.ecommerce.book_store.service.abstraction.UserService;
-import com.ecommerce.book_store.service.abstraction.VoucherService;
+import com.ecommerce.book_store.service.abstraction.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -28,12 +24,16 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
         implements OrderService {
     private final VoucherService voucherService;
     private final UserService userService;
+    private final AddressService addressService;
+    private final OrderItemService orderItemService;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository repository, VoucherService voucherService, UserService userService) {
+    public OrderServiceImpl(OrderRepository repository, VoucherService voucherService, UserService userService, AddressService addressService, @Lazy OrderItemService orderItemService) {
         super(repository);
         this.voucherService = voucherService;
         this.userService = userService;
+        this.addressService = addressService;
+        this.orderItemService = orderItemService;
     }
 
     @Override
@@ -41,22 +41,31 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
         Order orderResult = new Order(
                 null,
                 null,
-                requestDto.getAddress(),
+                null,
                 requestDto.getPhone(),
                 requestDto.getNote(),
-                OrderStatus.valueOf(requestDto.getStatus().toUpperCase()),
+                null,
                 requestDto.getTotalAmount(),
-                requestDto.getTotalDiscount()
+                requestDto.getTotalDiscount(),
+                requestDto.getPaymentMethod()
         );
+
+        if (requestDto.getStatus() != null && !requestDto.getStatus().isEmpty()) {
+            orderResult.setStatus(OrderStatus.valueOf(requestDto.getStatus()));
+        }
+
+        Address address = addressService.getRepository().findById(requestDto.getAddressId()).orElseThrow(
+                () -> new RuntimeException("Address not found")
+        );
+
         User user = userService.getRepository().findById(requestDto.getUserId()).orElseThrow(
                 () -> new RuntimeException("User not found")
         );
-        Voucher voucher = voucherService.getRepository().findById(requestDto.getVoucherId()).orElseThrow(
-                () -> new RuntimeException("Voucher not found")
-        );
-
+        Voucher voucher = voucherService.getRepository().findById(requestDto.getVoucherId()).orElse(null);
         orderResult.setUser(user);
         orderResult.setVoucher(voucher);
+        orderResult.setAddress(address);
+        orderResult.setPaymentMethod(requestDto.getPaymentMethod());
 
         return orderResult;
     }
@@ -70,33 +79,91 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
         Order order = (Order) entity;
         UserResponseDto userResponseDto = userService.toResponseDto(order.getUser());
         VoucherResponseDto voucherResponseDto= voucherService.toResponseDto(order.getVoucher());
+        AddressResponseDto addressResponseDto = addressService.toResponseDto(order.getAddress());
+
+        List<OrderItemResponseDto> orderItemResponseDtos = null;
+        if (order.getOrderItems() != null) {
+            orderItemResponseDtos = order.getOrderItems().stream()
+                    .map(orderItemService::toResponseDto)
+                    .toList();
+        }
         return new OrderResponseDto(
                 order.getId(),
                 userResponseDto,
                 voucherResponseDto,
-                order.getAddress(),
+                addressResponseDto,
                 order.getPhone(),
                 order.getNote(),
                 String.valueOf(order.getStatus()),
                 order.getTotalAmount(),
-                order.getTotalDiscount()
-                );
+                order.getTotalDiscount(),
+                orderItemResponseDtos,
+                order.getPaymentMethod()
+        );
     }
 
     @Override
     public void copyProperties(OrderRequestDto requestDto, Order entity) {
-        User user = userService.getRepository().findById(requestDto.getUserId()).orElseThrow(
-                () -> new RuntimeException("User not found")
-        );
-        Voucher voucher = voucherService.getRepository().findById(requestDto.getVoucherId()).orElseThrow(
-                () -> new RuntimeException("Voucher not found")
-        );
-        entity.setUser(user);
-        entity.setVoucher(voucher);
-        entity.setAddress(requestDto.getAddress());
-        entity.setPhone(requestDto.getPhone());
-        entity.setNote(requestDto.getNote());
-        entity.setStatus(OrderStatus.valueOf(requestDto.getStatus()));
+        if (requestDto.getAddressId() != null) {
+            Address address = addressService.getRepository().findById(requestDto.getAddressId()).orElseThrow(
+                    () -> new RuntimeException("Address not found")
+            );
+            entity.setAddress(address);
+        }
+
+        if (requestDto.getTotalAmount() != 0) {
+            entity.setTotalAmount(requestDto.getTotalAmount());
+        }
+
+        if (requestDto.getTotalDiscount() != 0) {
+            entity.setTotalDiscount(requestDto.getTotalDiscount());
+        }
+
+        if (requestDto.getPhone() != null) {
+            entity.setPhone(requestDto.getPhone());
+        }
+
+        if (requestDto.getNote() != null) {
+            entity.setNote(requestDto.getNote());
+        }
+
+        if (requestDto.getUserId() != null) {
+            User user = userService.getRepository().findById(requestDto.getUserId()).orElseThrow(
+                    () -> new RuntimeException("User not found")
+            );
+            entity.setUser(user);
+        }
+
+        if (requestDto.getVoucherId() != null) {
+            Voucher voucher = voucherService.getRepository().findById(requestDto.getVoucherId()).orElseThrow(
+                    () -> new RuntimeException("Voucher not found")
+            );
+            entity.setVoucher(voucher);
+        }
+
+        if (requestDto.getPaymentMethod() != null) {
+            entity.setPaymentMethod(requestDto.getPaymentMethod());
+        }
     }
 
+    @Override
+    @Transactional
+    public OrderResponseDto order(OrderRequestDto orderRequestDto) throws Exception {
+        try {
+            Order order = toEntity(orderRequestDto);
+            order.setStatus(OrderStatus.PENDING);
+            order = getRepository().save(order);
+
+            List<OrderItemRequestDto> orderItemRequestDtos = orderRequestDto.getOrderItems();
+            for (OrderItemRequestDto orderItemRequestDto : orderItemRequestDtos) {
+                OrderItem orderItem = orderItemService.toEntity(orderItemRequestDto);
+                orderItem.setOrder(order);
+                orderItemService.getRepository().save(orderItem);
+            }
+
+            return toResponseDto(order);
+        } catch (Exception e) {
+            throw new Exception("Error while processing order: " + e.getMessage());
+        }
+    }
 }

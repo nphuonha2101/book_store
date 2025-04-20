@@ -5,6 +5,7 @@ import com.ecommerce.book_store.http.dto.response.implement.UserResponseDto;
 import com.ecommerce.book_store.persistent.entity.AbstractEntity;
 import com.ecommerce.book_store.persistent.entity.User;
 import com.ecommerce.book_store.persistent.repository.abstraction.UserRepository;
+import com.ecommerce.book_store.service.abstraction.AddressService;
 import com.ecommerce.book_store.service.abstraction.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,17 +17,18 @@ import java.util.Optional;
 @Service
 public class UserServiceImpl extends IServiceImpl<UserRequestDto, UserResponseDto, User>
         implements UserService {
-
+    private final AddressService addressService;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final FirebaseStorageService firebaseStorageService;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, FirebaseStorageService firebaseStorageService) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, FirebaseStorageService firebaseStorageService, AddressService addressService) {
         super(userRepository);
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.firebaseStorageService = firebaseStorageService;
+        this.addressService = addressService;
     }
 
     @Override
@@ -51,9 +53,9 @@ public class UserServiceImpl extends IServiceImpl<UserRequestDto, UserResponseDt
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
+                user.getAvatar(),
                 user.getPhone(),
-                user.getAddress(),
-                user.getAvatar()
+                user.getAddress()
         );
     }
 
