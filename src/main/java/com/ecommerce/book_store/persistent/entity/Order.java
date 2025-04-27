@@ -1,6 +1,7 @@
 package com.ecommerce.book_store.persistent.entity;
 
 import com.ecommerce.book_store.core.constant.OrderStatus;
+import com.ecommerce.book_store.core.constant.PaymentMethod;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -41,9 +42,11 @@ public class Order extends AbstractEntity implements Serializable {
     @Column(name = "total_discount")
     private double totalDiscount;
     @Column(name = "payment_method")
-    private int paymentMethod;
+    private PaymentMethod paymentMethod;
+    @Column(name = "cancellation_reason")
+    private String cancellationReason;
 
-    public Order(User user, Voucher voucher, Address address, String phone, String note, OrderStatus status, double totalAmount, double totalDiscount, int paymentMethod) {
+    public Order(User user, Voucher voucher, Address address, String phone, String note, OrderStatus status, double totalAmount, double totalDiscount, int paymentMethod, String cancellationReason) {
         this.user = user;
         this.voucher = voucher;
         this.address = address;
@@ -52,7 +55,8 @@ public class Order extends AbstractEntity implements Serializable {
         this.status = status;
         this.totalAmount = totalAmount;
         this.totalDiscount = totalDiscount;
-        this.paymentMethod = paymentMethod;
+        this.paymentMethod = PaymentMethod.values()[paymentMethod];
+        this.cancellationReason = cancellationReason;
     }
 
     public Order(User user, Voucher voucher, Address address, String phone, String note, double totalAmount, double totalDiscount) {
@@ -63,5 +67,9 @@ public class Order extends AbstractEntity implements Serializable {
         this.note = note;
         this.totalAmount = totalAmount;
         this.totalDiscount = totalDiscount;
+    }
+
+    public void setPaymentMethod(int paymentMethod) {
+        this.paymentMethod = PaymentMethod.values()[paymentMethod];
     }
 }

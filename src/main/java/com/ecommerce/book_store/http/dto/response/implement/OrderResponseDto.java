@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -24,4 +26,6 @@ public class OrderResponseDto extends AbstractResponseDto {
     private double totalDiscount;
     private List<OrderItemResponseDto> orderItems;
     private Integer paymentMethod;
+    private String cancellationReason;
+    private LocalDateTime createdAt;
 }

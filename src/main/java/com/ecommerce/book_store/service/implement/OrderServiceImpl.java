@@ -47,7 +47,8 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
                 null,
                 requestDto.getTotalAmount(),
                 requestDto.getTotalDiscount(),
-                requestDto.getPaymentMethod()
+                requestDto.getPaymentMethod(),
+                requestDto.getCancellationReason()
         );
 
         if (requestDto.getStatus() != null && !requestDto.getStatus().isEmpty()) {
@@ -98,7 +99,9 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
                 order.getTotalAmount(),
                 order.getTotalDiscount(),
                 orderItemResponseDtos,
-                order.getPaymentMethod()
+                order.getPaymentMethod().ordinal(),
+                order.getCancellationReason(),
+                order.getCreatedAt()
         );
     }
 
@@ -166,4 +169,5 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
             throw new Exception("Error while processing order: " + e.getMessage());
         }
     }
+
 }

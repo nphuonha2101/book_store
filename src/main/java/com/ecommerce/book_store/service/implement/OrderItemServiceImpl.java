@@ -4,7 +4,6 @@ import com.ecommerce.book_store.http.dto.request.implement.OrderItemRequestDto;
 import com.ecommerce.book_store.http.dto.response.implement.OrderItemResponseDto;
 import com.ecommerce.book_store.persistent.entity.AbstractEntity;
 import com.ecommerce.book_store.persistent.entity.Book;
-import com.ecommerce.book_store.persistent.entity.Order;
 import com.ecommerce.book_store.persistent.entity.OrderItem;
 import com.ecommerce.book_store.persistent.repository.abstraction.OrderItemRepository;
 import com.ecommerce.book_store.service.abstraction.BookService;
@@ -16,12 +15,10 @@ import org.springframework.stereotype.Service;
 public class OrderItemServiceImpl extends IServiceImpl<OrderItemRequestDto, OrderItemResponseDto, OrderItem>
     implements OrderItemService
 {
-    private final OrderService orderService;
     private final BookService bookService;
 
     public OrderItemServiceImpl(OrderItemRepository repository, OrderService orderService, BookService bookService) {
         super(repository);
-        this.orderService = orderService;
         this.bookService = bookService;
     }
 
@@ -47,7 +44,7 @@ public class OrderItemServiceImpl extends IServiceImpl<OrderItemRequestDto, Orde
 
         return new OrderItemResponseDto(
                 orderItem.getId(),
-                orderService.toResponseDto(orderItem.getOrder()),
+                orderItem.getOrder().getId(),
                 bookService.toResponseDto(orderItem.getBook()),
                 orderItem.getQuantity(),
                 orderItem.getPrice()

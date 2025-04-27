@@ -22,4 +22,5 @@ public class OrderRequestDto extends AbstractRequestDto {
     private Double totalDiscount;
     List<OrderItemRequestDto> orderItems;
     private Integer paymentMethod;
+    private String cancellationReason;
 }
