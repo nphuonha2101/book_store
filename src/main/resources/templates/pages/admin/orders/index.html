@@ -37,7 +37,12 @@
                 </td>
                 <td class="text-center" th:text="${#numbers.formatDecimal(order.totalAmount, 1, 'COMMA', 0, 'POINT')} + ' VND'"></td>
                 <td class="text-center" th:text="${order.createdAt != null ? #temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm') : ''}"></td>
-                <td class="text-center"></td>
+                <td class="text-center">
+                    <a class="btn btn-primary btn-sm" title="Chi tiết đơn hàng"
+                       th:href="@{/admin/orders/{id}(id=${order.id})}">
+                        <i class="ti ti-eye" style="font-size: 1.2em"></i>
+                    </a>
+                </td>
 
             </tr>
             </tbody>
