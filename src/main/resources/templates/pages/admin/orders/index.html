@@ -17,7 +17,6 @@
             <tr>
                 <th class="text-center">ID</th>
                 <th class="text-center">Tên người đặt</th>
-                <th class="text-center">Địa chỉ</th>
                 <th class="text-center">Số điện thoại</th>
                 <th class="text-center">Trạng thái</th>
                 <th class="text-center">Giá trị đơn hàng</th>
@@ -32,20 +31,14 @@
             <tr th:each="order, iterStat : ${page.content}">
                 <td class="text-center" th:text="${order.id}"></td>
                 <td class="text-center" th:text="${order.user.name}"></td>
-                <td class="text-center" ></td>
                 <td class="text-center" th:text="${order.phone}"></td>
-                <td class="text-center" th:text="${order.status}"></td>
+                <td class="text-center">
+                    <div th:replace="fragments/order-status :: orderStatus(${order.status})"></div>
+                </td>
                 <td class="text-center" th:text="${#numbers.formatDecimal(order.totalAmount, 1, 'COMMA', 0, 'POINT')} + ' VND'"></td>
                 <td class="text-center" th:text="${order.createdAt != null ? #temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm') : ''}"></td>
-                <td class="text-center">
-<!--                    <a class="btn btn-primary btn-sm" title="Edit"-->
-<!--                       th:href="@{/admin/ribbons/edit/{id}(id=${ribbon.id})}">-->
-<!--                        <i class="ti ti-pencil" style="font-size: 1.2em"></i>-->
-<!--                    </a>-->
-<!--                        <button class="btn btn-danger btn-sm delete-ribbon-btn"-->
-<!--                            th:data-ribbon-id="${ribbon.id}" title="Delete">-->
-<!--                        <i class="ti ti-trash" style="font-size: 1.2em"></i>-->
-<!--                    </button>-->
+                <td class="text-center"></td>
+
             </tr>
             </tbody>
         </table>

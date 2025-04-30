@@ -170,4 +170,27 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
         }
     }
 
+    @Transactional
+    public void updateOrderStatus(Long orderId, OrderStatus newStatus) {
+        Order order = this.getRepository().findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+
+        if (!OrderStatusTransitionManager.isValidTransition(order.getStatus(), newStatus)) {
+            throw new IllegalStateException("Invalid status transition from " + order.getStatus() + " to " + newStatus);
+        }
+
+        if (newStatus == OrderStatus.CANCELLED) {
+            order.setCancellationReason("Đơn hàng đã bị huỷ bởi hệ thống");
+        }
+
+        order.setStatus(newStatus);
+        this.getRepository().save(order);
+    }
+
+    public List<OrderStatus> getAvailableStatuses(Long orderId) {
+        Order order = this.getRepository().findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+        return OrderStatusTransitionManager.getAllowedTransitions(order.getStatus());
+    }
+
 }
