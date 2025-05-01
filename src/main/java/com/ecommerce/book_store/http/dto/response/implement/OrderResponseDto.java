@@ -22,10 +22,11 @@ public class OrderResponseDto extends AbstractResponseDto {
     private String phone;
     private String note;
     private String status;
-    private double totalAmount;
-    private double totalDiscount;
+    private Double totalAmount;
+    private Double totalDiscount;
     private List<OrderItemResponseDto> orderItems;
     private Integer paymentMethod;
     private String cancellationReason;
     private LocalDateTime createdAt;
+    private Double shippingFee;
 }

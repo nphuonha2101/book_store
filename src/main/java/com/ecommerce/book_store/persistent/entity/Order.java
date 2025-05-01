@@ -38,15 +38,17 @@ public class Order extends AbstractEntity implements Serializable {
     @JsonManagedReference
     private List<OrderItem> orderItems;
     @Column(name = "total_amount")
-    private double totalAmount;
+    private Double totalAmount;
     @Column(name = "total_discount")
-    private double totalDiscount;
+    private Double totalDiscount;
+    @Column(name = "shipping_fee")
+    private Double shippingFee;
     @Column(name = "payment_method")
     private PaymentMethod paymentMethod;
     @Column(name = "cancellation_reason")
     private String cancellationReason;
 
-    public Order(User user, Voucher voucher, Address address, String phone, String note, OrderStatus status, double totalAmount, double totalDiscount, int paymentMethod, String cancellationReason) {
+    public Order(User user, Voucher voucher, Address address, String phone, String note, OrderStatus status, Double totalAmount, Double totalDiscount, Double shippingFee, int paymentMethod, String cancellationReason) {
         this.user = user;
         this.voucher = voucher;
         this.address = address;
@@ -55,18 +57,9 @@ public class Order extends AbstractEntity implements Serializable {
         this.status = status;
         this.totalAmount = totalAmount;
         this.totalDiscount = totalDiscount;
+        this.shippingFee = shippingFee;
         this.paymentMethod = PaymentMethod.values()[paymentMethod];
         this.cancellationReason = cancellationReason;
-    }
-
-    public Order(User user, Voucher voucher, Address address, String phone, String note, double totalAmount, double totalDiscount) {
-        this.user = user;
-        this.voucher = voucher;
-        this.address = address;
-        this.phone = phone;
-        this.note = note;
-        this.totalAmount = totalAmount;
-        this.totalDiscount = totalDiscount;
     }
 
     public void setPaymentMethod(int paymentMethod) {

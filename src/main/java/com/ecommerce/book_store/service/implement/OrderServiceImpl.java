@@ -47,6 +47,7 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
                 null,
                 requestDto.getTotalAmount(),
                 requestDto.getTotalDiscount(),
+                requestDto.getShippingFee(),
                 requestDto.getPaymentMethod(),
                 requestDto.getCancellationReason()
         );
@@ -88,6 +89,7 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
                     .map(orderItemService::toResponseDto)
                     .toList();
         }
+
         return new OrderResponseDto(
                 order.getId(),
                 userResponseDto,
@@ -101,7 +103,8 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
                 orderItemResponseDtos,
                 order.getPaymentMethod().ordinal(),
                 order.getCancellationReason(),
-                order.getCreatedAt()
+                order.getCreatedAt(),
+                order.getShippingFee()
         );
     }
 
@@ -146,6 +149,10 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
 
         if (requestDto.getPaymentMethod() != null) {
             entity.setPaymentMethod(requestDto.getPaymentMethod());
+        }
+
+        if (requestDto.getShippingFee() != 0) {
+            entity.setShippingFee(requestDto.getShippingFee());
         }
     }
 
