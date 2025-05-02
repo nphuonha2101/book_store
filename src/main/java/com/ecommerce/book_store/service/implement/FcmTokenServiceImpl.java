@@ -25,6 +25,11 @@ public class FcmTokenServiceImpl extends IServiceImpl<FcmTokenRequestDto, FcmTok
     }
 
     @Override
+    public List<String> findTokenStringByUserId(Long userId) {
+        return fcmTokenRepository.findTokenStringByUserId(userId);
+    }
+
+    @Override
     public FcmToken findByToken(String token) {
         return fcmTokenRepository.findByToken(token);
     }

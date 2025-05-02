@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface FcmTokenService extends IService<FcmTokenRequestDto, FcmTokenResponseDto, FcmToken> {
     List<FcmToken> findByUserId(Long userId);
+    List<String> findTokenStringByUserId(Long userId);
     FcmToken findByToken(String token);
     void deleteByToken(String token);
-
 }

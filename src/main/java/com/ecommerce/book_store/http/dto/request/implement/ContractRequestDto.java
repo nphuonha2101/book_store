@@ -1,4 +1,4 @@
-package com.ecommerce.book_store.http.controller.api.contact;
+package com.ecommerce.book_store.http.dto.request.implement;
 
 import com.ecommerce.book_store.http.dto.request.AbstractRequestDto;
 import lombok.Getter;
