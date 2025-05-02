@@ -1,24 +1,21 @@
 package com.ecommerce.book_store.service.implement;
 
 import com.ecommerce.book_store.core.constant.OrderStatus;
-import com.ecommerce.book_store.http.dto.request.implement.AddressRequestDto;
 import com.ecommerce.book_store.http.dto.request.implement.OrderItemRequestDto;
 import com.ecommerce.book_store.http.dto.request.implement.OrderRequestDto;
 import com.ecommerce.book_store.http.dto.response.implement.*;
 import com.ecommerce.book_store.persistent.entity.*;
 import com.ecommerce.book_store.persistent.repository.abstraction.OrderRepository;
-import com.ecommerce.book_store.persistent.repository.abstraction.UserRepository;
 import com.ecommerce.book_store.service.abstraction.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderResponseDto, Order>
         implements OrderService {
@@ -26,14 +23,16 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
     private final UserService userService;
     private final AddressService addressService;
     private final OrderItemService orderItemService;
+    private final NotificationService notificationService;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository repository, VoucherService voucherService, UserService userService, AddressService addressService, @Lazy OrderItemService orderItemService) {
+    public OrderServiceImpl(OrderRepository repository, VoucherService voucherService, UserService userService, AddressService addressService, @Lazy OrderItemService orderItemService, NotificationService notificationService) {
         super(repository);
         this.voucherService = voucherService;
         this.userService = userService;
         this.addressService = addressService;
         this.orderItemService = orderItemService;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -80,7 +79,7 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
 
         Order order = (Order) entity;
         UserResponseDto userResponseDto = userService.toResponseDto(order.getUser());
-        VoucherResponseDto voucherResponseDto= voucherService.toResponseDto(order.getVoucher());
+        VoucherResponseDto voucherResponseDto = voucherService.toResponseDto(order.getVoucher());
         AddressResponseDto addressResponseDto = addressService.toResponseDto(order.getAddress());
 
         List<OrderItemResponseDto> orderItemResponseDtos = null;
@@ -171,6 +170,14 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
                 orderItemService.getRepository().save(orderItem);
             }
 
+            // Create notification
+            notificationService.sendNotificationToUser(
+                    "Đơn hàng mới đã được tạo",
+                    "Đơn hàng của bạn đã được tạo thành công. Vui lòng kiểm tra thông tin đơn hàng trong tài khoản của bạn.",
+                    order.getUser().getId(),
+                    "/order/" + order.getId()
+            );
+
             return toResponseDto(order);
         } catch (Exception e) {
             throw new Exception("Error while processing order: " + e.getMessage());
@@ -179,19 +186,52 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
 
     @Transactional
     public void updateOrderStatus(Long orderId, OrderStatus newStatus) {
-        Order order = this.getRepository().findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+        try {
+            Order order = this.getRepository().findById(orderId)
+                    .orElseThrow(() -> new IllegalArgumentException("Order not found"));
 
-        if (!OrderStatusTransitionManager.isValidTransition(order.getStatus(), newStatus)) {
-            throw new IllegalStateException("Invalid status transition from " + order.getStatus() + " to " + newStatus);
+            if (!OrderStatusTransitionManager.isValidTransition(order.getStatus(), newStatus)) {
+                throw new IllegalStateException("Invalid status transition from " + order.getStatus() + " to " + newStatus);
+            }
+
+            if (newStatus == OrderStatus.CANCELLED) {
+                order.setCancellationReason("Đơn hàng đã bị huỷ bởi hệ thống");
+                notificationService.sendNotificationToUser(
+                        "Đơn hàng đã bị huỷ",
+                        "Đơn hàng #" + order.getId() +  " của bạn đã bị huỷ. Vui lòng kiểm tra lại thông tin đơn hàng trong tài khoản của bạn.",
+                        order.getUser().getId(),
+                        "/order/" + order.getId()
+                );
+
+            } else if (newStatus == OrderStatus.DELIVERED) {
+                notificationService.sendNotificationToUser(
+                        "Đơn hàng đã được giao",
+                        "Đơn hàng #" + order.getId() + " của bạn đã được giao thành công. Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi.",
+                        order.getUser().getId(),
+                        "/order/" + order.getId()
+                );
+            } else if (newStatus == OrderStatus.SHIPPING) {
+                notificationService.sendNotificationToUser(
+                        "Đơn hàng đang được giao",
+                        "Đơn hàng #" + order.getId() + " của bạn đang được giao. Vui lòng kiểm tra thông tin đơn hàng trong tài khoản của bạn.",
+                        order.getUser().getId(),
+                        "/order/" + order.getId()
+                );
+            } else if (newStatus == OrderStatus.PROCESSING) {
+                notificationService.sendNotificationToUser(
+                        "Đơn hàng đang được xử lý",
+                        "Đơn hàng #" + order.getId() + " của bạn đang được xử lý. Vui lòng kiểm tra thông tin đơn hàng trong tài khoản của bạn.",
+                        order.getUser().getId(),
+                        "/order/" + order.getId()
+                );
+            }
+
+            order.setStatus(newStatus);
+            this.getRepository().save(order);
+        } catch (Exception e) {
+            log.error("Error while updating order status: {}", e.getMessage());
+            throw new RuntimeException("Error while updating order status: " + e.getMessage());
         }
-
-        if (newStatus == OrderStatus.CANCELLED) {
-            order.setCancellationReason("Đơn hàng đã bị huỷ bởi hệ thống");
-        }
-
-        order.setStatus(newStatus);
-        this.getRepository().save(order);
     }
 
     public List<OrderStatus> getAvailableStatuses(Long orderId) {
