@@ -1,6 +1,7 @@
 package com.ecommerce.book_store.http.controller.api.contact;
 
 import com.ecommerce.book_store.http.ApiResponse;
+import com.ecommerce.book_store.http.dto.request.implement.ContractRequestDto;
 import com.ecommerce.book_store.service.abstraction.MailService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,9 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/api/v1/contacts")
 @RestController
-public class ContactUsController {
+public class ContactUsApiController {
     private final MailService mailService;
-    public ContactUsController(MailService mailService) {
+    public ContactUsApiController(MailService mailService) {
         this.mailService = mailService;
     }
 
@@ -27,7 +28,7 @@ public class ContactUsController {
             String subject = "[NEW] [Contact Form] Bạn có một tin nhắn mới";
             String body = "Email: " + request.getEmail() + "\n" +
                     "Message: " + request.getMessage();
-            mailService.sendEmail("filmbookingdn@gmail.com", subject, body);
+            mailService.sendEmail("nphuonha2101@gmail.com", subject, body);
 
             return ApiResponse.success(null, "Contact form submitted successfully");
         } catch (Exception e) {
