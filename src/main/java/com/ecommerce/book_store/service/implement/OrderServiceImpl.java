@@ -26,14 +26,16 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
     private final UserService userService;
     private final AddressService addressService;
     private final OrderItemService orderItemService;
+    private final OrderRepository orderRepository;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository repository, VoucherService voucherService, UserService userService, AddressService addressService, @Lazy OrderItemService orderItemService) {
+    public OrderServiceImpl(OrderRepository repository, VoucherService voucherService, UserService userService, AddressService addressService, @Lazy OrderItemService orderItemService, OrderRepository orderRepository) {
         super(repository);
         this.voucherService = voucherService;
         this.userService = userService;
         this.addressService = addressService;
         this.orderItemService = orderItemService;
+        this.orderRepository = orderRepository;
     }
 
     @Override
@@ -198,6 +200,27 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
         Order order = this.getRepository().findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found"));
         return OrderStatusTransitionManager.getAllowedTransitions(order.getStatus());
+    }
+
+    @Override
+    public List<OrderResponseDto> getOrderHistory(Long userId) {
+        return orderRepository.findById(userId).stream()
+                .map(this::toResponseDto)
+                .toList();
+    }
+
+    @Override
+    public void cancelOrder(Long orderId, Long userId) {
+        Order order = orderRepository.findByIdAndUserId(orderId, userId);
+        if (order == null) {
+            throw new IllegalArgumentException("Order not found for the given user.");
+        }
+        if (order.getStatus() == OrderStatus.CANCELLED) {
+            throw new IllegalStateException("Order is already cancelled.");
+        }
+        order.setStatus(OrderStatus.CANCELLED);
+        order.setCancellationReason("Order cancelled by user.");
+        orderRepository.save(order);
     }
 
 }
