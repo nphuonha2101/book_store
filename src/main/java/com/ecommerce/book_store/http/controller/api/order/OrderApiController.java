@@ -44,4 +44,17 @@ public class OrderApiController {
         }
     }
 
+    // Hủy đơn hàng
+    @PostMapping("/cancel/{orderId}")
+    public ResponseEntity<ApiResponse<Object>> cancelOrder(
+            @PathVariable Long orderId,
+            @RequestParam Long userId) {
+        try {
+            orderService.cancelOrder(orderId, userId);
+            return ApiResponse.success(null, "Hủy đơn hàng thành công");
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ApiResponse.error("Có lỗi xảy ra khi hủy đơn hàng", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
