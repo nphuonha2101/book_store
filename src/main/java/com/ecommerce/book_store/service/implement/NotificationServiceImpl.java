@@ -87,6 +87,7 @@ public class NotificationServiceImpl extends IServiceImpl<NotificationRequestDto
     }
 
     @Override
+    @Transactional
     public void markAsRead(Long notificationId) {
         Notification notification = getRepository().findById(notificationId).orElseThrow(
                 () -> new RuntimeException("Notification not found")
@@ -106,6 +107,17 @@ public class NotificationServiceImpl extends IServiceImpl<NotificationRequestDto
     public Page<NotificationResponseDto> findByUserId(Long userId, Pageable pageable) {
         return ((NotificationRepository) getRepository()).findByUserId(userId, pageable)
                 .map(this::toResponseDto);
+    }
+
+    @Override
+    public Integer countUnreadNotificationsByUserId(Long userId) {
+        return ((NotificationRepository) getRepository()).countUnreadNotificationsByUserId(userId);
+    }
+
+    @Override
+    @Transactional
+    public boolean markAsReadAllByUserId(Long userId) {
+        return ((NotificationRepository) getRepository()).markAsReadAllByUserId(userId) > 0;
     }
 
     @Override

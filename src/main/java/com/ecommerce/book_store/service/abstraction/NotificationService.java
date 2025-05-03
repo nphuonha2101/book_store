@@ -12,4 +12,8 @@ public interface NotificationService extends IService<NotificationRequestDto, No
     void markAsRead(Long notificationId);
     void deleteNotification(Long notificationId);
     Page<NotificationResponseDto> findByUserId(Long userId, Pageable pageable);
+    Integer countUnreadNotificationsByUserId(Long userId);
+    boolean markAsReadAllByUserId(Long userId);
+
+
 }
