@@ -24,15 +24,17 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
     private final AddressService addressService;
     private final OrderItemService orderItemService;
     private final NotificationService notificationService;
+    private final OrderRepository orderRepository;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository repository, VoucherService voucherService, UserService userService, AddressService addressService, @Lazy OrderItemService orderItemService, NotificationService notificationService) {
+    public OrderServiceImpl(OrderRepository repository, VoucherService voucherService, UserService userService, AddressService addressService, @Lazy OrderItemService orderItemService, NotificationService notificationService, OrderRepository orderRepository) {
         super(repository);
         this.voucherService = voucherService;
         this.userService = userService;
         this.addressService = addressService;
         this.orderItemService = orderItemService;
         this.notificationService = notificationService;
+        this.orderRepository = orderRepository;
     }
 
     @Override
@@ -198,7 +200,7 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
                 order.setCancellationReason("Đơn hàng đã bị huỷ bởi hệ thống");
                 notificationService.sendNotificationToUser(
                         "Đơn hàng đã bị huỷ",
-                        "Đơn hàng #" + order.getId() +  " của bạn đã bị huỷ. Vui lòng kiểm tra lại thông tin đơn hàng trong tài khoản của bạn.",
+                        "Đơn hàng #" + order.getId() + " của bạn đã bị huỷ. Vui lòng kiểm tra lại thông tin đơn hàng trong tài khoản của bạn.",
                         order.getUser().getId(),
                         "/order/" + order.getId()
                 );
@@ -241,24 +243,37 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
     }
 
     @Override
-    public List<OrderResponseDto> getOrderHistory(Long userId) {
-        return ((OrderRepository) getRepository()).findById(userId).stream()
+    public List<OrderResponseDto> getOrderHistory(Long userId, OrderStatus status) {
+        List<Order> orders;
+
+        if (status == null || status == OrderStatus.ALL) {
+            orders = ((OrderRepository) getRepository()).findAllByUserId(userId);
+        } else {
+            orders = ((OrderRepository) getRepository()).findAllByUserIdAndStatus(userId, status);
+
+        }
+        if (orders == null || orders.isEmpty()) {
+            return List.of();
+        }
+        return orders.stream()
                 .map(this::toResponseDto)
                 .toList();
+
     }
 
     @Override
-    public void cancelOrder(Long orderId, Long userId) {
-        Order order = ((OrderRepository) getRepository()).findByIdAndUserId(orderId, userId);
-        if (order == null) {
-            throw new IllegalArgumentException("Order not found for the given user.");
-        }
+    public Order cancelOrder(Long orderId, String cancellationReason) {
+        Order order = this.getRepository().findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+
         if (order.getStatus() == OrderStatus.CANCELLED) {
-            throw new IllegalStateException("Order is already cancelled.");
+            throw new IllegalStateException("Order is already cancelled");
         }
+
         order.setStatus(OrderStatus.CANCELLED);
-        order.setCancellationReason("Order cancelled by user.");
-        getRepository().save(order);
+        order.setCancellationReason(cancellationReason);
+
+        return this.getRepository().save(order);
     }
 
 }
