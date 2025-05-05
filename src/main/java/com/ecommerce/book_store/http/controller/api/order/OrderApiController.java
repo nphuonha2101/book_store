@@ -47,7 +47,7 @@ public class OrderApiController {
             // Xử lý thanh toán với PayOS
             if (orderRequestDto.getPaymentMethod() == PaymentMethod.PAYOS.ordinal()) {
                 String redirectUrl = paymentService.payment(orderResponseDto.getId(), orderResponseDto.getTotalAmount().intValue());
-                orderResponseDto.setRedirectUrl(redirectUrl);
+                orderResponseDto.setPaymentUrl(redirectUrl);
 
                 return ApiResponse.success(orderResponseDto, "Đặt hàng thành công");
             }

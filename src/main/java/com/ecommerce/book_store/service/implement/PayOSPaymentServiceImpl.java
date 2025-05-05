@@ -31,9 +31,9 @@ public class PayOSPaymentServiceImpl implements PaymentService {
                     .builder()
                     .orderCode(orderId)
                     .amount(amount)
-                    .description("Thanh toán đơn hàng " + orderId + " tại NPBookStore")
-                    .returnUrl(REACT_CLIENT_URL + "/order-success" + orderId)
-                    .cancelUrl(REACT_CLIENT_URL + "/order-fail" + orderId)
+                    .description("NPBookStore #" + orderId)
+                    .returnUrl(REACT_CLIENT_URL + "/order-success/" + orderId)
+                    .cancelUrl(REACT_CLIENT_URL + "/order-failed/" + orderId)
                     .build();
 
             CheckoutResponseData checkoutResponseData = payOS.createPaymentLink(paymentData);
