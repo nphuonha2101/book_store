@@ -1,9 +1,12 @@
 package com.ecommerce.book_store.http.controller.web;
 
 import com.ecommerce.book_store.http.ApiResponse;
+import com.ecommerce.book_store.http.dto.response.implement.ReviewResponseDto;
 import com.ecommerce.book_store.persistent.entity.Review;
 import com.ecommerce.book_store.service.abstraction.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +21,17 @@ public class ReviewController {
 
     @Autowired
     private ReviewService reviewService;
-
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<List<ReviewResponseDto>>> getAllReviews(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<ReviewResponseDto> reviews = reviewService.findAll(PageRequest.of(page, size));
+        if (reviews.isEmpty()) {
+            return ApiResponse.error("No review found", HttpStatus.NOT_FOUND);
+        }
+        return ApiResponse.successWithPagination(reviews, "Get all reviews successfully");
+    }
     @GetMapping("/{bookId}")
     public ResponseEntity<ApiResponse<Object>> getReviews(@PathVariable Long bookId) {
         List<Review> reviews = reviewService.getReviewsByBookId(bookId);
@@ -45,4 +58,5 @@ public class ReviewController {
             return ApiResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 }

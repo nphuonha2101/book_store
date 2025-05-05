@@ -76,7 +76,6 @@ public class ReviewServiceImpl extends IServiceImpl<ReviewRequestDto, ReviewResp
     @Override
     public Review addReview(Long bookId, Long userId, int rating, String comment) {
         Optional<Book> bookOpt = bookService.getRepository().findById(bookId);
-        // TODO: Temporary solution
         Optional<User> userOpt = userService.getRepository().findById(3L);
         if (bookOpt.isPresent() && userOpt.isPresent()) {
             Review review = new Review();
@@ -85,6 +84,29 @@ public class ReviewServiceImpl extends IServiceImpl<ReviewRequestDto, ReviewResp
             review.setRating(rating);
             review.setComment(comment);
             return reviewRepository.save(review);
+        }
+        return null;
+    }
+
+    @Override
+    public Review editReview(Long reviewId, Long userId, int rating, String comment) {
+        Optional<Review> reviewOpt = reviewRepository.findById(reviewId);
+        if (reviewOpt.isPresent()) {
+            Review review = reviewOpt.get();
+            review.setRating(rating);
+            review.setComment(comment);
+            return reviewRepository.save(review);
+        }
+        return null;
+    }
+
+    @Override
+    public Review deleteReview(Long reviewId) {
+        Optional<Review> reviewOpt = reviewRepository.findById(reviewId);
+        if (reviewOpt.isPresent()) {
+            Review review = reviewOpt.get();
+            reviewRepository.delete(review);
+            return review;
         }
         return null;
     }

@@ -11,5 +11,7 @@ public interface OrderService extends IService<OrderRequestDto, OrderResponseDto
     OrderResponseDto order(OrderRequestDto orderRequestDto) throws Exception;
     void updateOrderStatus(Long orderId, OrderStatus newStatus);
     List<OrderStatus> getAvailableStatuses(Long orderId);
+    List<OrderResponseDto> getOrderHistory(Long userId, OrderStatus status);
+    Order cancelOrder(Long orderId, String cancellationReason);
 }
 
