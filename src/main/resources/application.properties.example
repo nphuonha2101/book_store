@@ -80,3 +80,8 @@ jwt.expiration.time=86400000
 
 spring.devtools.restart.enabled=false
 react.client.url=http://localhost:5173
+
+password.random.string.length=10
+
+vosk.library.path=
+vosk.model.path=src/main/resources/models/vosk-model-small-vn-0.
