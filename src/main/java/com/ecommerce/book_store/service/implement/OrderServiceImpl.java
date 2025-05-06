@@ -1,6 +1,7 @@
 package com.ecommerce.book_store.service.implement;
 
 import com.ecommerce.book_store.core.constant.OrderStatus;
+import com.ecommerce.book_store.core.constant.PaymentMethod;
 import com.ecommerce.book_store.http.dto.request.implement.OrderItemRequestDto;
 import com.ecommerce.book_store.http.dto.request.implement.OrderRequestDto;
 import com.ecommerce.book_store.http.dto.response.implement.*;
@@ -105,7 +106,8 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
                 order.getPaymentMethod().ordinal(),
                 order.getCancellationReason(),
                 order.getCreatedAt(),
-                order.getShippingFee()
+                order.getShippingFee(),
+                null
         );
     }
 
@@ -162,7 +164,12 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
     public OrderResponseDto order(OrderRequestDto orderRequestDto) throws Exception {
         try {
             Order order = toEntity(orderRequestDto);
-            order.setStatus(OrderStatus.PENDING);
+
+            if (orderRequestDto.getPaymentMethod() == PaymentMethod.COD.ordinal())
+                order.setStatus(OrderStatus.PROCESSING);
+            else
+                order.setStatus(OrderStatus.PENDING);
+
             order = getRepository().save(order);
 
             List<OrderItemRequestDto> orderItemRequestDtos = orderRequestDto.getOrderItems();
