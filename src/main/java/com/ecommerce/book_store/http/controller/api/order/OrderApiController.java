@@ -86,13 +86,12 @@ public class OrderApiController {
     }
 
     @DeleteMapping("/cancel")
-    public ResponseEntity<ApiResponse<Object>> cancelOrder(
+    public ResponseEntity<ApiResponse<OrderResponseDto>> cancelOrder(
             @RequestParam Long orderId,
             @RequestParam String cancellationReason,
             @RequestHeader("Authorization") String token) {
         try {
-            log.info("Token received: {}", token);
-            Order order = orderService.cancelOrder(orderId, cancellationReason);
+            OrderResponseDto order = orderService.cancelOrder(orderId, cancellationReason);
             return order != null ? ApiResponse.success(order, "Hủy đơn hàng thành công") : ApiResponse.error("Hủy đơn hàng thất bại", HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             log.error(e.getMessage());

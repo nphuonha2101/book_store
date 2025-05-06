@@ -268,7 +268,7 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
     }
 
     @Override
-    public Order cancelOrder(Long orderId, String cancellationReason) {
+    public OrderResponseDto cancelOrder(Long orderId, String cancellationReason) throws Exception {
         Order order = this.getRepository().findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found"));
 
@@ -278,8 +278,21 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
 
         order.setStatus(OrderStatus.CANCELLED);
         order.setCancellationReason(cancellationReason);
+        order = this.getRepository().save(order);
 
-        return this.getRepository().save(order);
+        // Sending notification for order cancellation
+        String content = cancellationReason != null && !cancellationReason.isEmpty()
+                ? "Đơn hàng #" + order.getId() + " của bạn đã bị hủy với lý do: " + cancellationReason + ". Vui lòng kiểm tra lại thông tin đơn hàng trong tài khoản của bạn."
+                : "Đơn hàng #" + order.getId() + " của bạn đã bị hủy. Vui lòng kiểm tra lại thông tin đơn hàng trong tài khoản của bạn.";
+        notificationService.sendNotificationToUser
+                (
+                "Đơn hàng đã bị hủy",
+                content,
+                order.getUser().getId(),
+                "/order/" + order.getId()
+        );
+
+        return this.toResponseDto(order);
     }
 
     @Override

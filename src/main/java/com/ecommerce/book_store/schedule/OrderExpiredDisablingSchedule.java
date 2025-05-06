@@ -19,13 +19,13 @@ public class OrderExpiredDisablingSchedule {
         this.orderService = orderService;
     }
 
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 1800000)
     public void disableOrdersExactlyAfter1Day() {
         try {
             LocalDateTime now = LocalDateTime.now();
             LocalDateTime maxTime = now.minusDays(1);
-            LocalDateTime minTime = maxTime.minusSeconds(5);
-            
+            LocalDateTime minTime = maxTime.minusMinutes(30);
+
             List<Order> orders = orderService.findOrdersCreatedExactly24HoursAgo(
                     OrderStatus.PENDING,
                     minTime,

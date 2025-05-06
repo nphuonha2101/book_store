@@ -13,7 +13,7 @@ public interface OrderService extends IService<OrderRequestDto, OrderResponseDto
     void updateOrderStatus(Long orderId, OrderStatus newStatus);
     List<OrderStatus> getAvailableStatuses(Long orderId);
     List<OrderResponseDto> getOrderHistory(Long userId, OrderStatus status);
-    Order cancelOrder(Long orderId, String cancellationReason);
     List<Order> findOrdersCreatedExactly24HoursAgo(OrderStatus status, LocalDateTime minTime, LocalDateTime maxTime);
+    OrderResponseDto cancelOrder(Long orderId, String cancellationReason) throws Exception;
 }
 
