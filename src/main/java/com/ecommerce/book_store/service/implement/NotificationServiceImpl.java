@@ -37,6 +37,7 @@ public class NotificationServiceImpl extends IServiceImpl<NotificationRequestDto
     public void sendNotificationToUser(String title, String content, Long userId, String actionUrl) {
         try {
             log.info("Sending notification to user with id: {}", userId);
+            // Lấy danh sách FCM tokens của người dùng
             List<String> fcmTokens = fcmTokenService.findTokenStringByUserId(userId);
             log.info("Found {} tokens for user with id: {}", fcmTokens.size(), userId);
 

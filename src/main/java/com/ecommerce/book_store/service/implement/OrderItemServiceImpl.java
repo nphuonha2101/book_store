@@ -68,4 +68,9 @@ public class OrderItemServiceImpl extends IServiceImpl<OrderItemRequestDto, Orde
             entity.setPrice(requestDto.getPrice());
         }
     }
+
+    @Override
+    public boolean isUserPurchasedBook(Long userId, Long bookId) {
+        return ((OrderItemRepository) getRepository()).isUserPurchasedBook(userId, bookId);
+    }
 }
