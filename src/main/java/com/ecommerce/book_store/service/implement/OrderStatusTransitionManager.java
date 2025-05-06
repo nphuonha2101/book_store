@@ -8,7 +8,7 @@ public class OrderStatusTransitionManager {
     private static final Map<OrderStatus, List<OrderStatus>> ALLOWED_TRANSITIONS = new HashMap<>();
 
     static {
-        ALLOWED_TRANSITIONS.put(OrderStatus.PENDING, Arrays.asList(OrderStatus.PROCESSING, OrderStatus.CANCELLED));
+        ALLOWED_TRANSITIONS.put(OrderStatus.PENDING, Arrays.asList(OrderStatus.PROCESSING, OrderStatus.CANCELLED, OrderStatus.FAILED));
         ALLOWED_TRANSITIONS.put(OrderStatus.PROCESSING, Arrays.asList(OrderStatus.SHIPPING, OrderStatus.CANCELLED));
         ALLOWED_TRANSITIONS.put(OrderStatus.SHIPPING, Arrays.asList(OrderStatus.DELIVERED, OrderStatus.CANCELLED));
         ALLOWED_TRANSITIONS.put(OrderStatus.DELIVERED, Collections.emptyList()); // No transitions

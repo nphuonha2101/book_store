@@ -7,10 +7,12 @@ import com.ecommerce.book_store.http.dto.response.implement.FcmTokenResponseDto;
 import com.ecommerce.book_store.persistent.entity.FcmToken;
 import com.ecommerce.book_store.service.abstraction.FcmTokenService;
 import com.ecommerce.book_store.service.abstraction.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/auth/fcm")
 public class FcmApiController {
@@ -36,7 +38,7 @@ public class FcmApiController {
             requestDto.setUserId(userId);
 
             FcmTokenResponseDto fcmToken = fcmService.save(requestDto);
-            return fcmToken != null ? ApiResponse.success(fcmToken, "Fcm token đã được lưu") : ApiResponse.error("Lưu fcm token thất bại", HttpStatus.BAD_REQUEST);
+            return ApiResponse.success(fcmToken, "Fcm token đã được lưu");
         } catch (Exception e) {
             return ApiResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -58,9 +60,10 @@ public class FcmApiController {
         }
     }
 
-    @DeleteMapping("/delete/{token}")
-    public ResponseEntity<ApiResponse<String>> deleteToken(@PathVariable String token) {
+    @DeleteMapping("/delete")
+    public ResponseEntity<ApiResponse<String>> deleteToken(@RequestBody  String token) {
         try {
+            log.info("Token received: {}", token);
             fcmService.deleteByToken(token);
             return ApiResponse.success(null, "Xóa fcm token thành công");
         } catch (Exception e) {

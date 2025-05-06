@@ -113,4 +113,15 @@ public class OrderApiController {
           return ApiResponse.error("Có lỗi xảy ra khi lấy thông tin đơn hàng", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PostMapping("/make-failed/{orderId}")
+    public ResponseEntity<ApiResponse<Object>> makeFailed(@PathVariable Long orderId) {
+        try {
+            orderService.updateOrderStatus(orderId, OrderStatus.FAILED);
+            return ApiResponse.success(null, "Cập nhật trạng thái đơn hàng thành công");
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ApiResponse.error("Có lỗi xảy ra", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

@@ -7,6 +7,7 @@ import com.ecommerce.book_store.persistent.entity.FcmToken;
 import com.ecommerce.book_store.persistent.repository.abstraction.FcmTokenRepository;
 import com.ecommerce.book_store.service.abstraction.FcmTokenService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -35,6 +36,7 @@ public class FcmTokenServiceImpl extends IServiceImpl<FcmTokenRequestDto, FcmTok
     }
 
     @Override
+    @Transactional
     public void deleteByToken(String token) {
         fcmTokenRepository.deleteByToken(token);
     }

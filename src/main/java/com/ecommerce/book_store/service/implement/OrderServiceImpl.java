@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -25,17 +26,15 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
     private final AddressService addressService;
     private final OrderItemService orderItemService;
     private final NotificationService notificationService;
-    private final OrderRepository orderRepository;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository repository, VoucherService voucherService, UserService userService, AddressService addressService, @Lazy OrderItemService orderItemService, NotificationService notificationService, OrderRepository orderRepository) {
+    public OrderServiceImpl(OrderRepository repository, VoucherService voucherService, UserService userService, AddressService addressService, @Lazy OrderItemService orderItemService, NotificationService notificationService) {
         super(repository);
         this.voucherService = voucherService;
         this.userService = userService;
         this.addressService = addressService;
         this.orderItemService = orderItemService;
         this.notificationService = notificationService;
-        this.orderRepository = orderRepository;
     }
 
     @Override
@@ -184,7 +183,7 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
                     "Đơn hàng mới đã được tạo",
                     "Đơn hàng của bạn đã được tạo thành công. Vui lòng kiểm tra thông tin đơn hàng trong tài khoản của bạn.",
                     order.getUser().getId(),
-                    "/order/" + order.getId()
+                    "/orders/" + order.getId()
             );
 
             return toResponseDto(order);
@@ -209,7 +208,7 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
                         "Đơn hàng đã bị huỷ",
                         "Đơn hàng #" + order.getId() + " của bạn đã bị huỷ. Vui lòng kiểm tra lại thông tin đơn hàng trong tài khoản của bạn.",
                         order.getUser().getId(),
-                        "/order/" + order.getId()
+                        "/orders/" + order.getId()
                 );
 
             } else if (newStatus == OrderStatus.DELIVERED) {
@@ -217,21 +216,21 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
                         "Đơn hàng đã được giao",
                         "Đơn hàng #" + order.getId() + " của bạn đã được giao thành công. Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi.",
                         order.getUser().getId(),
-                        "/order/" + order.getId()
+                        "/orders/" + order.getId()
                 );
             } else if (newStatus == OrderStatus.SHIPPING) {
                 notificationService.sendNotificationToUser(
                         "Đơn hàng đang được giao",
                         "Đơn hàng #" + order.getId() + " của bạn đang được giao. Vui lòng kiểm tra thông tin đơn hàng trong tài khoản của bạn.",
                         order.getUser().getId(),
-                        "/order/" + order.getId()
+                        "/orders/" + order.getId()
                 );
             } else if (newStatus == OrderStatus.PROCESSING) {
                 notificationService.sendNotificationToUser(
                         "Đơn hàng đang được xử lý",
                         "Đơn hàng #" + order.getId() + " của bạn đang được xử lý. Vui lòng kiểm tra thông tin đơn hàng trong tài khoản của bạn.",
                         order.getUser().getId(),
-                        "/order/" + order.getId()
+                        "/orders/" + order.getId()
                 );
             }
 
@@ -282,5 +281,11 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
 
         return this.getRepository().save(order);
     }
+
+    @Override
+    public List<Order> findOrdersCreatedExactly24HoursAgo(OrderStatus status, LocalDateTime minTime, LocalDateTime maxTime) {
+        return ((OrderRepository) getRepository()).findOrdersCreatedExactly24HoursAgo(status, minTime, maxTime);
+    }
+
 
 }
