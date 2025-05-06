@@ -7,6 +7,8 @@ import com.ecommerce.book_store.http.dto.response.implement.UserResponseDto;
 import com.ecommerce.book_store.persistent.entity.*;
 import com.ecommerce.book_store.persistent.repository.abstraction.ReviewRepository;
 import com.ecommerce.book_store.service.abstraction.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -58,7 +60,8 @@ public class ReviewServiceImpl extends IServiceImpl<ReviewRequestDto, ReviewResp
                 userResponseDto,
                 bookResponseDto,
                 review.getRating(),
-                review.getComment()
+                review.getComment(),
+                review.getCreatedAt()
         );
     }
 
@@ -69,54 +72,58 @@ public class ReviewServiceImpl extends IServiceImpl<ReviewRequestDto, ReviewResp
     }
 
     @Override
-    public List<Review> getReviewsByBookId(Long bookId) {
-        return reviewRepository.findByBookId(bookId);
+    public Page<ReviewResponseDto> getReviewsByBookId(Long bookId, Pageable pageable) {
+        return reviewRepository.findByBookId(bookId, pageable).map(this::toResponseDto);
     }
 
     @Override
-    public Review addReview(Long bookId, Long userId, int rating, String comment) {
-        Optional<Book> bookOpt = bookService.getRepository().findById(bookId);
-        Optional<User> userOpt = userService.getRepository().findById(3L);
-        if (bookOpt.isPresent() && userOpt.isPresent()) {
-            Review review = new Review();
-            review.setBook(bookOpt.get());
-            review.setUser(userOpt.get());
+    public boolean isUserReviewedBook(Long userId, Long bookId) {
+        return reviewRepository.isUserReviewedBook(userId, bookId);
+    }
+
+    @Override
+    public ReviewResponseDto addReview(Long bookId, Long userId, int rating, String comment) {
+        boolean isUserReviewed = reviewRepository.isUserReviewedBook(userId, bookId);
+        if (isUserReviewed) {
+            throw new RuntimeException("User has already reviewed this book");
+        }
+        Review review = new Review();
+        review.setBook(bookService.getRepository().findById(bookId).orElseThrow(
+                () -> new RuntimeException("Book not found")
+        ));
+        review.setUser(userService.getRepository().findById(userId).orElseThrow(
+                () -> new RuntimeException("User not found")
+        ));
+        review.setRating(rating);
+        review.setComment(comment);
+        reviewRepository.save(review);
+        return toResponseDto(review);
+    }
+
+    @Override
+    public ReviewResponseDto editReview(Long reviewId, Long userId, int rating, String comment) {
+        Optional<Review> reviewOptional = reviewRepository.findById(reviewId);
+        if (reviewOptional.isPresent()) {
+            Review review = reviewOptional.get();
+            if (!review.getUser().getId().equals(userId)) {
+                throw new RuntimeException("User not authorized to edit this review");
+            }
             review.setRating(rating);
             review.setComment(comment);
-            return reviewRepository.save(review);
+            reviewRepository.save(review);
+            return toResponseDto(review);
+        } else {
+            throw new RuntimeException("Review not found");
         }
-        return null;
-    }
-
-    @Override
-    public Review editReview(Long reviewId, Long userId, int rating, String comment) {
-        Optional<Review> reviewOpt = reviewRepository.findById(reviewId);
-        if (reviewOpt.isPresent()) {
-            Review review = reviewOpt.get();
-            review.setRating(rating);
-            review.setComment(comment);
-            return reviewRepository.save(review);
-        }
-        return null;
-    }
-
-    @Override
-    public Review deleteReview(Long reviewId) {
-        Optional<Review> reviewOpt = reviewRepository.findById(reviewId);
-        if (reviewOpt.isPresent()) {
-            Review review = reviewOpt.get();
-            reviewRepository.delete(review);
-            return review;
-        }
-        return null;
     }
 
     @Override
     public double getAverageRatingByBookId(Long bookId) {
-        List<Review> reviews = reviewRepository.findByBookId(bookId);
-        return reviews.stream()
-                .mapToInt(Review::getRating)
-                .average()
-                .orElse(0.0);
+        return reviewRepository.findAverageRatingByBookId(bookId);
+    }
+
+    @Override
+    public Long countByBookId(Long bookId) {
+        return reviewRepository.countByBookId(bookId);
     }
 }
