@@ -1,0 +1,118 @@
+<div xmlns:th="http://www.thymeleaf.org" layout:fragment="content"
+     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+     layout:decorate="~{layouts/admin.html}" class="pb-100">
+    <head>
+        <link rel="stylesheet" href="https://unpkg.com/filepond/dist/filepond.css">
+        <link rel="stylesheet" href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css">
+    </head>
+    <div class="breadcrumb-area">
+        <h1>Quản lý sách</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/public.admin/dashboard}">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/public.admin/books}">Quản lý sách</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Quản lý ảnh sách</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="w-100 mb-5">
+        <input th:data-book-id="${bookId}" type="file" class="filepond" name="image" multiple>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead>
+            <tr>
+                <th class="text-center">STT</th>
+                <th class="text-center">Ảnh</th>
+                <th class="text-center">Hành động</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(page.content)}">
+                <td colspan="3" class="text-center">Không có dữ liệu</td>
+            </tr>
+            <tr th:each="image, iterStat : ${page.content}">
+                <td class="text-center" th:text="${iterStat.index + page.number * page.size + 1}">STT</td>
+                <td class="text-center">
+                    <img th:src="@{${image.url}}" class="img-thumbnail" style="height: 200px" alt="Ảnh sách" />
+                </td>
+                <td class="text-center ">
+                    <a th:data-id="${image.id}" th:data-book-id="${bookId}"  class="btn btn-danger btn-sm delete-book-img-btn" title="Delete">
+                        <i class="ti ti-trash" style="font-size: 1.2em"></i>
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:replace="~{fragments/pagination :: pagination(${page}, ${url}, ${params})}"></div>
+
+
+    <!-- include FilePond library -->
+    <script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
+
+    <!-- include FilePond plugins -->
+    <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.js"></script>
+
+    <!-- include FilePond jQuery adapter -->
+    <script src="https://unpkg.com/jquery-filepond/filepond.jquery.js"></script>
+    <script>
+        $(document).ready(function () {
+
+
+            $('.delete-book-img-btn').click(function () {
+                const id = $(this).data('id');
+                const bookId = $(this).data('book-id');
+                swalConfirm('Bạn có chắc chắn muốn xóa ảnh này?', 'Có', 'Không', function () {
+                    $.ajax({
+                        url: `/admin/books/${bookId}/images/${id}`,
+                        type: 'DELETE',
+                        success: function (response) {
+                            if (response.status === 200) {
+                                swalSuccess(response.message).then(function () {
+                                    location.reload();
+                                });
+                            } else {
+                                swalError(response.message);
+                            }
+                        },
+                        error: function (error) {
+                            swalError('Có lỗi xảy ra, vui lòng thử lại sau');
+                        }
+                    });
+                });
+            });
+
+            $.fn.filepond.registerPlugin(FilePondPluginImagePreview);
+            const filePondElement = $('.filepond');
+            const bookId = filePondElement.data('book-id');
+            filePondElement.filepond({
+                instantUpload: false,
+                allowImagePreview: true,
+                imagePreviewHeight: 250,
+                acceptedFileTypes: ['image/*'],
+                server: {
+                    process: {
+                        url: `/admin/books/${bookId}/images`,
+                        method: 'POST',
+                        ondata: (formData) => {
+                            formData.append('bookId', bookId);
+                            return formData;
+                        },
+                        onload: (response) => {
+                            const res = JSON.parse(response);
+                            if (res.status === 200) {
+                                swalSuccess(res.message).then(function () {
+                                    location.reload();
+                                });
+                            } else {
+                                swalError(res.message);
+                            }
+                        },
+                    }
+                }
+            });
+        });
+    </script>
+</div>

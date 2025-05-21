@@ -1,20 +1,20 @@
 package com.ecommerce.book_store.persistent.entity;
 
-import com.ecommerce.book_store.persistent.EntityFilterMap;
-import jakarta.annotation.PreDestroy;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @MappedSuperclass
 @Getter
-public abstract class AbstractEntity {
-
-    @Transient
-    protected EntityFilterMap filterMap;
-
+@Setter
+@SQLDelete(sql = "UPDATE #{entityName} SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@FilterDef(name = "deletedFilter", parameters = @ParamDef(name = "isDeleted", type = Boolean.class))
+@Filter(name = "deletedFilter", condition = "deleted_at IS NULL")
+public abstract class AbstractEntity implements Serializable {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name="id", insertable = false, updatable = false)
@@ -24,8 +24,15 @@ public abstract class AbstractEntity {
     private LocalDateTime createdAt;
     @Column(name="updated_at")
     private LocalDateTime updatedAt;
-    @Column(name="deleted_at")
+    @Column(name="deleted_at", nullable = true)
     private LocalDateTime deletedAt;
+
+    public AbstractEntity() {
+    }
+
+    public AbstractEntity(Long id) {
+        this.id = id;
+    }
 
     @PrePersist
     public void prePersist() {
@@ -38,12 +45,16 @@ public abstract class AbstractEntity {
         this.updatedAt = LocalDateTime.now();
     }
 
-    @PreDestroy
-    public void preDestroy() {
+    @PreRemove
+    public void preRemove() {
         this.deletedAt = LocalDateTime.now();
     }
 
-    public abstract void initFilterMap();
-    public abstract void addFilter(String key, Object value);
+    public boolean isDeleted() {
+        return deletedAt != null;
+    }
 
+    public void restore() {
+        this.deletedAt = null;
+    }
 }

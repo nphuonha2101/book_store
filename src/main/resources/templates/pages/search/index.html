@@ -1,0 +1,90 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/layouts/master.html}">
+<body>
+<th:block layout:fragment="content">
+    <div class="container py-4">
+        <h2 class="mb-40" th:text="|Kết quả tìm kiếm: ${param.term != null ? param.term : 'Không có từ khóa'}|"></h2>
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-body-tertiary text-white">
+                        <h5 class="mb-0">Lọc</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="filterForm">
+                            <div class="row g-3 flex-column">
+                                <input type="hidden" id="title" name="title" th:value="${param.term != null ? param.term : ''}">
+                                <div class="col">
+                                    <label for="author" class="form-label">Tác giả</label>
+                                    <input type="text" class="form-control" id="author" name="authorName" placeholder="Nhập tên tác giả">
+                                </div>
+                                <div class="col">
+                                    <label for="category" class="form-label">Thể loại</label>
+                                    <select class="form-select" id="category" name="categoryIds" multiple>
+                                    </select>
+                                </div>
+                                <div class="col">
+                                    <label for="minPrice" class="form-label">Giá tối thiểu</label>
+                                    <input type="number" class="form-control" id="minPrice" name="minPrice" placeholder="0" min="0" step="1">
+                                </div>
+                                <div class="col">
+                                    <label for="maxPrice" class="form-label">Giá tối đa</label>
+                                    <input type="number" class="form-control" id="maxPrice" name="maxPrice" placeholder="1000" min="0" step="1">
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-center mt-3">
+                                <button type="submit" class="btn btn-primary me-1"><i class="lni lni-search-alt"></i> Tìm kiếm</button>
+                                <button type="reset" class="btn btn-secondary ms-1"><i class="lni lni-reload"></i> Đặt lại bộ lọc</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Book Results -->
+            <div class="col-md-9">
+                <!-- Pagination Info -->
+                <div class="d-flex justify-content-between mb-3">
+                    <div>
+                        <span>Đang hiển thị <span id="currentPage" th:text="${page.number + 1}"></span> trên <span id="totalPages" th:text="${page.totalPages}"></span> trang</span>
+                    </div>
+                    <div>
+                        <select id="pageSize" class="form-select form-select-sm" style="width: auto;">
+                            <option value="10">10 kết quả mỗi trang</option>
+                            <option value="20">20 kết quả mỗi trang</option>
+                            <option value="50">50 kết quả mỗi trang</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Books Container -->
+                <div class="row mb-5" id="booksContainer">
+                    <div class="col-lg-3 col-md-6 col-12" th:each="book : ${page.content}">
+                        <div class="single-product">
+                            <div class="product-image">
+                                <img th:src="${book.coverImage}" alt="#">
+                                <div class="button">
+                                    <a href="" class="btn"><i class="lni lni-cart"></i> Thêm vào giỏ hàng</a>
+                                </div>
+                            </div>
+                            <div class="product-info">
+                                <span class="category" th:text="${book.authorName}"></span>
+                                <h4 class="title">
+                                    <a th:href="@{/books/{id}(id=${book.id})}" th:text="${book.title}"></a></h4>
+                                <div class="price">
+                                    <span th:text="${#numbers.formatDecimal(book.price, 1, 'COMMA', 0, 'POINT')} + ' VND'"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:replace="~{fragments/pagination :: pagination(${page}, ${url}, ${params})}"></div>
+    </div>
+
+    <script th:src="@{/js/search.js}"></script>
+</th:block>
+</body>
+</html>

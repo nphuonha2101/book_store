@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin.html}">
+
+<div layout:fragment="content" class="pb-100">
+    <link rel="stylesheet" th:href="@{https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css}">
+
+    <div class="breadcrumb-area">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/admin/dashboard}">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/admin/ribbons}">Quản lý Ribbon</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa Ribbon</li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="container">
+        <h2 class="mb-4">Chỉnh sửa Ribbon</h2>
+        <form id="ribbonForm" th:action="@{/admin/ribbons/update/{id}(id=${ribbon.id})}" method="post">
+            <div class="row g-4">
+                <!-- Card thông tin cơ bản -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="mb-3 form-group">
+                                <label for="name">Tiêu đề <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="name" name="name" th:value="${ribbon.name}" required>
+                            </div>
+                            <div class="mb-3 form-group">
+                                <label for="description">Mô tả <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="description" name="description" rows="3"
+                                          th:text="${ribbon.description}" required></textarea>
+                            </div>
+                            <div class="mb-3 form-group">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="status" name="status"
+                                           th:checked="${ribbon.status}">
+                                    <label class="form-check-label" for="status">Kích hoạt</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card chọn sách -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Chọn sách</h5>
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <input type="text" id="bookSearch" class="form-control" placeholder="Tìm sách..." autocomplete="off">
+                                    <input type="hidden" id="selectedBookId">
+                                    <button type="button" id="addBookBtn" class="btn btn-outline-primary ms-2">
+                                        <i class="fas fa-plus"></i> Thêm sách
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="selected-books mt-3">
+                                <h6>Sách đã chọn:</h6>
+                                <ul id="selectedBooksList" class="list-group"></ul>
+                                <div id="noSelectedBooks" class="text-muted">Chưa có sách nào được chọn</div>
+                            </div>
+
+                            <div id="selectedBooksContainer"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 text-center mt-4">
+                    <button type="submit" class="btn btn-primary">Cập nhật Ribbon</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <th:block th:if="${success != null}">
+        <script>window.swalSuccess('[[${success}]]');</script>
+    </th:block>
+    <th:block th:if="${error != null}">
+        <script>window.swalError('[[${error}]]');</script>
+    </th:block>
+
+    <!-- Truyền danh sách sách đã chọn -->
+    <script th:inline="javascript">
+        let existingBooks = /*[[${ribbon.ribbonItems}]]*/ [];
+    </script>
+
+    <script th:src="@{/public.admin/js/ribbon.js}"></script>
+</div>
+</html>

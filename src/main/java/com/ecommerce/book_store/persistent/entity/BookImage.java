@@ -1,24 +1,26 @@
 package com.ecommerce.book_store.persistent.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.awt.print.Book;
+import java.io.Serializable;
+
 
 @Getter
-@Setter
 @Table(name="book_images")
-public class BookImage {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id", insertable = false, updatable = false)
-    private Long id;
+@Entity
+@Setter
+public class BookImage extends AbstractEntity implements Serializable {
     @Column(name="url")
     private String url;
     @ManyToOne
-    @JoinColumn(name="book_id")
+    @JsonBackReference
+    @JoinColumn(name="book_id", insertable = false, updatable = false)
     protected Book book;
+    @Column(name="book_id")
+    private Long bookId;
 
     public BookImage() {
     }
@@ -27,4 +29,5 @@ public class BookImage {
         this.url = url;
         this.book = book;
     }
+
 }

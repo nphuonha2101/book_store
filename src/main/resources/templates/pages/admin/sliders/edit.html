@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin.html}">
+
+<div layout:fragment="content" class="pb-100">
+  <div class="breadcrumb-area">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a th:href="@{/admin/dashboard}">Trang chủ</a></li>
+        <li class="breadcrumb-item"><a th:href="@{/admin/sliders}">Quản lý Slider</a></li>
+        <li class="breadcrumb-item active">Cập nhật Slider</li>
+      </ol>
+    </nav>
+  </div>
+
+  <div class="container">
+    <h2 class="mb-4">Cập nhật Slider</h2>
+    <form id="sliderForm" th:action="@{/admin/sliders/{id}/update(id=${slider.id})}" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="id" th:value="${slider.id}">
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="card-title mb-0">Thông tin cơ bản</h5>
+            </div>
+            <div class="card-body">
+              <div class="mb-3 form-group">
+                <label for="title" class="form-label">Tiêu đề <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="title" name="title" th:value="${slider.title}">
+              </div>
+              <div class="mb-3 form-group">
+                <label for="description" class="form-label">Mô tả <span class="text-danger">*</span></label>
+                <textarea class="form-control validate" id="description" name="description" rows="3" th:text="${slider.description}"></textarea>
+              </div>
+              <div class="mb-3 form-group">
+                <label for="url" class="form-label">URL <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="url" name="url" th:value="${slider.url}">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="card-title mb-0">Chi tiết bổ sung</h5>
+            </div>
+            <div class="card-body">
+              <div class="mb-4 form-group">
+                <label for="coverImage" class="form-label">Hình ảnh</label>
+                <input type="file" class="form-control" id="coverImage" name="image" accept="image/*">
+                <img width="250px" height="250px" id="coverImagePreview" class="preview-container mt-2" th:src="${slider.image != null ? slider.image : 'https://static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg'}"/>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 text-center mt-4">
+          <button type="submit" class="btn btn-primary">Cập nhật Slider</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <style>
+    .preview-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .preview-item {
+      position: relative;
+      width: 100px;
+      height: 100px;
+    }
+    .preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+    .delete-btn {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .upload-btn {
+      display: inline-block;
+      padding: 6px 12px;
+      background: #007bff;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .upload-btn:hover {
+      background: #0056b3;
+    }
+  </style>
+
+  <th:block th:if="${success != null}">
+    <script>window.swalSuccess('[[${success}]]');</script>
+  </th:block>
+  <th:block th:if="${error != null}">
+    <script>window.swalError('[[${error}]]');</script>
+  </th:block>
+
+  <script th:src="@{/public.admin/js/slider.js}"></script>
+</div>
+</html>

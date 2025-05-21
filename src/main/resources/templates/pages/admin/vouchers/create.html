@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin.html}">
+
+<div layout:fragment="content" class="pb-100">
+    <div class="breadcrumb-area">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/admin/dashboard}">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/admin/vouchers}">Quản lý voucher</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Tạo voucher mới</li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="container">
+        <h2 class="mb-4">Tạo voucher mới</h2>
+        <form id="voucherForm" th:action="@{/admin/vouchers/store}" method="post" enctype="multipart/form-data">
+            <div class="row g-4">
+                <!-- Card thông tin cơ bản -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Thông tin cơ bản</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3 form-group">
+                                <label for="code" class="form-label">Mã voucher <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="code" name="code" required>
+                                    <button type="button" class="btn btn-outline-secondary" id="generateCode">Tạo mã</button>
+                                </div>
+                            </div>
+                            <div class="mb-3 form-group">
+                                <label for="discount" class="form-label">Giảm giá (%) <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="discount" name="discount" min="1" max="100" required>
+                            </div>
+                            <div class="mb-3 form-group">
+                                <label for="minSpend" class="form-label">Chi tiêu tối thiểu <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">₫</span>
+                                    <input type="number" class="form-control" id="minSpend" name="minSpend" step="1000" min="0" required>
+                                </div>
+                            </div>
+                            <div class="mb-3 form-group">
+                                <label for="expiredDate" class="form-label">Ngày hết hạn <span class="text-danger">*</span></label>
+                                <input type="datetime-local" class="form-control" id="expiredDate" name="expiredDate" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card chi tiết bổ sung -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Chi tiết bổ sung</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4 form-group">
+                                <label for="thumbnail" class="form-label">Hình ảnh voucher <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" id="thumbnail" name="thumbnail" accept="image/*">
+                                <img width="150px" height="150px" id="thumbnailPreview" src="https://static.vecteezy.com/system/resources/previews/016/916/479/original/placeholder-icon-design-free-vector.jpg" class="preview-container mt-2"/>
+                            </div>
+                            <div class="mb-3 form-group">
+                                <label for="categoryIds" class="form-label">Áp dụng cho thể loại</label>
+                                <select class="form-select" id="categoryIds" name="categoryIds" multiple>
+                                    <option th:each="category : ${categories}"
+                                            th:value="${category.id}"
+                                            th:text="${category.name}"></option>
+                                </select>
+                                <small class="form-text text-muted">Chọn nhiều thể loại bằng cách giữ Ctrl (hoặc Command trên Mac) và click. Nếu không chọn thể loại nào, voucher sẽ áp dụng cho tất cả.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 text-center mt-4">
+                    <button type="submit" class="btn btn-primary">Tạo voucher</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        $(function() {
+            // Preview ảnh thumbnail khi chọn file
+            $('input[type="file"][name="thumbnail"]').on('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#thumbnailPreview').attr('src', e.target.result);
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Đặt giá trị mặc định cho ngày hết hạn (7 ngày từ hiện tại)
+            const now = new Date();
+            now.setDate(now.getDate() + 7);
+            $('#expiredDate').val(now.toISOString().slice(0, 16));
+
+            // Tạo mã voucher tự động
+            $('#generateCode').on('click', function() {
+                // Tạo mã voucher ngẫu nhiên dạng: BOOK-XXXX-XXXX (X là chữ hoặc số)
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                let code = 'BOOK-';
+
+                // Thêm 4 ký tự đầu
+                for (let i = 0; i < 4; i++) {
+                    code += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+
+                code += '-';
+
+                // Thêm 4 ký tự cuối
+                for (let i = 0; i < 4; i++) {
+                    code += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+
+                // Cập nhật giá trị vào input
+                $('#code').val(code);
+            });
+        });
+    </script>
+
+    <th:block th:if="${success != null}">
+        <script>window.swalSuccess('[[${success}]]');</script>
+    </th:block>
+    <th:block th:if="${error != null}">
+        <script>window.swalError('[[${error}]]');</script>
+    </th:block>
+
+    <script th:src="@{/public.admin/js/voucher.js}"></script>
+</div>
+</html>

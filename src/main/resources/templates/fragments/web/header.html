@@ -1,0 +1,514 @@
+<th:block xmlns:th="http://www.thymeleaf.org" th:fragment="header"
+          xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+    <header class="header navbar-area">
+        <!-- Start Header Middle -->
+        <style>
+            /* Nút ghi âm lớn */
+            .mic-button {
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: #007bff;
+                color: white;
+                border: none;
+                box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+                transition: transform 0.2s, background-color 0.3s;
+            }
+
+            .mic-button:hover {
+                background-color: #0056b3;
+                transform: scale(1.1);
+            }
+
+            /* Nút nhỏ hơn: Dừng & Xóa */
+            .small-mic-button {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.2rem;
+                border: none;
+                box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.2);
+                transition: transform 0.2s, background-color 0.3s;
+            }
+
+            .small-mic-button:hover {
+                transform: scale(1.1);
+            }
+
+            #stopRecording {
+                background-color: #dc3545;
+                color: white;
+            }
+
+            #stopRecording:hover {
+                background-color: #b52b3a;
+            }
+
+            #clearRecording {
+                background-color: #ffc107;
+                color: black;
+            }
+
+            #clearRecording:hover {
+                background-color: #e0a800;
+            }
+
+            .search-suggestions {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: white;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                margin-top: 5px;
+                z-index: 1000;
+                overflow: hidden;
+                display: none;
+                border: 1px solid #eee;
+            }
+
+            .main-menu-search {
+                position: relative;
+            }
+
+            .suggestion-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 15px;
+                border-bottom: 1px solid #f1f1f1;
+                font-weight: 500;
+            }
+
+            .close-suggestions {
+                background: none;
+                border: none;
+                font-size: 18px;
+                cursor: pointer;
+                color: #777;
+            }
+
+            .close-suggestions:hover {
+                color: #333;
+            }
+
+            .suggestion-body {
+                padding: 15px;
+            }
+
+            .suggestion-section {
+                margin-bottom: 15px;
+            }
+
+            .suggestion-section:last-child {
+                margin-bottom: 0;
+            }
+
+            .suggestion-section h6 {
+                font-size: 14px;
+                color: #666;
+                margin-bottom: 10px;
+            }
+
+            .suggestion-tags {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .suggestion-tag {
+                background-color: #f5f5f5;
+                padding: 6px 12px;
+                border-radius: 20px;
+                font-size: 13px;
+                cursor: pointer;
+                transition: background-color 0.2s;
+            }
+
+            .suggestion-tag:hover {
+                background-color: #e9e9e9;
+            }
+
+            .suggestion-list {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .suggestion-list li {
+                padding: 8px 0;
+                cursor: pointer;
+                color: #333;
+                font-size: 14px;
+                display: flex;
+                align-items: center;
+            }
+
+            .suggestion-list li i {
+                margin-right: 8px;
+                color: #777;
+            }
+
+            .suggestion-list li:hover {
+                color: #007bff;
+            }
+
+            .suggestion-products {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+
+            .suggestion-product {
+                display: flex;
+                background-color: #f8f8f8;
+                border-radius: 6px;
+                overflow: hidden;
+                cursor: pointer;
+                transition: transform 0.2s;
+            }
+
+            .suggestion-product {
+                display: flex;
+                background-color: #f8f8f8;
+                border-radius: 6px;
+                overflow: hidden;
+                cursor: pointer;
+                transition: transform 0.2s;
+            }
+
+            .suggestion-product:hover {
+                transform: translateY(-2px);
+            }
+
+            .product-img {
+                width: 60px;
+                height: 60px;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .product-img img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .product-info {
+                padding: 8px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            .product-info h6 {
+                font-size: 13px;
+                margin: 0 0 5px 0;
+                color: #333;
+            }
+
+            .price {
+                font-size: 12px;
+                color: #007bff;
+                font-weight: 600;
+            }
+        </style>
+
+        <div class="header-middle">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-3 col-md-3 col-7">
+                        <!-- Start Header Logo -->
+                        <a class="navbar-brand" href="index.html">
+                            <img th:src="@{/images/logo/logo.svg}" alt="Logo">
+                        </a>
+                        <!-- End Header Logo -->
+                    </div>
+                    <div class="col-lg-5 col-md-7 d-xs-none">
+                        <!-- Start Main Menu Search -->
+                        <div class="main-menu-search">
+                            <!-- navbar search start -->
+                            <div class="main-menu-search">
+                                <!-- navbar search start -->
+                                <div class="input-group">
+                                    <input id="headerSearchBox" type="text" class="form-control"
+                                           placeholder="Tìm kiếm sản phẩm..." autocomplete="off">
+                                    <button id="voiceSearchBtn" class="btn btn-primary"
+                                            data-bs-toggle="modal" data-bs-target="#voiceModal">
+                                        <i class="bi bi-mic-fill"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Search suggestion popup -->
+                                <div id="searchSuggestions" class="search-suggestions">
+                                    <div class="suggestion-header">
+                                        <span id="suggestionHeaderTitle">Gợi ý tìm kiếm</span>
+                                        <button class="close-suggestions"><i class="bi bi-x"></i></button>
+                                    </div>
+                                    <div class="suggestion-body">
+                                        <div id="staticSuggestionContainer">
+                                            <div class="suggestion-section">
+                                                <h6>Tìm kiếm gần đây</h6>
+                                                <ul class="suggestion-list" id="searchHistoryList">
+                                                </ul>
+                                            </div>
+                                            <div class="suggestion-section">
+                                                <h6>Sản phẩm đề xuất</h6>
+                                                <div class="suggestion-products" id="searchSuggestionProducts">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="dynamicSuggestionContainer" style="display: none">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- navbar search Ends -->
+                            </div>
+                            <!-- navbar search Ends -->
+                        </div>
+                        <!-- End Main Menu Search -->
+                    </div>
+                    <div class="col-lg-4 col-md-2 col-5">
+                        <div class="middle-right-area">
+                            <div class="nav-hotline">
+                                <i class="lni lni-phone"></i>
+                                <h3>Hotline:
+                                    <span>(+100) 123 456 7890</span>
+                                </h3>
+                            </div>
+                            <div class="navbar-cart">
+                                <div class="wishlist">
+                                    <a href="javascript:void(0)">
+                                        <i class="lni lni-heart"></i>
+                                        <span class="total-items">0</span>
+                                    </a>
+                                </div>
+                                <div class="cart-items">
+                                    <a href="javascript:void(0)" class="main-btn">
+                                        <i class="lni lni-cart"></i>
+                                        <span class="total-items">2</span>
+                                    </a>
+                                    <!-- Shopping Item -->
+                                    <div class="shopping-item">
+                                        <div class="dropdown-cart-header">
+                                            <span>2 Items</span>
+                                            <a href="cart.html">View Cart</a>
+                                        </div>
+                                        <ul class="shopping-list">
+                                            <li>
+                                                <a href="javascript:void(0)" class="remove" title="Remove this item"><i
+                                                        class="lni lni-close"></i></a>
+                                                <div class="cart-img-head">
+                                                    <a class="cart-img" href="product-details.html"><img
+                                                            src="assets/images/header/cart-items/item1.jpg" alt="#"></a>
+                                                </div>
+
+                                                <div class="content">
+                                                    <h4><a href="product-details.html">
+                                                        Apple Watch Series 6</a></h4>
+                                                    <p class="quantity">1x - <span class="amount">$99.00</span></p>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <a href="javascript:void(0)" class="remove" title="Remove this item"><i
+                                                        class="lni lni-close"></i></a>
+                                                <div class="cart-img-head">
+                                                    <a class="cart-img" href="product-details.html"><img
+                                                            src="assets/images/header/cart-items/item2.jpg" alt="#"></a>
+                                                </div>
+                                                <div class="content">
+                                                    <h4><a href="product-details.html">Wi-Fi Smart Camera</a></h4>
+                                                    <p class="quantity">1x - <span class="amount">$35.00</span></p>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                        <div class="bottom">
+                                            <div class="total">
+                                                <span>Total</span>
+                                                <span class="total-amount">$134.00</span>
+                                            </div>
+                                            <div class="button">
+                                                <a href="checkout.html" class="btn animate">Checkout</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--/ End Shopping Item -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Header Middle -->
+        <!-- Start Header Bottom -->
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8 col-md-6 col-12">
+                    <div class="nav-inner">
+                        <!-- Start Mega Category Menu -->
+                        <div class="mega-category-menu">
+                            <span class="cat-button"><i class="lni lni-menu"></i>All Categories</span>
+                            <ul class="sub-category">
+                                <li><a href="product-grids.html">Electronics <i class="lni lni-chevron-right"></i></a>
+                                    <ul class="inner-sub-category">
+                                        <li><a href="product-grids.html">Digital Cameras</a></li>
+                                        <li><a href="product-grids.html">Camcorders</a></li>
+                                        <li><a href="product-grids.html">Camera Drones</a></li>
+                                        <li><a href="product-grids.html">Smart Watches</a></li>
+                                        <li><a href="product-grids.html">Headphones</a></li>
+                                        <li><a href="product-grids.html">MP3 Players</a></li>
+                                        <li><a href="product-grids.html">Microphones</a></li>
+                                        <li><a href="product-grids.html">Chargers</a></li>
+                                        <li><a href="product-grids.html">Batteries</a></li>
+                                        <li><a href="product-grids.html">Cables & Adapters</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="product-grids.html">accessories</a></li>
+                                <li><a href="product-grids.html">Televisions</a></li>
+                                <li><a href="product-grids.html">best selling</a></li>
+                                <li><a href="product-grids.html">top 100 offer</a></li>
+                                <li><a href="product-grids.html">sunglass</a></li>
+                                <li><a href="product-grids.html">watch</a></li>
+                                <li><a href="product-grids.html">man’s product</a></li>
+                                <li><a href="product-grids.html">Home Audio & Theater</a></li>
+                                <li><a href="product-grids.html">Computers & Tablets </a></li>
+                                <li><a href="product-grids.html">Video Games </a></li>
+                                <li><a href="product-grids.html">Home Appliances </a></li>
+                            </ul>
+                        </div>
+                        <!-- End Mega Category Menu -->
+                        <!-- Start Navbar -->
+                        <nav class="navbar navbar-expand-lg">
+                            <button class="navbar-toggler mobile-menu-btn" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                                    aria-expanded="false" aria-label="Toggle navigation">
+                                <span class="toggler-icon"></span>
+                                <span class="toggler-icon"></span>
+                                <span class="toggler-icon"></span>
+                            </button>
+                            <div class="collapse navbar-collapse sub-menu-bar" id="navbarSupportedContent">
+                                <ul id="nav" class="navbar-nav ms-auto">
+                                    <li class="nav-item">
+                                        <a href="index.html" class="active" aria-label="Toggle navigation">Home</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="dd-menu collapsed" href="javascript:void(0)" data-bs-toggle="collapse"
+                                           data-bs-target="#submenu-1-2" aria-controls="navbarSupportedContent"
+                                           aria-expanded="false" aria-label="Toggle navigation">Pages</a>
+                                        <ul class="sub-menu collapse" id="submenu-1-2">
+                                            <li class="nav-item"><a href="about-us.html">About Us</a></li>
+                                            <li class="nav-item"><a href="faq.html">Faq</a></li>
+                                            <li class="nav-item"><a href="login.html">Login</a></li>
+                                            <li class="nav-item"><a href="register.html">Register</a></li>
+                                            <li class="nav-item"><a href="mail-success.html">Mail Success</a></li>
+                                            <li class="nav-item"><a href="404.html">404 Error</a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="dd-menu collapsed" href="javascript:void(0)" data-bs-toggle="collapse"
+                                           data-bs-target="#submenu-1-3" aria-controls="navbarSupportedContent"
+                                           aria-expanded="false" aria-label="Toggle navigation">Shop</a>
+                                        <ul class="sub-menu collapse" id="submenu-1-3">
+                                            <li class="nav-item"><a href="product-grids.html">Shop Grid</a></li>
+                                            <li class="nav-item"><a href="product-list.html">Shop List</a></li>
+                                            <li class="nav-item"><a href="product-details.html">shop Single</a></li>
+                                            <li class="nav-item"><a href="cart.html">Cart</a></li>
+                                            <li class="nav-item"><a href="checkout.html">Checkout</a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="dd-menu collapsed" href="javascript:void(0)" data-bs-toggle="collapse"
+                                           data-bs-target="#submenu-1-4" aria-controls="navbarSupportedContent"
+                                           aria-expanded="false" aria-label="Toggle navigation">Blog</a>
+                                        <ul class="sub-menu collapse" id="submenu-1-4">
+                                            <li class="nav-item"><a href="blog-grid-sidebar.html">Blog Grid Sidebar</a>
+                                            </li>
+                                            <li class="nav-item"><a href="blog-single.html">Blog Single</a></li>
+                                            <li class="nav-item"><a href="blog-single-sidebar.html">Blog Single
+                                                Sibebar</a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="contact.html" aria-label="Toggle navigation">Contact Us</a>
+                                    </li>
+                                </ul>
+                            </div> <!-- navbar collapse -->
+                        </nav>
+                        <!-- End Navbar -->
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-12">
+                    <!-- Start Nav Social -->
+                    <div class="nav-social">
+                        <h5 class="title">Follow Us:</h5>
+                        <ul>
+                            <li>
+                                <a href="javascript:void(0)"><i class="lni lni-facebook-filled"></i></a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0)"><i class="lni lni-twitter-original"></i></a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0)"><i class="lni lni-instagram"></i></a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0)"><i class="lni lni-skype"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- End Nav Social -->
+                </div>
+            </div>
+        </div>
+
+    </header>
+
+    <div class="modal fade" id="voiceModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-center p-4">
+                <button type="button" class="btn-close position-absolute top-0 end-0 m-3"
+                        data-bs-dismiss="modal"></button>
+                <h5 class="modal-title mb-3">Tìm kiếm với giọng nói</h5>
+
+                <div class="alert alert-warning">
+                    <i class="bi bi-lightbulb-fill text-warning me-2"></i>
+                    <strong>Mẹo:</strong> Nói to, rõ ràng để tìm kiếm chính xác.
+                </div>
+
+                <!-- Nút ghi âm -->
+                <div class="d-flex align-items-center justify-content-center">
+                    <button id="startRecording" class="btn btn-primary mic-button">
+                        <i class="bi bi-mic-fill fs-3"></i>
+                    </button>
+                </div>
+
+                <!-- Nút dừng ghi âm và xóa ghi âm -->
+                <div class="d-flex justify-content-center mt-3 gap-3">
+                    <button id="stopRecording" class="btn btn-danger small-mic-button d-none">
+                        <i class="bi bi-stop-fill"></i>
+                    </button>
+                    <audio id="audioPlayback" class="d-none" controls></audio>
+                </div>
+
+
+                <p id="voiceResult" class="mt-2 text-muted">Nhấn để bắt đầu ghi âm</p>
+
+                <button id="confirmSearch" class="btn btn-success w-100 mt-3">Tìm kiếm</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- End Header Bottom -->
+    <script th:src="@{/js/header.js}"></script>
+</th:block>

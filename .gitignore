@@ -31,3 +31,27 @@ build/
 
 ### VS Code ###
 .vscode/
+/app.log
+/app.log.2025-01-27.0.gz
+/app.log.2025-01-30.0.gz
+/app.log.2025-01-31.0.gz
+/app.log.2025-02-02.0.gz
+/src/main/resources/application.properties
+/src/main/resources/models/vosk-model-vn-0.4/ivector/final.dubm
+/src/main/resources/models/vosk-model-vn-0.4/ivector/final.ie
+/src/main/resources/models/vosk-model-vn-0.4/ivector/final.mat
+/src/main/resources/models/vosk-model-vn-0.4/am/final.mdl
+/src/main/resources/models/vosk-model-vn-0.4/ivector/global_cmvn.stats
+/src/main/resources/models/vosk-model-vn-0.4/graph/HCLG.fst
+/src/main/resources/native/libgcc_s_seh-1.dll
+/src/main/resources/native/libstdc++-6.dll
+/src/main/resources/native/libvosk.dll
+/src/main/resources/native/libwinpthread-1.dll
+/src/main/resources/models/vosk-model-vn-0.4/conf/mfcc.conf
+/src/main/resources/models/vosk-model-vn-0.4/conf/model.conf
+/src/main/resources/nha03-a2ab5-3ce5ecd042f9.json
+/src/main/resources/models/vosk-model-vn-0.4/ivector/online_cmvn.conf
+/src/main/resources/models/vosk-model-vn-0.4/README
+/src/main/resources/models/vosk-model-vn-0.4/ivector/splice.conf
+/src/main/resources/models/vosk-model-vn-0.4/graph/phones/word_boundary.int
+/src/main/resources/models/vosk-model-vn-0.4/graph/words.txt

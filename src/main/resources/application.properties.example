@@ -1,0 +1,92 @@
+spring.application.name=book_store
+
+server.port=8080
+server.servlet.context-path=/
+spring.main.banner-mode=off
+
+spring.datasource.url=jdbc:mysql://localhost:3306/book_store
+spring.datasource.username=root
+spring.datasource.password=
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.sql.init.platform=mysql
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+
+spring.datasource.hikari.maximum-pool-size=10
+spring.datasource.hikari.minimum-idle=5
+spring.datasource.hikari.idle-timeout=30000
+spring.datasource.hikari.connection-timeout=30000
+
+spring.security.user.name=user
+spring.security.user.password=password
+
+logging.level.org.springframework=INFO
+logging.level.com.example.myapp=DEBUG
+logging.level.org.springframework.cache=DEBUG
+logging.level.org.springframework.data.redis=DEBUG
+logging.file.name=app.log
+logging.file.path=/var/log/myapp
+
+
+spring.profiles.active=dev
+
+# C?u h�nh cho profiles kh�c nhau
+# application-dev.properties
+# spring.datasource.url=jdbc:mysql://localhost:3306/devdb
+# spring.datasource.username=devuser
+# spring.datasource.password=devpassword
+#
+# application-prod.properties
+# spring.datasource.url=jdbc:mysql://prod-db:3306/proddb
+# spring.datasource.username=produser
+# spring.datasource.password=prodpassword
+
+spring.thymeleaf.prefix=classpath:/templates/
+spring.thymeleaf.suffix=.html
+spring.thymeleaf.cache=false
+
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=username
+spring.mail.password=password
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+spring.data.redis.host=localhost
+spring.data.redis.port=6379
+spring.data.redis.password=secret
+spring.data.redis.database=0
+
+server.servlet.session.timeout=43200m
+
+spring.servlet.multipart.max-file-size=10MB
+spring.servlet.multipart.max-request-size=10MB
+
+firebase.credentials.url=
+firebase.storage.bucket=
+
+spring.security.oauth2.client.registration.google.client-id=
+spring.security.oauth2.client.registration.google.client-secret=
+spring.security.oauth2.client.registration.google.scope=profile,email,openid
+spring.security.oauth2.client.registration.google.redirect-uri=http://localhost:8080/login/oauth2/code/google
+spring.security.oauth2.client.provider.google.authorization-uri=https://accounts.google.com/o/oauth2/v2/auth
+spring.security.oauth2.client.provider.google.token-uri=https://oauth2.googleapis.com/token
+spring.security.oauth2.client.provider.google.user-info-uri=https://www.googleapis.com/oauth2/v3/userinfo
+spring.security.oauth2.client.provider.google.user-name-attribute=sub
+
+jwt.secret.key=9e295ad5303aa56fe78e8fed2203d8d3213c466b49951ba010f0a9ec4abd0704
+jwt.expiration.time=86400000
+
+spring.devtools.restart.enabled=false
+react.client.url=http://localhost:5173
+
+password.random.string.length=10
+config.mail.from=
+vosk.library.path=
+vosk.model.path=src/main/resources/models/vosk-model-small-vn-0.
+
+# Payment
+payment.payos.client-id=
+payment.payos.api-key=
+payment.payos.checksum-key=

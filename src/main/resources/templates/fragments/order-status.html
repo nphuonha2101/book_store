@@ -1,0 +1,46 @@
+<!-- fragments/order-status.html -->
+<div th:fragment="orderStatus(status)">
+    <style>
+        @import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css');
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: white;
+        }
+
+        .status-pending    { background-color: #ffc107; }
+        .status-processing { background-color: #17a2b8; }
+        .status-shipping   { background-color: #007bff; }
+        .status-delivered  { background-color: #28a745; }
+        .status-cancelled  { background-color: #dc3545; }
+
+        .status-badge i {
+            font-size: 1rem;
+        }
+    </style>
+
+    <div th:switch="${status}">
+        <span th:case="'PENDING'" class="status-badge status-pending">
+            <i class="ti ti-clock-hour-3"></i> Chờ xử lý
+        </span>
+        <span th:case="'PROCESSING'" class="status-badge status-processing">
+            <i class="ti ti-settings"></i> Đang xử lý
+        </span>
+        <span th:case="'SHIPPING'" class="status-badge status-shipping">
+            <i class="ti ti-truck-delivery"></i> Đang giao
+        </span>
+        <span th:case="'DELIVERED'" class="status-badge status-delivered">
+            <i class="ti ti-check"></i> Đã giao
+        </span>
+        <span th:case="'CANCELLED'" class="status-badge status-cancelled">
+            <i class="ti ti-x"></i> Đã hủy
+        </span>
+        <span th:case="*">Không xác định</span>
+    </div>
+</div>

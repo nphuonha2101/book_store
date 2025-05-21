@@ -1,0 +1,69 @@
+<div xmlns:th="http://www.thymeleaf.org" layout:fragment="content"
+     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+     layout:decorate="~{layouts/admin.html}" class="pb-100">
+
+    <div class="breadcrumb-area">
+        <h1>Quản lý voucher</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="index.html">Trang chủ</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Quản lý voucher</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="d-flex justify-content-end mb-3">
+        <a th:href="@{/admin/vouchers/create}" class="btn btn-primary">Tạo voucher mới</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead>
+            <tr>
+                <th class="text-center">Mã voucher</th>
+                <th class="text-center">Giảm giá (%)</th>
+                <th class="text-center">Giá trị tối thiểu</th>
+                <th class="text-center">Ngày hết hạn</th>
+                <th class="text-center">Danh mục</th>
+                <th class="text-center">Tình trạng</th>
+                <th class="text-center">Hành động</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(page.content)}">
+                <td colspan="7" class="text-center">Không có dữ liệu</td>
+            </tr>
+            <tr th:each="voucher : ${page.content}">
+                <td class="text-center" th:text="${voucher.code}">Mã voucher</td>
+                <td class="text-center" th:text="${voucher.discount + '%'}">Giảm giá</td>
+                <td class="text-center" th:text="${voucher.minSpend}">Giá trị tối thiểu</td>
+                <td class="text-center" th:text="${#temporals.format(voucher.expiredDate, 'dd/MM/yyyy HH:mm')}">Ngày hết hạn</td>
+                <td class="text-center">
+                    <span th:each="category, iterStat : ${voucher.categories}" class="badge bg-info me-1" th:text="${category.name}"></span>
+                </td>
+                <td class="text-center">
+                    <span th:text="${#temporals.createNow().isBefore(voucher.expiredDate) ? 'Còn hiệu lực' : 'Hết hạn'}"
+                          th:classappend="${#temporals.createNow().isBefore(voucher.expiredDate) ? 'badge bg-success' : 'badge bg-danger'}"></span>
+                </td>
+                <td class="text-center">
+                    <a class="btn btn-primary btn-sm" title="Edit" th:href="@{/admin/vouchers/edit/{id}(id=${voucher.id})}">
+                        <i class="ti ti-pencil" style="font-size: 1.2em"></i>
+                    </a>
+                    <button class="btn btn-danger btn-sm delete-voucher-btn" th:data-id="${voucher.id}" title="Delete">
+                        <i class="ti ti-trash" style="font-size: 1.2em"></i>
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:replace="~{fragments/pagination :: pagination(${page}, ${url}, ${params})}"></div>
+
+    <th:block th:if="${success != null}">
+        <script>window.swalSuccess('[[${success}]]');</script>
+    </th:block>
+    <th:block th:if="${error != null}">
+        <script>window.swalError('[[${error}]]');</script>
+    </th:block>
+
+    <script th:src="@{/public.admin/js/voucher.js}"></script>
+</div>
