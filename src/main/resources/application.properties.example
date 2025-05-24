@@ -46,7 +46,7 @@ spring.thymeleaf.prefix=classpath:/templates/
 spring.thymeleaf.suffix=.html
 spring.thymeleaf.cache=false
 
-spring.mail.host=smtp.mailtrap.io
+spring.mail.host=smtp.gmail.com
 spring.mail.port=587
 spring.mail.username=username
 spring.mail.password=password
@@ -82,6 +82,11 @@ spring.devtools.restart.enabled=false
 react.client.url=http://localhost:5173
 
 password.random.string.length=10
-
+config.mail.from=
 vosk.library.path=
 vosk.model.path=src/main/resources/models/vosk-model-small-vn-0.
+
+# Payment
+payment.payos.client-id=
+payment.payos.api-key=
+payment.payos.checksum-key=
