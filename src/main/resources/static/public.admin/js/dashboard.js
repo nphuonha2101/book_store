@@ -1,211 +1,257 @@
-$(function () {
+$(document).ready(function() {
+  dashboard.init();
+});
 
+(function(exports, global) {
+  let revenueChart;
+  const statusLabels = {
+    'ALL': 'Tất cả trạng thái',
+    'DELIVERED': 'Đã giao hàng',
+    'PROCESSING': 'Đang xử lý',
+    'SHIPPING': 'Đang giao hàng',
+    'CANCELLED': 'Đã huỷ',
+    'PENDING': 'Chờ xác nhận',
+    'FAILED': 'Thất bại',
+  };
 
-  // =====================================
-  // Profit
-  // =====================================
-  var chart = {
-    series: [
-      { name: "Earnings this month:", data: [355, 390, 300, 350, 390, 180, 355, 390] },
-      { name: "Expense this month:", data: [280, 250, 325, 215, 250, 310, 280, 250] },
-    ],
+  exports.loadChartData = function() {
+    const status = $('#orderStatus').val();
+    const month = $('#monthFilter').val();
 
-    chart: {
-      type: "bar",
-      height: 345,
-      offsetX: -15,
-      toolbar: { show: true },
-      foreColor: "#adb0bb",
-      fontFamily: 'inherit',
-      sparkline: { enabled: false },
-    },
+    $('.chart-container').addClass('opacity-50');
 
+    fetch(`/admin/ajax/chart/order?status=${status}&month=${month}`)
+        .then(response => response.json())
+        .then(response => {
+          if (response.success) {
+            exports.renderChart(response.data, status, month);
+          } else {
+            console.error('Lỗi khi tải dữ liệu biểu đồ:', response.message);
+          }
+        })
+        .catch(error => {
+          console.error('Lỗi khi tải dữ liệu biểu đồ:', error);
+        })
+        .finally(() => {
+          $('.chart-container').removeClass('opacity-50');
+        });
+  };
 
-    colors: ["#5D87FF", "#49BEFF"],
+  exports.renderChart = function(data, status, month) {
+    if (revenueChart) {
+      revenueChart.destroy();
+    }
 
+    const labels = [];
+    const values = [];
+    const monthNames = [
+      "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6",
+      "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"
+    ];
 
-    plotOptions: {
-      bar: {
-        horizontal: false,
-        columnWidth: "35%",
-        borderRadius: [6],
-        borderRadiusApplication: 'end',
-        borderRadiusWhenStacked: 'all'
+    if (Object.keys(data).length > 1) {
+      for (let i = 1; i <= 12; i++) {
+        labels.push(monthNames[i-1]);
+        values.push(data[i] || 0);
+      }
+    } else {
+      const monthKey = parseInt(Object.keys(data)[0]);
+      labels.push(monthNames[monthKey-1]);
+      values.push(data[monthKey] || 0);
+    }
+
+    const totalRevenue = values.reduce((sum, current) => sum + current, 0);
+    const chartType = 'bar';
+
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(54, 162, 235, 0.8)');
+    gradient.addColorStop(1, 'rgba(54, 162, 235, 0.2)');
+
+    const statusText = statusLabels[status] || status;
+    const monthText = month === 0 ? 'tất cả các tháng' : monthNames[month-1];
+    const chartTitle = `Doanh thu (${statusText}) - ${monthText}`;
+
+    revenueChart = new Chart(ctx, {
+      type: chartType,
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Doanh thu (VNĐ)',
+          data: values,
+          backgroundColor: gradient,
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1,
+          borderRadius: 4,
+          barPercentage: 0.7
+        }]
       },
-    },
-    markers: { size: 0 },
-
-    dataLabels: {
-      enabled: false,
-    },
-
-
-    legend: {
-      show: false,
-    },
-
-
-    grid: {
-      borderColor: "rgba(0,0,0,0.1)",
-      strokeDashArray: 3,
-      xaxis: {
-        lines: {
-          show: false,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: {
+          padding: {
+            top: 20
+          }
         },
-      },
-    },
-
-    xaxis: {
-      type: "category",
-      categories: ["16/08", "17/08", "18/08", "19/08", "20/08", "21/08", "22/08", "23/08"],
-      labels: {
-        style: { cssClass: "grey--text lighten-2--text fill-color" },
-      },
-    },
-
-
-    yaxis: {
-      show: true,
-      min: 0,
-      max: 400,
-      tickAmount: 4,
-      labels: {
-        style: {
-          cssClass: "grey--text lighten-2--text fill-color",
-        },
-      },
-    },
-    stroke: {
-      show: true,
-      width: 3,
-      lineCap: "butt",
-      colors: ["transparent"],
-    },
-
-
-    tooltip: { theme: "light" },
-
-    responsive: [
-      {
-        breakpoint: 600,
-        options: {
-          plotOptions: {
-            bar: {
-              borderRadius: 3,
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(0, 0, 0, 0.05)'
+            },
+            ticks: {
+              callback: function(value) {
+                return new Intl.NumberFormat('vi-VN', {
+                  style: 'currency',
+                  currency: 'VND',
+                  maximumFractionDigits: 0
+                }).format(value);
+              },
+              font: {
+                size: 11
+              }
             }
           },
+          x: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              font: {
+                size: 11
+              }
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          },
+          title: {
+            display: true,
+            text: chartTitle,
+            font: {
+              size: 16
+            },
+            padding: {
+              bottom: 20
+            }
+          },
+          subtitle: {
+            display: true,
+            text: `Tổng doanh thu: ${new Intl.NumberFormat('vi-VN', {
+              style: 'currency',
+              currency: 'VND',
+              maximumFractionDigits: 0
+            }).format(totalRevenue)}`,
+            padding: {
+              bottom: 10
+            },
+            font: {
+              size: 14,
+              weight: 'bold'
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleFont: {
+              size: 13
+            },
+            bodyFont: {
+              size: 13
+            },
+            padding: 12,
+            callbacks: {
+              label: function(context) {
+                return 'Doanh thu: ' + new Intl.NumberFormat('vi-VN', {
+                  style: 'currency',
+                  currency: 'VND',
+                  maximumFractionDigits: 0
+                }).format(context.raw);
+              }
+            }
+          }
         }
       }
-    ]
-
-
+    });
   };
 
-  var chart = new ApexCharts(document.querySelector("#chart"), chart);
-  chart.render();
 
+  let statusPieChart;
 
-  // =====================================
-  // Breakup
-  // =====================================
-  var breakup = {
-    color: "#adb5bd",
-    series: [38, 40, 25],
-    labels: ["2022", "2021", "2020"],
-    chart: {
-      width: 180,
-      type: "donut",
-      fontFamily: "Plus Jakarta Sans', sans-serif",
-      foreColor: "#adb0bb",
-    },
-    plotOptions: {
-      pie: {
-        startAngle: 0,
-        endAngle: 360,
-        donut: {
-          size: '75%',
-        },
+  exports.loadStatusPieChart = function() {
+    const month = $('#monthFilter').val();
+    fetch(`/admin/ajax/chart/order-status?month=${month}`)
+        .then(response => response.json())
+        .then(response => {
+          if (response.success) {
+            exports.renderStatusPieChart(response.data);
+          } else {
+            console.error('Lỗi khi tải dữ liệu pie chart:', response.message);
+          }
+        })
+        .catch(error => {
+          console.error('Lỗi khi tải dữ liệu pie chart:', error);
+        });
+  };
+
+  exports.renderStatusPieChart = function(data) {
+    if (statusPieChart) {
+      statusPieChart.destroy();
+    }
+
+    const labels = Object.keys(data).map(k => statusLabels[k] || k);
+    const values = Object.values(data);
+    const colors = [
+      '#36A2EB', '#FFCE56', '#FF6384', '#4BC0C0', '#9966FF'
+    ];
+
+    const ctx = document.getElementById('statusPieChart').getContext('2d');
+    statusPieChart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: values,
+          backgroundColor: colors,
+          borderWidth: 1
+        }]
       },
-    },
-    stroke: {
-      show: false,
-    },
-
-    dataLabels: {
-      enabled: false,
-    },
-
-    legend: {
-      show: false,
-    },
-    colors: ["#5D87FF", "#ecf2ff", "#F9F9FD"],
-
-    responsive: [
-      {
-        breakpoint: 991,
-        options: {
-          chart: {
-            width: 150,
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom'
           },
-        },
-      },
-    ],
-    tooltip: {
-      theme: "dark",
-      fillSeriesColor: false,
-    },
+          title: {
+            display: true,
+            text: 'Tỷ lệ doanh thu theo trạng thái đơn hàng'
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return `${context.label}: ${new Intl.NumberFormat('vi-VN', {
+                  style: 'currency',
+                  currency: 'VND',
+                  maximumFractionDigits: 0
+                }).format(context.raw)}`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  exports.init = function() {
+    exports.loadChartData();
+    exports.loadStatusPieChart();
+
+    $('#filterBtn').off().on('click', function() {
+      exports.loadChartData();
+      exports.loadStatusPieChart();
+    });
   };
 
-  var chart = new ApexCharts(document.querySelector("#breakup"), breakup);
-  chart.render();
-
-
-
-  // =====================================
-  // Earning
-  // =====================================
-  var earning = {
-    chart: {
-      id: "sparkline3",
-      type: "area",
-      height: 60,
-      sparkline: {
-        enabled: true,
-      },
-      group: "sparklines",
-      fontFamily: "Plus Jakarta Sans', sans-serif",
-      foreColor: "#adb0bb",
-    },
-    series: [
-      {
-        name: "Earnings",
-        color: "#49BEFF",
-        data: [25, 66, 20, 40, 12, 58, 20],
-      },
-    ],
-    stroke: {
-      curve: "smooth",
-      width: 2,
-    },
-    fill: {
-      colors: ["#f3feff"],
-      type: "solid",
-      opacity: 0.05,
-    },
-
-    markers: {
-      size: 0,
-    },
-    tooltip: {
-      theme: "dark",
-      fixed: {
-        enabled: true,
-        position: "right",
-      },
-      x: {
-        show: false,
-      },
-    },
-  };
-  new ApexCharts(document.querySelector("#earning"), earning).render();
-})
+})((window.dashboard = window.dashboard || {}), window);

@@ -74,26 +74,6 @@
                         <span class="hide-menu">Đơn hàng</span>
                     </a>
                 </li>
-
-                <th:block th:if="${#authorization.expression('isAuthenticated()')}">
-                    <li class="nav-small-cap">
-                        <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-                        <span>Xin chào </span><span class="hide-menu" th:text="${#authentication.name}"></span>
-                    </li>
-
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="#" onclick="document.getElementById('logout-form').submit();">
-                            <span>
-                                <i class="ti ti-power-off"></i>
-                            </span>
-                            <span class="hide-menu">Đăng xuất</span>
-                        </a>
-                        <form th:action="@{/admin/logout}" method="post" id="logout-form" style="display: none;">
-                            <input type="submit" value="Đăng xuất">
-                        </form>
-                    </li>
-                </th:block>
-
             </ul>
         </nav>
         <!-- End Sidebar navigation -->
