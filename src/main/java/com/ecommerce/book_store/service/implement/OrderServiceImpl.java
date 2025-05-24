@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -293,6 +294,24 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
         );
 
         return this.toResponseDto(order);
+    }
+
+    @Override
+    public Map<String, Double> getOrderStats(OrderStatus status, int month) {
+        try {
+            Map<String, Double> stats = ((OrderRepository) getRepository()).getOrderStats(status, month);
+
+            // Đảm bảo luôn có dữ liệu trả về
+            if (stats == null || stats.isEmpty()) {
+                stats = Map.of("totalAmount", 0.0);
+            }
+
+            return stats;
+        } catch (Exception e) {
+            log.error("Lỗi khi thống kê doanh thu với status: {}, month: {}, error: {}",
+                    status, month, e.getMessage());
+            throw new RuntimeException("Không thể thống kê doanh thu: " + e.getMessage());
+        }
     }
 
     @Override

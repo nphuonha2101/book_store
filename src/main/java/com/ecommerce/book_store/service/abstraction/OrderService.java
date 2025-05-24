@@ -7,6 +7,7 @@ import com.ecommerce.book_store.persistent.entity.Order;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public interface OrderService extends IService<OrderRequestDto, OrderResponseDto, Order> {
     OrderResponseDto order(OrderRequestDto orderRequestDto) throws Exception;
@@ -15,5 +16,6 @@ public interface OrderService extends IService<OrderRequestDto, OrderResponseDto
     List<OrderResponseDto> getOrderHistory(Long userId, OrderStatus status);
     List<Order> findOrdersCreatedExactly24HoursAgo(OrderStatus status, LocalDateTime minTime, LocalDateTime maxTime);
     OrderResponseDto cancelOrder(Long orderId, String cancellationReason) throws Exception;
+    Map<String, Double> getOrderStats(OrderStatus status, int month);
 }
 
