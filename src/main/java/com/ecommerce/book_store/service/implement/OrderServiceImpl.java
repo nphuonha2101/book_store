@@ -236,6 +236,14 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
                         "/orders/" + order.getId()
                 );
             }
+            else if (newStatus == OrderStatus.FAILED) {
+                notificationService.sendNotificationToUser(
+                        "Đơn hàng đã thất bại",
+                        "Đơn hàng #" + order.getId() + " của bạn đã thất bại. Vui lòng kiểm tra lại thông tin đơn hàng trong tài khoản của bạn.",
+                        order.getUser().getId(),
+                        "/orders/" + order.getId()
+                );
+            }
 
             order.setStatus(newStatus);
             this.getRepository().save(order);
