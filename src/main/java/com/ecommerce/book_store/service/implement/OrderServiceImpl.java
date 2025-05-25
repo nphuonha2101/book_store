@@ -11,6 +11,8 @@ import com.ecommerce.book_store.service.abstraction.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -250,21 +252,16 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
     }
 
     @Override
-    public List<OrderResponseDto> getOrderHistory(Long userId, OrderStatus status) {
-        List<Order> orders;
+    public Page<OrderResponseDto> getOrderHistory(Long userId, OrderStatus status, Pageable pageable) {
+        Page<Order> orders;
 
         if (status == null || status == OrderStatus.ALL) {
-            orders = ((OrderRepository) getRepository()).findAllByUserId(userId);
+            orders = ((OrderRepository) getRepository()).findAllByUserId(userId, pageable);
         } else {
-            orders = ((OrderRepository) getRepository()).findAllByUserIdAndStatus(userId, status);
+            orders = ((OrderRepository) getRepository()).findAllByUserIdAndStatus(userId, status, pageable);
 
         }
-        if (orders == null || orders.isEmpty()) {
-            return List.of();
-        }
-        return orders.stream()
-                .map(this::toResponseDto)
-                .toList();
+        return orders.map(this::toResponseDto);
 
     }
 

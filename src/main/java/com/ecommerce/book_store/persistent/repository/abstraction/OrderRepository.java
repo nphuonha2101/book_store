@@ -19,10 +19,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Order findByIdAndUserId(Long orderId, Long userId);
 
     @Query("SELECT o FROM Order o WHERE o.user.id = ?1 AND o.status = ?2 ORDER BY o.createdAt DESC")
-    List<Order> findAllByUserIdAndStatus(Long userId, OrderStatus status);
+    Page<Order> findAllByUserIdAndStatus(Long userId, OrderStatus status, Pageable pageable);
 
     @Query("SELECT o FROM Order o WHERE o.user.id = ?1 ORDER BY o.createdAt DESC")
-    List<Order> findAllByUserId(Long userId);
+    Page<Order> findAllByUserId(Long userId, Pageable pageable);
 
     @Query("SELECT o FROM Order o WHERE o.status = :status AND o.createdAt <= :maxTime AND o.createdAt > :minTime")
     List<Order> findOrdersCreatedExactly24HoursAgo(

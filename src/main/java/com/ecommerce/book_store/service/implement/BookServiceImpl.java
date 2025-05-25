@@ -1,7 +1,6 @@
 package com.ecommerce.book_store.service.implement;
 
 import com.ecommerce.book_store.http.dto.request.implement.BookRequestDto;
-import com.ecommerce.book_store.http.dto.response.implement.BookImageResponseDto;
 import com.ecommerce.book_store.http.dto.response.implement.BookResponseDto;
 import com.ecommerce.book_store.http.dto.response.implement.CategoryResponseDto;
 import com.ecommerce.book_store.persistent.entity.AbstractEntity;
@@ -12,13 +11,7 @@ import com.ecommerce.book_store.persistent.repository.abstraction.BookRepository
 import com.ecommerce.book_store.service.abstraction.BookImageService;
 import com.ecommerce.book_store.service.abstraction.BookService;
 import com.ecommerce.book_store.service.abstraction.CategoryService;
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
@@ -37,15 +29,13 @@ public class BookServiceImpl
 
     private final CategoryService categoryService;
     private final FirebaseStorageService firebaseStorageService;
-    private final BookRepository bookRepository;
     private final BookImageService bookImageService;
 
     @Autowired
-    public BookServiceImpl(BookRepository repository, CategoryService categoryService, FirebaseStorageService firebaseStorageService, BookRepository bookRepository, @Lazy BookImageService bookImageService) {
+    public BookServiceImpl(BookRepository repository, CategoryService categoryService, FirebaseStorageService firebaseStorageService, @Lazy BookImageService bookImageService) {
         super(repository);
         this.categoryService = categoryService;
         this.firebaseStorageService = firebaseStorageService;
-        this.bookRepository = bookRepository;
         this.bookImageService = bookImageService;
     }
 
@@ -179,18 +169,24 @@ public class BookServiceImpl
     @Override
     public Page<BookResponseDto> findBooksContainingTitle(String title, int page, int size) {
         Pageable pageable = Pageable.ofSize(size).withPage(page);
-        return bookRepository.findByTitleContaining(title, pageable).map(this::toResponseDto);
+        return ((BookRepository) getRepository()).findByTitleContaining(title, pageable).map(this::toResponseDto);
     }
 
     @Override
     public Page<BookResponseDto> findBooksByTitleIn(List<String> titles, int page, int size) {
         Pageable pageable = Pageable.ofSize(size).withPage(page);
-        return bookRepository.findByTitleIn(titles, pageable).map(this::toResponseDto);
+        return ((BookRepository) getRepository()).findByTitleIn(titles, pageable).map(this::toResponseDto);
     }
 
     @Override
     public Page<BookResponseDto> filter(String authorName, String title, List<Long> categoryIds, Double minPrice, Double maxPrice, int page, int size) {
         Pageable pageable = Pageable.ofSize(size).withPage(page);
-        return bookRepository.filter(authorName, title, categoryIds, minPrice, maxPrice, pageable).map(this::toResponseDto);
+        return ((BookRepository) getRepository()).filter(authorName, title, categoryIds, minPrice, maxPrice, pageable).map(this::toResponseDto);
+    }
+
+    @Override
+    public Page<BookResponseDto> searchRelevanceByKeyword(String keyword, Pageable pageable) {
+        return ((BookRepository) getRepository()).searchByKeyword(keyword, pageable)
+                .map(this::toResponseDto);
     }
 }

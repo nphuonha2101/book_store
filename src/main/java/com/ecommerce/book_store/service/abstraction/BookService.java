@@ -14,4 +14,5 @@ public interface BookService
     Page<BookResponseDto> findBooksContainingTitle(String title, int page, int size);
     Page<BookResponseDto> findBooksByTitleIn(List<String> titles, int page, int size);
     Page<BookResponseDto> filter(String authorName, String title, List<Long> categoryIds, Double minPrice, Double maxPrice,  int page, int size);
+    Page<BookResponseDto> searchRelevanceByKeyword(String keyword, Pageable pageable);
 }

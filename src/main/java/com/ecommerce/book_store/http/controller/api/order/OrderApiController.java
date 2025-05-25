@@ -13,6 +13,8 @@ import com.ecommerce.book_store.service.abstraction.UserService;
 import com.google.api.gax.rpc.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -63,7 +65,9 @@ public class OrderApiController {
     @GetMapping("/history")
     public ResponseEntity<ApiResponse<List<OrderResponseDto>>> getOrderHistory(
             @RequestParam(required = false) String status,
-            @RequestHeader("Authorization") String token
+            @RequestHeader("Authorization") String token,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
     ) {
         try {
             String jwtToken = token.substring(7);
@@ -77,8 +81,8 @@ public class OrderApiController {
                 orderStatus = OrderStatus.valueOf(status.toUpperCase());
             }
 
-            List<OrderResponseDto> orderHistory = orderService.getOrderHistory(userId, orderStatus);
-            return ApiResponse.success(orderHistory, "Lấy danh sách đơn hàng thành công");
+            Page<OrderResponseDto> orderHistory = orderService.getOrderHistory(userId, orderStatus, PageRequest.of(page, size));
+            return ApiResponse.successWithPagination(orderHistory, "Lấy danh sách đơn hàng thành công");
         } catch (Exception e) {
             log.error(e.getMessage());
             return ApiResponse.error("Có lỗi xảy ra khi lấy danh sách đơn hàng", HttpStatus.INTERNAL_SERVER_ERROR);
