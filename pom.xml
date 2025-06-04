@@ -154,6 +154,13 @@
 			<version>1.0.0</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/com.google.cloud/google-cloud-speech -->
+		<dependency>
+			<groupId>com.google.cloud</groupId>
+			<artifactId>google-cloud-speech</artifactId>
+			<version>4.58.0</version>
+		</dependency>
+
 
 
 	</dependencies>

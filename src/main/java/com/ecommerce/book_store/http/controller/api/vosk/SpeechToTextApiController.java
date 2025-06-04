@@ -1,7 +1,8 @@
 package com.ecommerce.book_store.http.controller.api.vosk;
 
 import com.ecommerce.book_store.http.ApiResponse;
-import com.ecommerce.book_store.service.abstraction.VoskService;
+import com.ecommerce.book_store.service.abstraction.SpeechToTextService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,16 +12,15 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedInputStream;
-import java.util.HashMap;
-import java.util.Map;
 
+@Slf4j
 @RestController
-@RequestMapping("/api/v1/vosk")
-public class VoskController {
-    private final VoskService voskService;
+@RequestMapping("/api/v1/stt")
+public class SpeechToTextApiController {
+    private final SpeechToTextService speechToTextService;
 
-    public VoskController(VoskService voskService) {
-        this.voskService = voskService;
+    public SpeechToTextApiController(SpeechToTextService speechToTextService) {
+        this.speechToTextService = speechToTextService;
     }
 
     @PostMapping("/transcribe")
@@ -32,11 +32,11 @@ public class VoskController {
 
             BufferedInputStream bufferedStream = new BufferedInputStream(audio.getInputStream());
 
-            String result = this.voskService.transcribeAudio(bufferedStream);
+            String result = this.speechToTextService.transcribeAudio(bufferedStream);
             return ApiResponse.success(result, "Kết quả được trả về thành công");
         } catch (Exception e) {
-            e.printStackTrace();
-            return ApiResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error("Failed to transcribe audio: {}", e.getMessage());
+            return ApiResponse.error("Có lỗi xảy ra", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
