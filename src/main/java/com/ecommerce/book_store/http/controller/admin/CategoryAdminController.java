@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import java.util.Map;
 
 
@@ -28,14 +29,16 @@ public class CategoryAdminController {
     @GetMapping
     public String listCategories(Model model, Pageable pageable) {
         try {
-        Page<CategoryResponseDto> page = categoryService.findAll(pageable);
-        model.addAttribute("page", page);
-        model.addAttribute("url", "/admin/categories");
-        return "pages/admin/categories/index";
-    } catch (Exception e) {
-        log.error(e.getMessage());
-        return "redirect:/admin/categories";
-    }
+            Page<CategoryResponseDto> page = categoryService.findAll(pageable);
+            model.addAttribute("page", page);
+            model.addAttribute("url", "/admin/categories");
+            model.addAttribute("CONTENT_TITLE", "Quản lý thế loại sách");
+            model.addAttribute("LAYOUT_TITLE", "Admin BookStore");
+            return "pages/admin/categories/index";
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return "redirect:/admin/categories";
+        }
     }
 
     @GetMapping(value = {"/edit/{id}"})
@@ -86,6 +89,7 @@ public class CategoryAdminController {
             return "redirect:/admin/categories/edit/" + id;
         }
     }
+
     @DeleteMapping(value = {"/delete/{id}"})
     @ResponseBody
     public Map<String, Object> delete(@PathVariable Long id) {

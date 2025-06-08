@@ -1,4 +1,4 @@
-package com.ecommerce.book_store.http.controller.web;
+package com.ecommerce.book_store.http.controller.api.review;
 
 import com.ecommerce.book_store.core.security.JwtUtils;
 import com.ecommerce.book_store.http.ApiResponse;

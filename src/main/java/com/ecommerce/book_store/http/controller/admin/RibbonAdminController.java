@@ -31,14 +31,16 @@ public class RibbonAdminController {
         Page<RibbonResponseDto> page = ribbonService.findAll(pageable);
 
         model.addAttribute("page", page);
-        model.addAttribute("url", "/admin/vouchers");
-        model.addAttribute("CONTENT_TITLE", "Quản lý voucher");
+        model.addAttribute("url", "/admin/ribbons");
+        model.addAttribute("CONTENT_TITLE", "Quản lý Ribbon sách");
         model.addAttribute("LAYOUT_TITLE", "Admin BookStore");
         return "pages/admin/ribbon/index";
     }
 
     @GetMapping("/create")
-    public String createRibbon() {
+    public String createRibbon(Model model) {
+        model.addAttribute("CONTENT_TITLE", "Tạo Ribbon mới");
+        model.addAttribute("LAYOUT_TITLE", "Admin BookStore");
         return "pages/admin/ribbon/create";
     }
 
@@ -46,6 +48,8 @@ public class RibbonAdminController {
     public String editRibbon(@PathVariable Long id, Model model) {
         RibbonResponseDto ribbon = ribbonService.findById(id);
         model.addAttribute("ribbon", ribbon);
+        model.addAttribute("CONTENT_TITLE", "Chỉnh sửa Ribbon");
+        model.addAttribute("LAYOUT_TITLE", "Admin BookStore");
         return "pages/admin/ribbon/edit";
     }
 

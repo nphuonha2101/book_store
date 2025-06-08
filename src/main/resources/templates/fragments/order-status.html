@@ -41,6 +41,9 @@
         <span th:case="'CANCELLED'" class="status-badge status-cancelled">
             <i class="ti ti-x"></i> Đã hủy
         </span>
+        <span th:case="FAILED" class="status-badge status-cancelled">
+            <i class="ti ti-x"></i> Thất bại
+        </span>
         <span th:case="*">Không xác định</span>
     </div>
 </div>

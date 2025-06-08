@@ -32,6 +32,8 @@ public class DashboardAdminController {
         try {
             List<OrderResponseDto> recentOrders = orderService.findAll(PageRequest.of(0, 5)).getContent();
             model.addAttribute("recentOrders", recentOrders);
+            model.addAttribute("CONTENT_TITLE", "Dashboard");
+            model.addAttribute("LAYOUT_TITLE", "Admin BookStore");
             return "pages/admin/dashboard/dashboard";
         } catch (Exception e) {
             return "redirect:/admin/login";
