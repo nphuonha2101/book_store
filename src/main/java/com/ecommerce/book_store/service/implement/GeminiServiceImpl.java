@@ -36,18 +36,18 @@ public class GeminiServiceImpl implements GeminiService {
     }
 
     @Override
-    public String generateResponse(String question, ChatType chatType) {
+    public String generateResponse(String question, ChatType chatType, Long userId) {
         try {
-            String prompt = generatePrompt(question, chatType);
+            String prompt = generatePrompt(question, chatType, userId);
             log.info("GeminiService: Generated prompt: " + prompt);
             return getGeminiResponse(prompt);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             log.error("GeminiService: Error generating response: " + e.getMessage());
             return "Đã xảy ra lỗi khi tạo phản hồi: " + e.getMessage();
         }
     }
 
-    private String generatePrompt(String question, ChatType chatType) throws JsonProcessingException {
+    private String generatePrompt(String question, ChatType chatType, Long userId) throws Exception {
         StringBuilder prompt = new StringBuilder();
         prompt.append("Bạn là một trợ lý ảo thông minh của NPBookStore, chuyên cung cấp thông tin và hỗ trợ người dùng. ");
         prompt.append("Hãy trả lời câu hỏi của tôi một cách rõ ràng và chi tiết. ");
@@ -70,7 +70,7 @@ public class GeminiServiceImpl implements GeminiService {
 
             if (matcher.find()) {
                 String extractedId = matcher.group();
-                order = orderService.findById(Long.parseLong(extractedId));
+                order = orderService.findByIdAndUserId(Long.parseLong(extractedId), userId);
             }
 
             prompt.append("Tôi có câu hỏi: '").append(question).append("'. ");

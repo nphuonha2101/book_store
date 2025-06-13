@@ -14,10 +14,13 @@ public class AdminAuthController {
 
     @GetMapping("/admin/login")
     public String login(
+            @RequestParam(value = "error", required = false) String error,
             Model model
     ) {
         model.addAttribute("CONTENT_TITLE", "Đăng nhập");
         model.addAttribute("LAYOUT_TITLE", "Admin Book Store");
+        model.addAttribute("error", error);
+        log.info("Error during login: {}", error);
 
         return "pages/admin/auth/login";
     }

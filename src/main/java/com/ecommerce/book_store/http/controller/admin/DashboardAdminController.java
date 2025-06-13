@@ -27,7 +27,7 @@ public class DashboardAdminController {
     public DashboardAdminController(OrderService orderService) {
         this.orderService = orderService;
     }
-    @GetMapping("/admin/dashboard")
+    @GetMapping({"/admin/dashboard", "/admin"})
     public String dashboard(Model model) {
         try {
             List<OrderResponseDto> recentOrders = orderService.findAll(PageRequest.of(0, 5)).getContent();

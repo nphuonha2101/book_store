@@ -121,7 +121,6 @@ public class SecurityConfiguration {
                         .loginProcessingUrl("/admin/login-process")
                         .defaultSuccessUrl("/admin/dashboard")
                         .failureHandler((request, response, exception) -> {
-                            System.out.println("❌ Login failed: " + exception.getMessage());
                             response.sendRedirect("/admin/login?error=" + exception.getMessage());
                         })
                         .permitAll()

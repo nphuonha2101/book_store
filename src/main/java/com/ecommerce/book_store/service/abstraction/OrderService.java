@@ -19,5 +19,6 @@ public interface OrderService extends IService<OrderRequestDto, OrderResponseDto
     List<Order> findOrdersCreatedExactly24HoursAgo(OrderStatus status, LocalDateTime minTime, LocalDateTime maxTime);
     OrderResponseDto cancelOrder(Long orderId, String cancellationReason) throws Exception;
     Map<String, Double> getOrderStats(OrderStatus status, int month);
+    OrderResponseDto findByIdAndUserId(Long id, Long userId) throws Exception;
 }
 

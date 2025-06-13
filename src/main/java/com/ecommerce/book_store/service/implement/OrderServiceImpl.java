@@ -320,9 +320,14 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
     }
 
     @Override
+    public OrderResponseDto findByIdAndUserId(Long id, Long userId) {
+        Order order = ((OrderRepository) getRepository()).findByIdAndUserId(id, userId);
+
+        return order != null ? toResponseDto(order): null;
+    }
+
+    @Override
     public List<Order> findOrdersCreatedExactly24HoursAgo(OrderStatus status, LocalDateTime minTime, LocalDateTime maxTime) {
         return ((OrderRepository) getRepository()).findOrdersCreatedExactly24HoursAgo(status, minTime, maxTime);
     }
-
-
 }
