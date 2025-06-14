@@ -55,3 +55,4 @@ build/
 /src/main/resources/models/vosk-model-vn-0.4/ivector/splice.conf
 /src/main/resources/models/vosk-model-vn-0.4/graph/phones/word_boundary.int
 /src/main/resources/models/vosk-model-vn-0.4/graph/words.txt
+/.env

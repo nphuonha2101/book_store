@@ -307,7 +307,7 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
     }
 
     @Override
-    @Cacheable(value = "orderStats", key = "#status + '-' + #month")
+//    @Cacheable(value = "orderStats", key = "#status + '-' + #month")
     public Map<String, Double> getOrderStats(OrderStatus status, int month) {
         try {
             Map<String, Double> stats = ((OrderRepository) getRepository()).getOrderStats(status, month);

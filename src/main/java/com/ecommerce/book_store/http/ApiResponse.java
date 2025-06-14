@@ -1,29 +1,18 @@
 package com.ecommerce.book_store.http;
 
-import lombok.Getter;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Getter
-public class ApiResponse<T> {
-    private final boolean success;
-    private final String message;
-    private final int statusCode;
-    private final T data;
-    private final Map<String, Object> pagination;
-
-    public ApiResponse(boolean success, String message, int statusCode, T data, Map<String, Object> pagination) {
-        this.success = success;
-        this.message = message;
-        this.statusCode = statusCode;
-        this.data = data;
-        this.pagination = pagination;
-    }
+public record ApiResponse<T>(boolean success, String message, int statusCode, T data,
+                             Map<String, Object> pagination) implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     public static <T> ResponseEntity<ApiResponse<T>> success(T data, String message) {
         return ResponseEntity.ok(new ApiResponse<>(true, message, HttpStatus.OK.value(), data, null));
@@ -31,7 +20,8 @@ public class ApiResponse<T> {
 
     public static <T> ResponseEntity<ApiResponse<List<T>>> successWithPagination(Page<T> page, String message) {
         Map<String, Object> pagination = getAttachPaginate(page);
-        return ResponseEntity.ok(new ApiResponse<>(true, message, HttpStatus.OK.value(), page.getContent(), pagination));
+        return ResponseEntity
+                .ok(new ApiResponse<>(true, message, HttpStatus.OK.value(), page.getContent(), pagination));
     }
 
     public static <T> ResponseEntity<ApiResponse<T>> error(String message, HttpStatus status) {
