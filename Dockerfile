@@ -1,21 +1,25 @@
-FROM eclipse-temurin:17-jdk
+# Stage 1: Build JAR
+FROM maven:3.9.6-eclipse-temurin-17 AS builder
 
 LABEL authors="Phuong Nha Nguyen, Bich Phuong Lai Thi"
 
 WORKDIR /app
 
-# Copy Maven wrapper and configuration
-COPY mvnw .
-COPY .mvn .mvn
 COPY pom.xml .
-
-# Copy source code
+COPY .mvn .mvn
+COPY mvnw .
 COPY src ./src
 
-RUN chmod +x ./mvnw
+RUN chmod +x mvnw
+RUN ./mvnw clean package -DskipTests
 
-# Install dependencies
-RUN ./mvnw dependency:resolve
+# Stage 2: Run JAR
+FROM eclipse-temurin:17-jdk
 
-# Build the application
-CMD ["./mvnw", "spring-boot:run"]
+WORKDIR /app
+
+COPY --from=builder /app/target/*.jar app.jar
+
+EXPOSE 8080
+
+CMD ["java", "-jar", "app.jar"]

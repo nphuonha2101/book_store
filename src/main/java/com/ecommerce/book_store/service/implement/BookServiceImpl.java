@@ -12,15 +12,19 @@ import com.ecommerce.book_store.service.abstraction.BookImageService;
 import com.ecommerce.book_store.service.abstraction.BookService;
 import com.ecommerce.book_store.service.abstraction.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 @Service
 public class BookServiceImpl
@@ -32,7 +36,8 @@ public class BookServiceImpl
     private final BookImageService bookImageService;
 
     @Autowired
-    public BookServiceImpl(BookRepository repository, CategoryService categoryService, FirebaseStorageService firebaseStorageService, @Lazy BookImageService bookImageService) {
+    public BookServiceImpl(BookRepository repository, CategoryService categoryService,
+            FirebaseStorageService firebaseStorageService, @Lazy BookImageService bookImageService) {
         super(repository);
         this.categoryService = categoryService;
         this.firebaseStorageService = firebaseStorageService;
@@ -46,8 +51,7 @@ public class BookServiceImpl
         if (requestDto.getCoverImage() != null && !requestDto.getCoverImage().isEmpty()) {
             coverImageUrl = firebaseStorageService.uploadFile(
                     requestDto.getCoverImage(),
-                    "books/covers"
-            );
+                    "books/covers");
         }
 
         // Upload multiple book images if exists
@@ -56,8 +60,7 @@ public class BookServiceImpl
             for (MultipartFile image : requestDto.getBookImages()) {
                 String imageUrl = firebaseStorageService.uploadFile(
                         image,
-                        "books/images"
-                );
+                        "books/images");
                 imageUrls.add(imageUrl);
             }
         }
@@ -73,13 +76,11 @@ public class BookServiceImpl
                 requestDto.getQuantity(),
                 requestDto.getIsAvailable(),
                 requestDto.getPublishedAt(),
-                null
-        );
+                null);
 
         // Set category
         Category category = categoryService.getRepository().findById(requestDto.getCategoryId()).orElseThrow(
-                () -> new RuntimeException("Category not found")
-        );
+                () -> new RuntimeException("Category not found"));
         result.setCategory(category);
 
         // Create BookImage entities from uploaded URLs
@@ -116,23 +117,19 @@ public class BookServiceImpl
                 book.getQuantity(),
                 book.isAvailable(),
                 book.getPublishedAt(),
-                categoryResponseDto
-        );
+                categoryResponseDto);
     }
-
 
     @Override
     public void copyProperties(BookRequestDto requestDto, Book entity) {
         Category category = categoryService.getRepository().findById(requestDto.getCategoryId()).orElseThrow(
-                () -> new RuntimeException("Category not found")
-        );
+                () -> new RuntimeException("Category not found"));
 
         // Check if a new cover image is provided
         if (requestDto.getCoverImage() != null && !requestDto.getCoverImage().isEmpty()) {
             String coverImageUrl = firebaseStorageService.uploadFile(
                     requestDto.getCoverImage(),
-                    "books/covers"
-            );
+                    "books/covers");
             entity.setCoverImage(coverImageUrl);
         }
 
@@ -142,8 +139,7 @@ public class BookServiceImpl
             for (MultipartFile image : requestDto.getBookImages()) {
                 String imageUrl = firebaseStorageService.uploadFile(
                         image,
-                        "books/images"
-                );
+                        "books/images");
                 imageUrls.add(imageUrl);
             }
         }
@@ -167,26 +163,86 @@ public class BookServiceImpl
     }
 
     @Override
+    @Cacheable(value = "books", key = "#id")
+    public BookResponseDto findById(Long id) {
+        return super.findById(id);
+    }
+
+    @Override
+    @Cacheable(value = "allBooks")
+    public List<BookResponseDto> findAll() {
+        return super.findAll();
+    }
+
+    @Override
+    @CachePut(value = "books", key = "#result.id")
+    @CacheEvict(value = "allBooks", allEntries = true)
+    public BookResponseDto save(BookRequestDto requestDto) {
+        return super.save(requestDto);
+    }
+
+    @Override
+    @Caching(put = { @CachePut(value = "books", key = "#id") }, evict = {
+            @CacheEvict(value = "allBooks", allEntries = true) })
+    public BookResponseDto update(BookRequestDto requestDto, Long id) {
+        return super.update(requestDto, id);
+    }
+
+    @Override
+    @Caching(evict = {
+            @CacheEvict(value = "books", key = "#id"),
+            @CacheEvict(value = "allBooks", allEntries = true)
+    })
+    public boolean deleteById(Long id) {
+        return super.deleteById(id);
+    }
+
+    @Override
+    @Cacheable(value = "booksByTitle", key = "#title + '-' + #page + '-' + #size")
     public Page<BookResponseDto> findBooksContainingTitle(String title, int page, int size) {
         Pageable pageable = Pageable.ofSize(size).withPage(page);
         return ((BookRepository) getRepository()).findByTitleContaining(title, pageable).map(this::toResponseDto);
     }
 
     @Override
+    @Cacheable(value = "booksByTitles", key = "#titles.hashCode() + '-' + #page + '-' + #size")
     public Page<BookResponseDto> findBooksByTitleIn(List<String> titles, int page, int size) {
         Pageable pageable = Pageable.ofSize(size).withPage(page);
-        return ((BookRepository) getRepository()).findByTitleIn(titles, pageable).map(this::toResponseDto);
+        return ((BookRepository) getRepository()).findByTitleIn(titles, pageable)
+                .map(this::toResponseDto);
     }
 
     @Override
-    public Page<BookResponseDto> filter(String authorName, String title, List<Long> categoryIds, Double minPrice, Double maxPrice, int page, int size) {
+    @Cacheable(value = "booksByFilter", key = "#authorName + '-' + #title + '-' + #categoryIds + '-' + #minPrice + '-' + #maxPrice + '-' + #page + '-' + #size")
+    public Page<BookResponseDto> filter(String authorName, String title, List<Long> categoryIds, Double minPrice,
+            Double maxPrice, int page, int size) {
         Pageable pageable = Pageable.ofSize(size).withPage(page);
-        return ((BookRepository) getRepository()).filter(authorName, title, categoryIds, minPrice, maxPrice, pageable).map(this::toResponseDto);
+        return ((BookRepository) getRepository()).filter(authorName, title, categoryIds, minPrice, maxPrice, pageable)
+                .map(this::toResponseDto);
     }
 
     @Override
+    @Cacheable(value = "booksByKeyword", key = "#keyword + '-' + #pageable.pageNumber + '-' + #pageable.pageSize")
     public Page<BookResponseDto> searchRelevanceByKeyword(String keyword, Pageable pageable) {
         return ((BookRepository) getRepository()).searchByKeyword(keyword, pageable)
                 .map(this::toResponseDto);
+    }
+
+    @Override
+    @Cacheable(value = "sortedBooks", key = "#sort.toString()")
+    public List<BookResponseDto> findAll(Sort sort) {
+        return super.findAll(sort);
+    }
+
+    @Override
+    @Cacheable(value = "pagedBooks", key = "#pageable.pageNumber + '-' + #pageable.pageSize + '-' + #pageable.sort")
+    public Page<BookResponseDto> findAll(Pageable pageable) {
+        return super.findAll(pageable);
+    }
+
+    @Override
+    @Cacheable(value = "booksList", key = "#entities.hashCode()")
+    public List<BookResponseDto> toResponseDto(List<AbstractEntity> entities) {
+        return super.toResponseDto(entities);
     }
 }

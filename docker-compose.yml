@@ -7,16 +7,15 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_PROFILES_ACTIVE: docker
+      SPRING_PROFILES_ACTIVE: prod
       SPRING_REDIS_HOST: redis
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
     depends_on:
       redis:
         condition: service_healthy
-    volumes:
-      - ./:/app
     networks:
       - app-network
-    command: ["./mvnw", "spring-boot:run"]
+    command: ["java", "-jar", "app.jar"]
 
   redis:
     image: redis:latest

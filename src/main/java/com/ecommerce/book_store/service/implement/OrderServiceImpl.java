@@ -10,9 +10,14 @@ import com.ecommerce.book_store.persistent.repository.abstraction.OrderRepositor
 import com.ecommerce.book_store.service.abstraction.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +36,9 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
     private final NotificationService notificationService;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository repository, VoucherService voucherService, UserService userService, AddressService addressService, @Lazy OrderItemService orderItemService, NotificationService notificationService) {
+    public OrderServiceImpl(OrderRepository repository, VoucherService voucherService, UserService userService,
+            AddressService addressService, @Lazy OrderItemService orderItemService,
+            NotificationService notificationService) {
         super(repository);
         this.voucherService = voucherService;
         this.userService = userService;
@@ -53,20 +60,17 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
                 requestDto.getTotalDiscount(),
                 requestDto.getShippingFee(),
                 requestDto.getPaymentMethod(),
-                requestDto.getCancellationReason()
-        );
+                requestDto.getCancellationReason());
 
         if (requestDto.getStatus() != null && !requestDto.getStatus().isEmpty()) {
             orderResult.setStatus(OrderStatus.valueOf(requestDto.getStatus()));
         }
 
         Address address = addressService.getRepository().findById(requestDto.getAddressId()).orElseThrow(
-                () -> new RuntimeException("Address not found")
-        );
+                () -> new RuntimeException("Address not found"));
 
         User user = userService.getRepository().findById(requestDto.getUserId()).orElseThrow(
-                () -> new RuntimeException("User not found")
-        );
+                () -> new RuntimeException("User not found"));
         Voucher voucher = voucherService.getRepository().findById(requestDto.getVoucherId()).orElse(null);
         orderResult.setUser(user);
         orderResult.setVoucher(voucher);
@@ -109,16 +113,14 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
                 order.getCancellationReason(),
                 order.getCreatedAt(),
                 order.getShippingFee(),
-                null
-        );
+                null);
     }
 
     @Override
     public void copyProperties(OrderRequestDto requestDto, Order entity) {
         if (requestDto.getAddressId() != null) {
             Address address = addressService.getRepository().findById(requestDto.getAddressId()).orElseThrow(
-                    () -> new RuntimeException("Address not found")
-            );
+                    () -> new RuntimeException("Address not found"));
             entity.setAddress(address);
         }
 
@@ -140,15 +142,13 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
 
         if (requestDto.getUserId() != null) {
             User user = userService.getRepository().findById(requestDto.getUserId()).orElseThrow(
-                    () -> new RuntimeException("User not found")
-            );
+                    () -> new RuntimeException("User not found"));
             entity.setUser(user);
         }
 
         if (requestDto.getVoucherId() != null) {
             Voucher voucher = voucherService.getRepository().findById(requestDto.getVoucherId()).orElseThrow(
-                    () -> new RuntimeException("Voucher not found")
-            );
+                    () -> new RuntimeException("Voucher not found"));
             entity.setVoucher(voucher);
         }
 
@@ -186,8 +186,7 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
                     "Đơn hàng mới đã được tạo",
                     "Đơn hàng của bạn đã được tạo thành công. Vui lòng kiểm tra thông tin đơn hàng trong tài khoản của bạn.",
                     order.getUser().getId(),
-                    "/orders/" + order.getId()
-            );
+                    "/orders/" + order.getId());
 
             return toResponseDto(order);
         } catch (Exception e) {
@@ -195,6 +194,7 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
         }
     }
 
+    @Override
     @Transactional
     public void updateOrderStatus(Long orderId, OrderStatus newStatus) {
         try {
@@ -202,47 +202,47 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
                     .orElseThrow(() -> new IllegalArgumentException("Order not found"));
 
             if (!OrderStatusTransitionManager.isValidTransition(order.getStatus(), newStatus)) {
-                throw new IllegalStateException("Invalid status transition from " + order.getStatus() + " to " + newStatus);
+                throw new IllegalStateException(
+                        "Invalid status transition from " + order.getStatus() + " to " + newStatus);
             }
 
             if (newStatus == OrderStatus.CANCELLED) {
                 order.setCancellationReason("Đơn hàng đã bị huỷ bởi hệ thống");
                 notificationService.sendNotificationToUser(
                         "Đơn hàng đã bị huỷ",
-                        "Đơn hàng #" + order.getId() + " của bạn đã bị huỷ. Vui lòng kiểm tra lại thông tin đơn hàng trong tài khoản của bạn.",
+                        "Đơn hàng #" + order.getId()
+                                + " của bạn đã bị huỷ. Vui lòng kiểm tra lại thông tin đơn hàng trong tài khoản của bạn.",
                         order.getUser().getId(),
-                        "/orders/" + order.getId()
-                );
+                        "/orders/" + order.getId());
 
             } else if (newStatus == OrderStatus.DELIVERED) {
                 notificationService.sendNotificationToUser(
                         "Đơn hàng đã được giao",
-                        "Đơn hàng #" + order.getId() + " của bạn đã được giao thành công. Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi.",
+                        "Đơn hàng #" + order.getId()
+                                + " của bạn đã được giao thành công. Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi.",
                         order.getUser().getId(),
-                        "/orders/" + order.getId()
-                );
+                        "/orders/" + order.getId());
             } else if (newStatus == OrderStatus.SHIPPING) {
                 notificationService.sendNotificationToUser(
                         "Đơn hàng đang được giao",
-                        "Đơn hàng #" + order.getId() + " của bạn đang được giao. Vui lòng kiểm tra thông tin đơn hàng trong tài khoản của bạn.",
+                        "Đơn hàng #" + order.getId()
+                                + " của bạn đang được giao. Vui lòng kiểm tra thông tin đơn hàng trong tài khoản của bạn.",
                         order.getUser().getId(),
-                        "/orders/" + order.getId()
-                );
+                        "/orders/" + order.getId());
             } else if (newStatus == OrderStatus.PROCESSING) {
                 notificationService.sendNotificationToUser(
                         "Đơn hàng đang được xử lý",
-                        "Đơn hàng #" + order.getId() + " của bạn đang được xử lý. Vui lòng kiểm tra thông tin đơn hàng trong tài khoản của bạn.",
+                        "Đơn hàng #" + order.getId()
+                                + " của bạn đang được xử lý. Vui lòng kiểm tra thông tin đơn hàng trong tài khoản của bạn.",
                         order.getUser().getId(),
-                        "/orders/" + order.getId()
-                );
-            }
-            else if (newStatus == OrderStatus.FAILED) {
+                        "/orders/" + order.getId());
+            } else if (newStatus == OrderStatus.FAILED) {
                 notificationService.sendNotificationToUser(
                         "Đơn hàng đã thất bại",
-                        "Đơn hàng #" + order.getId() + " của bạn đã thất bại. Vui lòng kiểm tra lại thông tin đơn hàng trong tài khoản của bạn.",
+                        "Đơn hàng #" + order.getId()
+                                + " của bạn đã thất bại. Vui lòng kiểm tra lại thông tin đơn hàng trong tài khoản của bạn.",
                         order.getUser().getId(),
-                        "/orders/" + order.getId()
-                );
+                        "/orders/" + order.getId());
             }
 
             order.setStatus(newStatus);
@@ -253,6 +253,8 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
         }
     }
 
+    @Override
+    @Cacheable(value = "orderStatuses", key = "#orderId")
     public List<OrderStatus> getAvailableStatuses(Long orderId) {
         Order order = this.getRepository().findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found"));
@@ -260,6 +262,7 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
     }
 
     @Override
+    @Cacheable(value = "userOrders", key = "#userId + '-' + #status + '-' + #pageable.pageNumber + '-' + #pageable.pageSize")
     public Page<OrderResponseDto> getOrderHistory(Long userId, OrderStatus status, Pageable pageable) {
         Page<Order> orders;
 
@@ -274,6 +277,8 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
     }
 
     @Override
+    @CachePut(value = "orders", key = "#orderId")
+    @CacheEvict(value = { "allOrders", "userOrders" }, allEntries = true)
     public OrderResponseDto cancelOrder(Long orderId, String cancellationReason) throws Exception {
         Order order = this.getRepository().findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found"));
@@ -288,20 +293,21 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
 
         // Sending notification for order cancellation
         String content = cancellationReason != null && !cancellationReason.isEmpty()
-                ? "Đơn hàng #" + order.getId() + " của bạn đã bị hủy với lý do: " + cancellationReason + ". Vui lòng kiểm tra lại thông tin đơn hàng trong tài khoản của bạn."
-                : "Đơn hàng #" + order.getId() + " của bạn đã bị hủy. Vui lòng kiểm tra lại thông tin đơn hàng trong tài khoản của bạn.";
-        notificationService.sendNotificationToUser
-                (
+                ? "Đơn hàng #" + order.getId() + " của bạn đã bị hủy với lý do: " + cancellationReason
+                        + ". Vui lòng kiểm tra lại thông tin đơn hàng trong tài khoản của bạn."
+                : "Đơn hàng #" + order.getId()
+                        + " của bạn đã bị hủy. Vui lòng kiểm tra lại thông tin đơn hàng trong tài khoản của bạn.";
+        notificationService.sendNotificationToUser(
                 "Đơn hàng đã bị hủy",
                 content,
                 order.getUser().getId(),
-                "/order/" + order.getId()
-        );
+                "/order/" + order.getId());
 
         return this.toResponseDto(order);
     }
 
     @Override
+    @Cacheable(value = "orderStats", key = "#status + '-' + #month")
     public Map<String, Double> getOrderStats(OrderStatus status, int month) {
         try {
             Map<String, Double> stats = ((OrderRepository) getRepository()).getOrderStats(status, month);
@@ -320,14 +326,69 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
     }
 
     @Override
+    @Cacheable(value = "userOrder", key = "#id + '-' + #userId")
     public OrderResponseDto findByIdAndUserId(Long id, Long userId) {
         Order order = ((OrderRepository) getRepository()).findByIdAndUserId(id, userId);
 
-        return order != null ? toResponseDto(order): null;
+        return order != null ? toResponseDto(order) : null;
     }
 
     @Override
-    public List<Order> findOrdersCreatedExactly24HoursAgo(OrderStatus status, LocalDateTime minTime, LocalDateTime maxTime) {
+    public List<Order> findOrdersCreatedExactly24HoursAgo(OrderStatus status, LocalDateTime minTime,
+            LocalDateTime maxTime) {
         return ((OrderRepository) getRepository()).findOrdersCreatedExactly24HoursAgo(status, minTime, maxTime);
+    }
+
+    @Override
+    @Cacheable(value = "orders", key = "#id")
+    public OrderResponseDto findById(Long id) {
+        return super.findById(id);
+    }
+
+    @Override
+    @Cacheable(value = "allOrders")
+    public List<OrderResponseDto> findAll() {
+        return super.findAll();
+    }
+
+    @Override
+    @Cacheable(value = "sortedOrders", key = "#sort.toString()")
+    public List<OrderResponseDto> findAll(Sort sort) {
+        return super.findAll(sort);
+    }
+
+    @Override
+    @Cacheable(value = "pagedOrders", key = "#pageable.pageNumber + '-' + #pageable.pageSize + '-' + #pageable.sort")
+    public Page<OrderResponseDto> findAll(Pageable pageable) {
+        return super.findAll(pageable);
+    }
+
+    @Override
+    @CachePut(value = "orders", key = "#result.id")
+    @CacheEvict(value = { "allOrders", "sortedOrders", "pagedOrders" }, allEntries = true)
+    public OrderResponseDto save(OrderRequestDto requestDto) {
+        return super.save(requestDto);
+    }
+
+    @Override
+    @Caching(put = { @CachePut(value = "orders", key = "#id") }, evict = {
+            @CacheEvict(value = { "allOrders", "sortedOrders", "pagedOrders" }, allEntries = true) })
+    public OrderResponseDto update(OrderRequestDto requestDto, Long id) {
+        return super.update(requestDto, id);
+    }
+
+    @Override
+    @Caching(evict = {
+            @CacheEvict(value = "orders", key = "#id"),
+            @CacheEvict(value = { "allOrders", "sortedOrders", "pagedOrders" }, allEntries = true)
+    })
+    public boolean deleteById(Long id) {
+        return super.deleteById(id);
+    }
+
+    @Override
+    @Cacheable(value = "ordersList", key = "#entities.hashCode()")
+    public List<OrderResponseDto> toResponseDto(List<AbstractEntity> entities) {
+        return super.toResponseDto(entities);
     }
 }

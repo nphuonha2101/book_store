@@ -102,6 +102,7 @@ public class OrderApiController {
             return ApiResponse.error("Có lỗi xảy ra", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @GetMapping("/{orderId}")
     public ResponseEntity<ApiResponse<OrderResponseDto>> getOrderById(@PathVariable("orderId") Long orderId) {
         try {
@@ -111,9 +112,11 @@ public class OrderApiController {
             }
             return ApiResponse.success(orderResponseDto, "Lấy thông tin đơn hàng thành công");
         } catch (NotFoundException e) {
+            log.error("Order not found: {}", e.getMessage());
             return ApiResponse.error("Đơn hàng không tồn tại", HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-          return ApiResponse.error("Có lỗi xảy ra khi lấy thông tin đơn hàng", HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error(e.getMessage());
+            return ApiResponse.error("Có lỗi xảy ra khi lấy thông tin đơn hàng", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
