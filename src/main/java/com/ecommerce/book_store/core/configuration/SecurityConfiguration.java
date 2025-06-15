@@ -55,8 +55,7 @@ public class SecurityConfiguration {
             @Qualifier("adminDetailsService") UserDetailsService adminDetailsService,
             JwtAuthenticationFilter jwtAuthenticationFilter,
             CustomOAuth2UserService customOAuth2UserService,
-            @Lazy CustomOidcUserService customOidcUserService
-    ) {
+            @Lazy CustomOidcUserService customOidcUserService) {
         this.userDetailsService = userDetailsService;
         this.adminDetailsService = adminDetailsService;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
@@ -71,19 +70,16 @@ public class SecurityConfiguration {
                 .securityMatchers(matcher -> matcher
                         .requestMatchers(antMatcher("/oauth2/**"))
                         .requestMatchers(antMatcher("/oidc/**"))
-                        .requestMatchers(antMatcher("/login/oauth2/**"))
-                )
+                        .requestMatchers(antMatcher("/login/oauth2/**")))
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService)
-                                .oidcUserService(customOidcUserService)
-                        )
+                                .oidcUserService(customOidcUserService))
                         .successHandler(oAuth2SuccessHandler(jwtUtils))
-                        .failureHandler(oAuth2FailureHandler())
-                );
+                        .failureHandler(oAuth2FailureHandler()));
         return http.build();
     }
 
@@ -97,8 +93,7 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").authenticated()
-                        .anyRequest().permitAll()
-                )
+                        .anyRequest().permitAll())
                 .httpBasic(Customizer.withDefaults())
                 .authenticationProvider(userAuthenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -116,8 +111,7 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().permitAll()
-                )
+                        .anyRequest().permitAll())
                 .formLogin(form -> form
                         .loginPage("/admin/login")
                         .loginProcessingUrl("/admin/login-process")
@@ -125,22 +119,23 @@ public class SecurityConfiguration {
                         .failureHandler((request, response, exception) -> {
                             response.sendRedirect("/admin/login?error=" + exception.getMessage());
                         })
-                        .permitAll()
-                )
+                        .permitAll())
                 .logout(logout -> logout
                         .logoutUrl("/admin/logout")
                         .logoutSuccessUrl("/admin/login")
-                        .permitAll()
-                );
+                        .permitAll());
 
         return http.build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        log.info("Configuring CORS for frontend URLs: http://localhost:5173, http://localhost:5174, https://book-store-react-beta.vercel.app, {}", CLIENT_URL);
+        log.info(
+                "Configuring CORS for frontend URLs: https://135.149.56.115.nip.io, http://localhost:5173, http://localhost:5174, https://book-store-react-beta.vercel.app, {}",
+                CLIENT_URL);
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174", "https://book-store-react-beta.vercel.app", CLIENT_URL)); // Frontend URLs
+        configuration.setAllowedOrigins(List.of("https://135.149.56.115.nip.io", "http://localhost:5173",
+                "http://localhost:5174", "https://book-store-react-beta.vercel.app", CLIENT_URL)); // Frontend URLs
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Phương thức API cho phép
         configuration.setAllowedHeaders(List.of("*")); // Chấp nhận tất cả headers
         configuration.setAllowCredentials(true); // Cho phép gửi credentials (JWT, session)
