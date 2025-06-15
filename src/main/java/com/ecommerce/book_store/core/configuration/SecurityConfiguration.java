@@ -6,6 +6,7 @@ import com.ecommerce.book_store.service.oauth.CustomOAuth2UserService;
 import com.ecommerce.book_store.service.oauth.CustomOidcUserService;
 import com.ecommerce.book_store.service.oauth.CustomUser;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -37,6 +38,7 @@ import java.util.List;
 
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
+@Slf4j
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
@@ -136,6 +138,7 @@ public class SecurityConfiguration {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+        log.info("Configuring CORS for frontend URLs: http://localhost:5173, http://localhost:5174, https://book-store-react-beta.vercel.app, {}", CLIENT_URL);
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174", "https://book-store-react-beta.vercel.app", CLIENT_URL)); // Frontend URLs
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Phương thức API cho phép
