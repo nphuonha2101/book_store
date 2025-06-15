@@ -326,7 +326,7 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
     }
 
     @Override
-    @Cacheable(value = "userOrder", key = "#id + '-' + #userId")
+    @Cacheable(value = "userOrder", key = "#id + '-' + #userId", unless = "#result == null")
     public OrderResponseDto findByIdAndUserId(Long id, Long userId) {
         Order order = ((OrderRepository) getRepository()).findByIdAndUserId(id, userId);
 
