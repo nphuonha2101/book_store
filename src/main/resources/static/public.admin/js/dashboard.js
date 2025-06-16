@@ -69,7 +69,7 @@ $(document).ready(function() {
     gradient.addColorStop(1, 'rgba(54, 162, 235, 0.2)');
 
     const statusText = statusLabels[status] || status;
-    const monthText = month === 0 ? 'tất cả các tháng' : monthNames[month-1];
+    const monthText = (month === undefined || month === 0) ? 'tất cả các tháng' : monthNames[month-1];
     const chartTitle = `Doanh thu (${statusText}) - ${monthText}`;
 
     revenueChart = new Chart(ctx, {

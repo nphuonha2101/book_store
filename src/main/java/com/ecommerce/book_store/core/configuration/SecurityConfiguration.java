@@ -130,15 +130,17 @@ public class SecurityConfiguration {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+        List<String> allowedOrigins = List.of(
+                "https://135.149.56.115.nip.io", "http://localhost:5173",
+                "http://localhost:5174", "https://book-store-react-beta.vercel.app", CLIENT_URL);
         log.info(
-                "Configuring CORS for frontend URLs: https://135.149.56.115.nip.io, http://localhost:5173, http://localhost:5174, https://book-store-react-beta.vercel.app, {}",
-                CLIENT_URL);
+                "Configuring CORS for frontend URLs: {}",
+                String.join(", ", allowedOrigins));
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("https://135.149.56.115.nip.io", "http://localhost:5173",
-                "http://localhost:5174", "https://book-store-react-beta.vercel.app", CLIENT_URL)); // Frontend URLs
+        configuration.setAllowedOrigins(allowedOrigins);
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Phương thức API cho phép
-        configuration.setAllowedHeaders(List.of("*")); // Chấp nhận tất cả headers
-        configuration.setAllowCredentials(true); // Cho phép gửi credentials (JWT, session)
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
