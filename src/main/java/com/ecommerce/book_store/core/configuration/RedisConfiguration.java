@@ -15,6 +15,8 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.session.config.annotation.web.server.EnableSpringWebSession;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 @EnableCaching
@@ -100,16 +102,51 @@ public class RedisConfiguration {
 
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
-        RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofSeconds(generateRandomTtl()))
-                .disableCachingNullValues();
+        Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
+
+        // Order cache configurations
+        cacheConfigurations.put("orders", RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofSeconds(30)));
+        cacheConfigurations.put("allOrders", RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofSeconds(60)));
+        cacheConfigurations.put("sortedOrders", RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofSeconds(60)));
+        cacheConfigurations.put("pagedOrders", RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofSeconds(60)));
+        cacheConfigurations.put("userOrder", RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofSeconds(30)));
+        cacheConfigurations.put("orderStats", RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(10)));
+        cacheConfigurations.put("ordersList", RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofSeconds(30)));
+
+        // Book cache configurations
+        cacheConfigurations.put("books", RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofSeconds(30)));
+        cacheConfigurations.put("allBooks", RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofSeconds(60)));
+        cacheConfigurations.put("booksByTitle", RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofSeconds(60)));
+        cacheConfigurations.put("booksByTitles", RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofSeconds(60)));
+        cacheConfigurations.put("booksByFilter", RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(2)));
+        cacheConfigurations.put("booksByKeyword", RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofSeconds(60)));
+        cacheConfigurations.put("sortedBooks", RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofSeconds(60)));
+        cacheConfigurations.put("pagedBooks", RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofSeconds(60)));
+        cacheConfigurations.put("booksList", RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofSeconds(30)));
 
         return RedisCacheManager.builder(connectionFactory)
-                .cacheDefaults(cacheConfiguration)
+                .withInitialCacheConfigurations(cacheConfigurations)
+                .cacheDefaults(RedisCacheConfiguration.defaultCacheConfig())
                 .build();
     }
 
     private Long generateRandomTtl() {
-        return 60L + (long) (Math.random() * 1200L);    // 1 minute to 20 minutes
+        return 60L + (long) (Math.random() * 540L);
     }
 }
