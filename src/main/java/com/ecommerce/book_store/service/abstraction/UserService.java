@@ -12,6 +12,7 @@ public interface UserService extends IService<UserRequestDto, UserResponseDto, U
     Optional<Long> findIdByEmail(String email);
     boolean existsByUserId(Long userId);
     boolean forgotPassword(String email);
+    boolean existsByEmail(String email);
 
 }
 

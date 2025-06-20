@@ -105,4 +105,14 @@ public class AuthApiController {
             return ApiResponse.error("Internal Server Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/api/v1/exist-email")
+    public ResponseEntity<ApiResponse<Boolean>> existEmail(@RequestParam String email) {
+        try {
+            boolean exists = userService.existsByEmail(email);
+            return ApiResponse.success(exists, "Check email existence successfully");
+        } catch (Exception e) {
+            return ApiResponse.error("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

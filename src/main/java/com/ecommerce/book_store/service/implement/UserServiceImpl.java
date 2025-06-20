@@ -135,4 +135,9 @@ public class UserServiceImpl extends IServiceImpl<UserRequestDto, UserResponseDt
         }
         return false;
     }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
 }
