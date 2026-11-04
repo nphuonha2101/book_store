@@ -1,0 +1,52 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:bookstore;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  session:
+    store-type: none
+  thymeleaf:
+    cache: false
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: test-client
+            client-secret: test-secret
+
+jwt:
+  secret:
+    key: dGVzdC1vbmx5LWJvb2stc3RvcmUtc2VjcmV0LWtleS0xMjM0NTY3ODkwMTIzNDU2Nzg5MA==
+  expiration:
+    time: 3600000
+
+react:
+  client:
+    url: http://localhost:3000
+
+app:
+  cors:
+    allowed-origins: http://localhost:3000
+
+firebase:
+  credentials:
+    url:
+  storage:
+    bucket:
+
+vosk:
+  model:
+    path: models/vosk-model-small-vn-0.4

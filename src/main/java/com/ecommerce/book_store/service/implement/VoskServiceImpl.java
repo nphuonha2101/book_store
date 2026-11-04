@@ -3,32 +3,56 @@ package com.ecommerce.book_store.service.implement;
 import com.ecommerce.book_store.service.abstraction.VoskService;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import jakarta.annotation.PreDestroy;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.vosk.Model;
 import org.vosk.Recognizer;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
+@Slf4j
 @Service
 public class VoskServiceImpl implements VoskService {
-    private static final String MODEL_PATH = "src/main/resources/models/vosk-model-small-vn-0.4";
+    @Value("${vosk.model.path:models/vosk-model-small-vn-0.4}")
+    private String modelPath;
+
+    private volatile Model model;
+
+    private Model getModel() throws IOException {
+        Model current = model;
+        if (current != null) return current;
+
+        synchronized (this) {
+            if (model == null) {
+                Path path = Path.of(modelPath);
+                if (!Files.isDirectory(path)) {
+                    throw new IllegalStateException(
+                            "Vosk model not found at '" + path.toAbsolutePath()
+                                    + "'. Set VOSK_MODEL_PATH to the extracted model directory.");
+                }
+                model = new Model(path.toString());
+                log.info("Loaded Vosk model from {}", path.toAbsolutePath());
+            }
+            return model;
+        }
+    }
 
     @Override
-    public String transcribeAudio(InputStream audioStream) {
+    public String transcribeAudio(java.io.InputStream audioStream) {
         BufferedInputStream bufferedStream = new BufferedInputStream(audioStream);
 
-        try (Model model = new Model(MODEL_PATH)) {
-            Recognizer recognizer = new Recognizer(model, 16000);
-
+        try (Recognizer recognizer = new Recognizer(getModel(), 16000)) {
             recognizer.setWords(true);
             recognizer.setPartialWords(true);
 
             if (isWavFormat(bufferedStream)) {
                 bufferedStream.skip(44);
-                System.out.println("Phát hiện file WAV, đã bỏ qua header");
             }
 
             byte[] buffer = new byte[4096];
@@ -37,45 +61,28 @@ public class VoskServiceImpl implements VoskService {
 
             while ((bytesRead = bufferedStream.read(buffer)) != -1) {
                 if (recognizer.acceptWaveForm(buffer, bytesRead)) {
-                    String segmentResult = recognizer.getResult();
-                    System.out.println("Segment result: " + segmentResult);
-
-                    try {
-                        JsonObject jsonResult = JsonParser.parseString(segmentResult).getAsJsonObject();
-                        if (jsonResult.has("text")) {
-                            String text = jsonResult.get("text").getAsString();
-                            if (!text.isEmpty()) {
-                                resultBuilder.append(text).append(" ");
-                            }
-                        }
-                    } catch (Exception e) {
-                        System.err.println("Lỗi xử lý JSON segment: " + e.getMessage());
-                    }
+                    appendText(resultBuilder, recognizer.getResult());
                 }
             }
+            appendText(resultBuilder, recognizer.getFinalResult());
 
-            String finalResult = recognizer.getFinalResult();
-            System.out.println("Final result JSON: " + finalResult);
-
-            try {
-                JsonObject jsonResult = JsonParser.parseString(finalResult).getAsJsonObject();
-                if (jsonResult.has("text")) {
-                    String text = jsonResult.get("text").getAsString();
-                    if (!text.isEmpty()) {
-                        resultBuilder.append(text);
-                    }
-                }
-            } catch (Exception e) {
-                System.err.println("Lỗi xử lý JSON cuối cùng: " + e.getMessage());
-            }
-
-            String result = resultBuilder.toString().trim();
-            System.out.println("Kết quả cuối cùng: " + result);
-            return result;
+            return resultBuilder.toString().trim();
         } catch (IOException e) {
-            System.err.println("Lỗi xử lý file âm thanh: " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException("Lỗi xử lý file âm thanh", e);
+            throw new IllegalStateException("Unable to transcribe audio", e);
+        }
+    }
+
+    private void appendText(StringBuilder builder, String json) {
+        try {
+            JsonObject result = JsonParser.parseString(json).getAsJsonObject();
+            if (result.has("text")) {
+                String text = result.get("text").getAsString();
+                if (!text.isBlank()) {
+                    builder.append(text).append(' ');
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Could not parse Vosk result: {}", e.getMessage());
         }
     }
 
@@ -84,14 +91,18 @@ public class VoskServiceImpl implements VoskService {
         byte[] header = new byte[4];
         int bytesRead = bis.read(header);
         bis.reset();
-
-        if (bytesRead != 4) {
-            return false;
-        }
-
-        String headerStr = new String(header, StandardCharsets.UTF_8);
-        return "RIFF".equals(headerStr);
+        if (bytesRead != 4) return false;
+        return "RIFF".equals(new String(header, StandardCharsets.UTF_8));
     }
 
-
+    @PreDestroy
+    void close() {
+        if (model != null) {
+            try {
+                model.close();
+            } catch (Exception e) {
+                log.warn("Failed to close Vosk model", e);
+            }
+        }
+    }
 }

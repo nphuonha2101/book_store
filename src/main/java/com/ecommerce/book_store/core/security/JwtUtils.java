@@ -3,35 +3,52 @@ package com.ecommerce.book_store.core.security;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
-import java.util.Map;
 
 @Component
 public class JwtUtils {
     /**
-     * To generate a JWT token, we need a secret key and an expiration time.
-     * Go to git bash and run the following command: <code>openssl rand -hex 32</code> then copy the output and paste it in the application.properties file.
+     * Generate a production key with: <code>openssl rand -base64 48</code>.
      */
-    @Value("${jwt.secret.key}")
-    private String SECRET_KEY;
-    @Value("${jwt.expiration.time}")
-    private long EXPIRATION_TIME;
+    @Value("${jwt.secret.key:}")
+    private String secretKey;
+
+    @Value("${jwt.expiration.time:86400000}")
+    private long expirationTime;
+
+    @PostConstruct
+    public void validateConfiguration() {
+        if (secretKey == null || secretKey.isBlank()) {
+            throw new IllegalStateException(
+                    "jwt.secret.key is not configured. Set the JWT_SECRET environment variable.");
+        }
+        byte[] keyBytes;
+        try {
+            keyBytes = Decoders.BASE64.decode(secretKey);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalStateException("jwt.secret.key must be a Base64-encoded value", e);
+        }
+        if (keyBytes.length < 32) {
+            throw new IllegalStateException(
+                    "jwt.secret.key must contain at least 256 bits (32 bytes) for HS256");
+        }
+    }
 
     private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
-        return Keys.hmacShaKeyFor(keyBytes);
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
     }
 
     public String generateToken(String email) {
-
+        Date now = new Date();
         return Jwts.builder()
                 .subject(email)
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .issuedAt(now)
+                .expiration(new Date(now.getTime() + expirationTime))
                 .signWith(getSigningKey())
                 .compact();
     }

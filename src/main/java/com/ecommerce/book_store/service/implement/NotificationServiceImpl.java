@@ -7,9 +7,9 @@ import com.ecommerce.book_store.persistent.entity.Notification;
 import com.ecommerce.book_store.persistent.repository.abstraction.NotificationRepository;
 import com.ecommerce.book_store.service.abstraction.FcmTokenService;
 import com.ecommerce.book_store.service.abstraction.NotificationService;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.messaging.BatchResponse;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.MulticastMessage;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -35,55 +35,44 @@ public class NotificationServiceImpl extends IServiceImpl<NotificationRequestDto
     @Override
     @Async
     public void sendNotificationToUser(String title, String content, Long userId, String actionUrl) {
+        // Persist the in-app notification first: it must not depend on FCM.
+        Notification notificationEntity = new Notification(
+                title,
+                content,
+                false,
+                userId,
+                actionUrl
+        );
+        getRepository().save(notificationEntity);
+
+        if (FirebaseApp.getApps().isEmpty()) {
+            log.debug("Firebase is not configured; skipped push notification for user {}", userId);
+            return;
+        }
+
         try {
-            log.info("Sending notification to user with id: {}", userId);
-            // Lấy danh sách FCM tokens của người dùng
             List<String> fcmTokens = fcmTokenService.findTokenStringByUserId(userId);
-            log.info("Found {} tokens for user with id: {}", fcmTokens.size(), userId);
+            if (fcmTokens.isEmpty()) return;
 
             com.google.firebase.messaging.Notification notification = com.google.firebase.messaging.Notification.builder()
                     .setTitle(title)
                     .setBody(content)
                     .build();
 
-            // Tạo message với danh sách tokens
             MulticastMessage message = MulticastMessage.builder()
                     .addAllTokens(fcmTokens)
                     .setNotification(notification)
                     .putData("actionUrl", actionUrl)
                     .build();
 
-            // Gửi message và nhận phản hồi
             BatchResponse response = FirebaseMessaging.getInstance().sendEachForMulticast(message);
-
-            // Kiểm tra kết quả gửi
-            int successCount = response.getSuccessCount();
-            int failureCount = response.getFailureCount();
-
-            // Ghi log kết quả gửi
-            if (successCount > 0) {
-                log.info("Successfully sent {} messages", successCount);
+            if (response.getFailureCount() > 0) {
+                log.warn("Failed to deliver {} of {} push notifications",
+                        response.getFailureCount(), response.getSuccessCount() + response.getFailureCount());
             }
-            if (failureCount > 0) {
-                log.error("Failed to send {} messages", failureCount);
-                response.getResponses().forEach(resp -> {
-                    if (!resp.isSuccessful()) {
-                        log.error("Error sending message: {}", resp.getException().getMessage());
-                    }
-                });
-            }
-
-            // Lưu thông báo vào cơ sở dữ liệu
-            Notification notificationEntity = new Notification(
-                    title,
-                    content,
-                    false,
-                    userId,
-                    actionUrl
-            );
-            getRepository().save(notificationEntity);
-        } catch (FirebaseMessagingException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            // Push delivery is best-effort; the in-app notification is already saved.
+            log.warn("Push notification failed for user {}: {}", userId, e.getMessage());
         }
     }
 

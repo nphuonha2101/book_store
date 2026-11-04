@@ -289,7 +289,7 @@ public class OrderServiceImpl extends IServiceImpl<OrderRequestDto, OrderRespons
                 "Đơn hàng đã bị hủy",
                 content,
                 order.getUser().getId(),
-                "/order/" + order.getId()
+                "/orders/" + order.getId()
         );
 
         return this.toResponseDto(order);

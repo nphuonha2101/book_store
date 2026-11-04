@@ -91,6 +91,13 @@ public class OrderApiController {
             @RequestParam String cancellationReason,
             @RequestHeader("Authorization") String token) {
         try {
+            Long userId = currentUserId(token);
+            OrderResponseDto existing = orderService.findById(orderId);
+            if (existing == null || existing.getUser() == null
+                    || !userId.equals(existing.getUser().getId())) {
+                return ApiResponse.error("Đơn hàng không tồn tại", HttpStatus.NOT_FOUND);
+            }
+
             OrderResponseDto order = orderService.cancelOrder(orderId, cancellationReason);
             return order != null ? ApiResponse.success(order, "Hủy đơn hàng thành công") : ApiResponse.error("Hủy đơn hàng thất bại", HttpStatus.NOT_FOUND);
         } catch (Exception e) {
@@ -98,29 +105,49 @@ public class OrderApiController {
             return ApiResponse.error("Có lỗi xảy ra", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @GetMapping("/{orderId}")
-    public ResponseEntity<ApiResponse<OrderResponseDto>> getOrderById(@PathVariable("orderId") Long orderId) {
+    public ResponseEntity<ApiResponse<OrderResponseDto>> getOrderById(
+            @PathVariable("orderId") Long orderId,
+            @RequestHeader("Authorization") String token) {
         try {
             OrderResponseDto orderResponseDto = orderService.findById(orderId);
-            if (orderResponseDto == null) {
+            if (orderResponseDto == null || orderResponseDto.getUser() == null
+                    || !currentUserId(token).equals(orderResponseDto.getUser().getId())) {
                 return ApiResponse.error("Đơn hàng không tồn tại", HttpStatus.NOT_FOUND);
             }
             return ApiResponse.success(orderResponseDto, "Lấy thông tin đơn hàng thành công");
         } catch (NotFoundException e) {
             return ApiResponse.error("Đơn hàng không tồn tại", HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-          return ApiResponse.error("Có lỗi xảy ra khi lấy thông tin đơn hàng", HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error("Error loading order {}", orderId, e);
+            return ApiResponse.error("Có lỗi xảy ra khi lấy thông tin đơn hàng", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping("/make-failed/{orderId}")
-    public ResponseEntity<ApiResponse<Object>> makeFailed(@PathVariable Long orderId) {
+    public ResponseEntity<ApiResponse<Object>> makeFailed(
+            @PathVariable Long orderId,
+            @RequestHeader("Authorization") String token) {
         try {
+            Long userId = currentUserId(token);
+            OrderResponseDto existing = orderService.findById(orderId);
+            if (existing == null || existing.getUser() == null
+                    || !userId.equals(existing.getUser().getId())) {
+                return ApiResponse.error("Đơn hàng không tồn tại", HttpStatus.NOT_FOUND);
+            }
             orderService.updateOrderStatus(orderId, OrderStatus.FAILED);
             return ApiResponse.success(null, "Cập nhật trạng thái đơn hàng thành công");
         } catch (Exception e) {
             log.error(e.getMessage());
             return ApiResponse.error("Có lỗi xảy ra", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private Long currentUserId(String authorizationHeader) {
+        String jwt = authorizationHeader.substring(7);
+        String email = jwtUtils.extractUserEmail(jwt);
+        return userService.findIdByEmail(email)
+                .orElseThrow(() -> new IllegalStateException("User not found"));
     }
 }

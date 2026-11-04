@@ -1,0 +1,28 @@
+spring:
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  thymeleaf:
+    cache: false
+
+logging:
+  level:
+    com.ecommerce.book_store: DEBUG
+
+# Development-only signing key. Never use this value outside local development.
+jwt:
+  secret:
+    key: ${JWT_SECRET:ZGV2LW9ubHktYm9vay1zdG9yZS1zZWNyZXQta2V5LWNoYW5nZS1tZS0xMjM0NTY3ODkw}
+
+react:
+  client:
+    url: ${FRONTEND_URL:http://localhost:3000}
+
+vosk:
+  model:
+    path: ${VOSK_MODEL_PATH:src/main/resources/models/vosk-model-small-vn-0.4}
+
+session:
+  cookie:
+    secure: false

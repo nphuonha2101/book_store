@@ -19,6 +19,10 @@ public class FirebaseStorageService {
     private String storageBucket;
 
     public String uploadFile(MultipartFile file, String folder) {
+        if (com.google.firebase.FirebaseApp.getApps().isEmpty()) {
+            throw new IllegalStateException(
+                    "Firebase Storage is not configured; set FIREBASE_CREDENTIALS_PATH and FIREBASE_STORAGE_BUCKET.");
+        }
         try {
             String fileName = generateFileName(Objects.requireNonNull(file.getOriginalFilename()));
             String path = folder + "/" + fileName;
@@ -41,6 +45,10 @@ public class FirebaseStorageService {
     }
 
     public void deleteFile(String fileUrl) {
+        if (com.google.firebase.FirebaseApp.getApps().isEmpty()) {
+            log.warn("Firebase Storage is not configured; ignoring delete for {}", fileUrl);
+            return;
+        }
         try {
             String path = new URL(fileUrl).getPath().substring(1);
             String[] parts = path.split("/", 2);

@@ -13,36 +13,34 @@ import vn.payos.type.PaymentData;
 @Service
 @Qualifier("payOSPaymentService")
 public class PayOSPaymentServiceImpl implements PaymentService {
-    @Value("${payment.payos.client-id}")
-    private String CLIENT_ID;
-    @Value("${payment.payos.checksum-key}")
-    private String CHECKSUM;
-    @Value("${payment.payos.api-key}")
-    private String API_KEY;
-    @Value("${react.client.url}")
-    private String REACT_CLIENT_URL;
+    private final PayOS payOS;
+    private final String returnUrl;
+    private final String cancelUrl;
+
+    public PayOSPaymentServiceImpl(
+            PayOS payOS,
+            @Value("${react.client.url}") String clientUrl) {
+        this.payOS = payOS;
+        this.returnUrl = clientUrl + "/order-success/";
+        this.cancelUrl = clientUrl + "/order-failed/";
+    }
 
     @Override
     public String payment(Long orderId, Integer amount) {
         try {
-            final PayOS payOS = new PayOS(CLIENT_ID, API_KEY, CHECKSUM);
-
-            PaymentData paymentData = PaymentData
-                    .builder()
+            PaymentData paymentData = PaymentData.builder()
                     .orderCode(orderId)
                     .amount(amount)
                     .description("NPBookStore #" + orderId)
-                    .returnUrl(REACT_CLIENT_URL + "/order-success/" + orderId)
-                    .cancelUrl(REACT_CLIENT_URL + "/order-failed/" + orderId)
+                    .returnUrl(returnUrl + orderId)
+                    .cancelUrl(cancelUrl + orderId)
                     .build();
 
             CheckoutResponseData checkoutResponseData = payOS.createPaymentLink(paymentData);
-
             return checkoutResponseData.getCheckoutUrl();
         } catch (Exception e) {
-            log.error("Error while creating payment link: ", e);
+            log.error("Error while creating payment link for order {}", orderId, e);
             return null;
         }
     }
 }
-
