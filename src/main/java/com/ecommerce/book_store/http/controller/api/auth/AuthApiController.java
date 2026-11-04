@@ -3,10 +3,12 @@ package com.ecommerce.book_store.http.controller.api.auth;
 import com.ecommerce.book_store.core.security.JwtUtils;
 import com.ecommerce.book_store.http.ApiResponse;
 import com.ecommerce.book_store.http.dto.request.implement.AuthRequest;
+import com.ecommerce.book_store.http.dto.request.implement.ForgotPasswordRequest;
 import com.ecommerce.book_store.http.dto.request.implement.UserRequestDto;
 import com.ecommerce.book_store.http.dto.response.implement.UserResponseDto;
 import com.ecommerce.book_store.persistent.entity.User;
 import com.ecommerce.book_store.service.abstraction.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,7 +32,7 @@ public class AuthApiController {
     }
 
     @PostMapping("/api/v1/login")
-    public ResponseEntity<ApiResponse<String>> login(@RequestBody AuthRequest request) {
+    public ResponseEntity<ApiResponse<String>> login(@Valid @RequestBody AuthRequest request) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
@@ -51,7 +53,7 @@ public class AuthApiController {
 
     @PostMapping("/api/v1/register")
     public ResponseEntity<ApiResponse<UserResponseDto>> registerUser(
-            @RequestBody UserRequestDto userRequestDto) {
+            @Valid @RequestBody UserRequestDto userRequestDto) {
         try {
             UserResponseDto user = userService.registerUser(userRequestDto);
             return user != null ? ApiResponse.success(user, "Register successfully") :
@@ -95,7 +97,7 @@ public class AuthApiController {
         }
     }
     @PostMapping("/api/v1/forgot-password")
-    public ResponseEntity<ApiResponse<String>> forgotPassword(@RequestBody AuthRequest request) {
+    public ResponseEntity<ApiResponse<String>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         try {
             boolean forgotPasswordSuccess = userService.forgotPassword(request.getEmail());
 

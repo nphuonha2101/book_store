@@ -37,6 +37,15 @@ class ApiSecurityTest {
     }
 
     @Test
+    void invalidLoginPayloadIsRejected() throws Exception {
+        mockMvc.perform(post("/api/v1/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"not-an-email\",\"password\":\"\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false));
+    }
+
+    @Test
     void invalidPayOsSignatureIsRejected() throws Exception {
         String payload = """
                 {
