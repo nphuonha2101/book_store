@@ -14,7 +14,9 @@ spring:
       connection-timeout: 30000
       idle-timeout: 600000
   jpa:
-    open-in-view: false
+    # Legacy services map lazy relations to DTOs outside repository calls.
+    # Keep OSIV enabled until those mappings are moved into transactions.
+    open-in-view: true
     show-sql: ${JPA_SHOW_SQL:false}
     hibernate:
       ddl-auto: ${JPA_DDL_AUTO:update}
@@ -127,6 +129,14 @@ react:
 app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
+  seed:
+    enabled: ${APP_SEED_ENABLED:false}
+    admin:
+      email: ${SEED_ADMIN_EMAIL:admin@npbookstore.local}
+      password: ${SEED_ADMIN_PASSWORD:Admin@123456}
+    user:
+      email: ${SEED_USER_EMAIL:demo@npbookstore.local}
+      password: ${SEED_USER_PASSWORD:Demo@123456}
 
 firebase:
   credentials:

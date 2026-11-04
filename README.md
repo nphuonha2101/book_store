@@ -33,6 +33,22 @@ MySQL and Redis are provisioned by Compose with health checks and persistent
 volumes. `JPA_DDL_AUTO=update` is the default for first-run convenience; switch
 to `validate` once schema migrations are managed externally.
 
+### Demo data (seed)
+
+`APP_SEED_ENABLED=true` loads an idempotent demo catalogue on an empty database:
+6 categories, 15 books with galleries, 3 sliders, 3 ribbons, 3 vouchers, demo
+customers (addresses, cart, wishlist, reviews) and an admin account.
+
+| Role | Email | Password |
+| --- | --- | --- |
+| Customer | `demo@npbookstore.local` | `Demo@123456` |
+| Customer | `reviewer@npbookstore.local` | `Review@123456` |
+| Admin | `admin@npbookstore.local` | `Admin@123456` |
+
+The seed runs by default in the `dev` profile and in Compose. Set
+`APP_SEED_ENABLED=false` (and override `SEED_*` values) for real production
+deployments.
+
 ## Local development
 
 Prerequisites: Java 21, MySQL 8, Redis 7.
@@ -69,6 +85,9 @@ Configuration is environment-first (`application.yml`). Important variables:
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | `not-configured` | Google OAuth2 login |
 | `PAYOS_CLIENT_ID` / `PAYOS_API_KEY` / `PAYOS_CHECKSUM_KEY` | empty | PayOS payments |
 | `VOSK_MODEL_PATH` | `models/vosk-model-small-vn-0.4` | Filesystem path to the Vosk model |
+| `APP_SEED_ENABLED` | `false` (`true` in dev/Compose) | Load the demo catalogue/accounts on an empty database |
+| `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` | `admin@npbookstore.local` / `Admin@123456` | Demo admin credentials |
+| `SEED_USER_EMAIL` / `SEED_USER_PASSWORD` | `demo@npbookstore.local` / `Demo@123456` | Demo customer credentials |
 
 Production profile (`SPRING_PROFILES_ACTIVE=prod`): `ddl-auto=validate`,
 Thymeleaf cache on, secure session cookie, no SQL logging.

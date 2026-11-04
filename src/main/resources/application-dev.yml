@@ -10,6 +10,10 @@ logging:
   level:
     com.ecommerce.book_store: DEBUG
 
+app:
+  seed:
+    enabled: ${APP_SEED_ENABLED:true}
+
 # Development-only signing key. Never use this value outside local development.
 jwt:
   secret:
